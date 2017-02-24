@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="integration-bdio.NET">
+      <HintPath>..\..\integration-bdio.NET\integration-bdio.NET\bin\Debug\integration-bdio.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -151,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildBOMTask.cs" />
+    <Compile Include="Package.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

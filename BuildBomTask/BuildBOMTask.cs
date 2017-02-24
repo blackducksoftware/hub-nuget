@@ -13,6 +13,12 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using com.blackducksoftware.integration.hub.bdio.simple;
+using System.Text;
+using NuGet.ProjectManagement;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using System.Reflection;
 
 namespace com.blackducksoftware.integration.hub.nuget
 {
@@ -74,33 +80,79 @@ namespace com.blackducksoftware.integration.hub.nuget
 
         public override bool Execute()
         {
-            string projectPath = "C:/Users/Black_Duck/Documents/Visual Studio 2015/Projects/hub-nuget/";
+            string projectPath = "C:/Users/Black_Duck/Documents/Visual Studio 2015/Projects/hub-nuget/BuildBomTask";
 
             // Load the packages.config file into a list of Packages
-            FileStream configFileStream = new FileStream($"{projectPath}/packages.config", FileMode.Open);
-            XmlReader reader = XmlReader.Create(configFileStream);
-            XmlSerializer serializer = new XmlSerializer(typeof(List<Package>));
-            List<Package> referencedPackages = (List<Package>) serializer.Deserialize(reader);
-            configFileStream.Close();
+            //         FileStream configFileStream = new FileStream($"{projectPath}/packages.config", FileMode.Open);
+            //       XmlReader reader = XmlReader.Create(configFileStream);
+            //     XmlSerializer serializer = new XmlSerializer(typeof(List<Package>));
+            //   List<Package> packages = (List<Package>) serializer.Deserialize(reader);
+            // configFileStream.Close();
+
+            NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile($"{projectPath}/packages.config");
 
             // Setup NuGet API
             // Snippets taken from https://daveaglick.com/posts/exploring-the-nuget-v3-libraries-part-2 with modifications
             List<Lazy<INuGetResourceProvider>> providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
             providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
-            PackageSource packageSource = new PackageSource(projectPath);
+            PackageSource packageSource = new PackageSource($"{projectPath}/../packages");
             SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
 
             // TODO: Go through all the packages in the referencesPackages list and start figuring out dependencies
-            List<IPackageSearchMetadata> searchMetadata = new List<IPackageSearchMetadata>(packageMetadataResource.GetMetadataAsync("NuGet.Client", true, true, new Logger(), CancellationToken.None).Result);
+            BuildBOM(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
 
-
-            string searchMetadataJson = searchMetadata.ToJson();
-            Console.WriteLine(JToken.Parse(searchMetadataJson));
+            //string searchMetadataJson = searchMetadata.ToJson();
+            //Console.WriteLine(JToken.Parse(searchMetadataJson));
 
             return true;
         }
+
+        public void BuildBOM(List<NuGet.PackageReference> packages, PackageMetadataResource metadataResource)
+        {
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+            BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
+
+            foreach (NuGet.PackageReference packageRef in packages)
+            {
+                PackageDependency package = new PackageDependency(packageRef.Id);
+                WriteDependencies(bdioNodeFactory, package, metadataResource);
+            }
+
+
+            StringBuilder stringBuilder = new StringBuilder();
+            TextWriter textWriter = new StringWriter(stringBuilder);
+            BdioWriter writer = new BdioWriter(textWriter);
+
+            writer.Dispose();
+            //Console.WriteLine(stringBuilder.ToJToken());
+        }
+
+        public void WriteDependencies(BdioNodeFactory factory, PackageDependency packageDependency, PackageMetadataResource metadataResource)
+        {
+            Console.WriteLine("Direct dependencies of " + packageDependency.Id);
+            // Gets all versions of package in cache
+            List<IPackageSearchMetadata> searchMetadata = new List<IPackageSearchMetadata>(metadataResource.GetMetadataAsync(packageDependency.Id, true, true, new Logger(), CancellationToken.None).Result);
+            foreach (IPackageSearchMetadata metadata in searchMetadata)
+            {
+                // Gets dependencyGroup in each version
+                foreach (PackageDependencyGroup dependencySet in metadata.DependencySets)
+                {
+                    foreach (PackageDependency dependency in dependencySet.Packages)
+                    {
+                        // Access to the dependecy here
+                        
+                        FileVersionInfo file = FileVersionInfo.GetVersionInfo(@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6 Tools\WSatUI.dll");
+                        Console.WriteLine("\t{1}\t\t{0}", dependency.Id, file.FileVersion);
+                        
+                    }
+                }
+            }
+            Console.WriteLine("--------------------------------------------");
+        }
+
+
     }
 
     public class Logger : NuGet.Common.ILogger
