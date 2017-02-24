@@ -142,10 +142,11 @@ namespace com.blackducksoftware.integration.hub.nuget
                     foreach (PackageDependency dependency in dependencySet.Packages)
                     {
                         // Access to the dependecy here
-                        
-                        FileVersionInfo file = FileVersionInfo.GetVersionInfo(@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6 Tools\WSatUI.dll");
-                        Console.WriteLine("\t{1}\t\t{0}", dependency.Id, file.FileVersion);
-                        
+
+                        //FileVersionInfo file = FileVersionInfo.GetVersionInfo(@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6 Tools\WSatUI.dll");
+                        //Console.WriteLine(file.FileVersion);
+                        Console.WriteLine("\t{1}\t\t{0}", dependency.Id, dependency.VersionRange);
+
                     }
                 }
             }
