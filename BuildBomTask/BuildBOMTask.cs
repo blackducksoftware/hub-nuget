@@ -185,7 +185,6 @@ namespace com.blackducksoftware.integration.hub.nuget
         public List<PackageDependency> GetPackageDependencies(NuGet.PackageReference packageDependency, PackageMetadataResource metadataResource)
         {
             List<PackageDependency> dependencies = new List<PackageDependency>();
-            //Console.WriteLine($"Direct dependencies of {packageDependency.Id}/{packageDependency.Version}");
 
             //Gets all versions of package in package repository
             List<IPackageSearchMetadata> matchingPackages = new List<IPackageSearchMetadata>(metadataResource.GetMetadataAsync(packageDependency.Id, true, true, new Logger(), CancellationToken.None).Result);
@@ -201,15 +200,13 @@ namespace com.blackducksoftware.integration.hub.nuget
                         if (FrameworksMatch(dependencySet, packageDependency))
                         {
                             dependencies.AddRange(dependencySet.Packages);
-                            //Console.WriteLine(dependencySet.Packages.ToJToken());
                         }
-                        break; // Search no more
+                        break;
 
                     }
-                    break; // Search no more
+                    break;
                 }
             }
-            //Console.WriteLine("--------------------------------------------");
             return dependencies;
         }
 
