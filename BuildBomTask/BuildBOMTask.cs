@@ -99,16 +99,20 @@ namespace com.blackducksoftware.integration.hub.nuget
             SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
 
-            // TODO: Go through all the packages in the referencesPackages list and start figuring out dependencies
-            BuildBOM(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
+            // Create BDIO 
+            Bdio bdio = BuildBOM(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
+
+            // Write BDIO
+            WriteBdio(bdio);
 
             return true;
         }
 
-        public void BuildBOM(List<NuGet.PackageReference> packages, PackageMetadataResource metadataResource)
+        public Bdio BuildBOM(List<NuGet.PackageReference> packages, PackageMetadataResource metadataResource)
         {
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
+            Bdio bdio = new Bdio();
 
             // Create bdio bill of materials node
             BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubProjectName);
@@ -124,7 +128,7 @@ namespace com.blackducksoftware.integration.hub.nuget
             {
                 // Create component node
                 string componentName = packageRef.Id;
-                string componentVersion = packageRef.Version.ToString(); // Note: Could be ToSemanticString()
+                string componentVersion = packageRef.Version.ToString();
                 string componentBdioId = bdioPropertyHelper.CreateBdioId(componentName, componentVersion);
                 BdioExternalIdentifier componentExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(componentName, componentVersion);
                 BdioComponent component = bdioNodeFactory.CreateComponent(componentName, componentVersion, componentBdioId, componentExternalIdentifier);
@@ -147,13 +151,22 @@ namespace com.blackducksoftware.integration.hub.nuget
                 bdioComponents.Add(component);
             }
 
+            bdio.BillOfMaterials = bdioBillOfMaterials;
+            bdio.Project = bdioProject;
+            bdio.Components = bdioComponents;
+
+            return bdio;
+        }
+
+        public void WriteBdio(Bdio bdio)
+        {
             // Note: Change from writing to string to writing to file
             StringBuilder stringBuilder = new StringBuilder();
             TextWriter textWriter = new StringWriter(stringBuilder);
             BdioWriter writer = new BdioWriter(textWriter);
-            writer.WriteBdioNode(bdioBillOfMaterials);
-            writer.WriteBdioNode(bdioProject);
-            writer.WriteBdioNodes(bdioComponents);
+            writer.WriteBdioNode(bdio.BillOfMaterials);
+            writer.WriteBdioNode(bdio.Project);
+            writer.WriteBdioNodes(bdio.Components);
 
             writer.Dispose();
             Console.WriteLine(stringBuilder.ToString());
@@ -164,7 +177,7 @@ namespace com.blackducksoftware.integration.hub.nuget
             string version = null;
             foreach (NuGet.PackageReference packageRef in packages)
             {
-                if(packageRef.Id == packageDependency.Id)
+                if (packageRef.Id == packageDependency.Id)
                 {
                     version = packageRef.Version.ToString();
                     break;
