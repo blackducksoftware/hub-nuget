@@ -9,17 +9,10 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.v2;
 using NuGet.Configuration;
 using System.Diagnostics;
-using Newtonsoft.Json.Linq;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 using com.blackducksoftware.integration.hub.bdio.simple;
-using System.Text;
-using NuGet.ProjectManagement;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
-using System.Reflection;
-using NuGet.Frameworks;
 using com.blackducksoftware.integration.hub.bdio.simple.model;
 
 namespace com.blackducksoftware.integration.hub.nuget

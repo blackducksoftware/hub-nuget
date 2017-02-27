@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using System.Text;
 using System.IO;
-using System;
 
 namespace com.blackducksoftware.integration.hub.nuget
 {
