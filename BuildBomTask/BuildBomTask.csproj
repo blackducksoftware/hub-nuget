@@ -153,6 +153,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bdio.cs" />
     <Compile Include="BuildBOMTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

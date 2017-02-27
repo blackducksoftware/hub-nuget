@@ -84,6 +84,7 @@ namespace com.blackducksoftware.integration.hub.nuget
         public string PackagesConfigPath { get; set; }
         public string ProjectFilePath { get; set; }
         public string PackagesRepoPath { get; set; }
+        public TextWriter Writer { get; set; }
 
         public override bool Execute()
         {
@@ -103,7 +104,7 @@ namespace com.blackducksoftware.integration.hub.nuget
             Bdio bdio = BuildBOM(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
 
             // Write BDIO
-            WriteBdio(bdio);
+            WriteBdio(bdio, Writer);
 
             return true;
         }
@@ -158,18 +159,13 @@ namespace com.blackducksoftware.integration.hub.nuget
             return bdio;
         }
 
-        public void WriteBdio(Bdio bdio)
+        public void WriteBdio(Bdio bdio, TextWriter textWriter)
         {
-            // Note: Change from writing to string to writing to file
-            StringBuilder stringBuilder = new StringBuilder();
-            TextWriter textWriter = new StringWriter(stringBuilder);
             BdioWriter writer = new BdioWriter(textWriter);
             writer.WriteBdioNode(bdio.BillOfMaterials);
             writer.WriteBdioNode(bdio.Project);
             writer.WriteBdioNodes(bdio.Components);
-
             writer.Dispose();
-            Console.WriteLine(stringBuilder.ToString());
         }
 
         private string GetDependencyVersion(PackageDependency packageDependency, List<NuGet.PackageReference> packages)
