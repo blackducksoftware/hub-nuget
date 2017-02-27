@@ -14,8 +14,13 @@ namespace BuildBomTaskTest
         //[ExpectedException(typeof(NotImplementedException))]
         public void ExecuteTaskTest()
         {
-            Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
             BuildBOMTask task = new BuildBOMTask();
+            task.HubProjectName = "BuildBomTask";
+            task.HubVersionName = "0.0.1";
+            task.ProjectPath = "C:/Users/Black_Duck/Documents/Visual Studio 2015/Projects/hub-nuget/BuildBomTask";
+            task.PackagesConfigPath = $"{task.ProjectPath}/packages.config";
+            task.ProjectFilePath = $"{task.ProjectPath}/BuildBomTask.csproj";
+            task.PackagesRepoPath = $"{task.ProjectPath}/../packages";
             task.Execute();
         }
     }

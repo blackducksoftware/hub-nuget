@@ -19,6 +19,8 @@ using NuGet.ProjectManagement;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using System.Reflection;
+using NuGet.Frameworks;
+using com.blackducksoftware.integration.hub.bdio.simple.model;
 
 namespace com.blackducksoftware.integration.hub.nuget
 {
@@ -78,33 +80,27 @@ namespace com.blackducksoftware.integration.hub.nuget
         [DisplayName("hub.check.policies")]
         public bool CheckPolicies { get; set; } = false;
 
+        public string ProjectPath { get; set; }
+        public string PackagesConfigPath { get; set; }
+        public string ProjectFilePath { get; set; }
+        public string PackagesRepoPath { get; set; }
+
         public override bool Execute()
         {
-            string projectPath = "C:/Users/Black_Duck/Documents/Visual Studio 2015/Projects/hub-nuget/BuildBomTask";
-
             // Load the packages.config file into a list of Packages
-            //         FileStream configFileStream = new FileStream($"{projectPath}/packages.config", FileMode.Open);
-            //       XmlReader reader = XmlReader.Create(configFileStream);
-            //     XmlSerializer serializer = new XmlSerializer(typeof(List<Package>));
-            //   List<Package> packages = (List<Package>) serializer.Deserialize(reader);
-            // configFileStream.Close();
-
-            NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile($"{projectPath}/packages.config");
+            NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile(PackagesConfigPath);
 
             // Setup NuGet API
             // Snippets taken from https://daveaglick.com/posts/exploring-the-nuget-v3-libraries-part-2 with modifications
             List<Lazy<INuGetResourceProvider>> providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
             providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
-            PackageSource packageSource = new PackageSource($"{projectPath}/../packages");
+            PackageSource packageSource = new PackageSource(PackagesRepoPath);
             SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
 
             // TODO: Go through all the packages in the referencesPackages list and start figuring out dependencies
             BuildBOM(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
-
-            //string searchMetadataJson = searchMetadata.ToJson();
-            //Console.WriteLine(JToken.Parse(searchMetadataJson));
 
             return true;
         }
@@ -114,46 +110,106 @@ namespace com.blackducksoftware.integration.hub.nuget
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
 
+            // Create bdio bill of materials node
+            BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubProjectName);
+
+            // Create bdio project node
+            string projectBdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
+            BdioExternalIdentifier projectExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(HubProjectName, HubVersionName); // Note: Could be different. Look at config file
+            BdioProject bdioProject = bdioNodeFactory.CreateProject(HubProjectName, HubVersionName, projectBdioId, projectExternalIdentifier);
+
+            // Create relationships for every bdio node
+            List<BdioNode> bdioComponents = new List<BdioNode>();
             foreach (NuGet.PackageReference packageRef in packages)
             {
-                PackageDependency package = new PackageDependency(packageRef.Id);
-                WriteDependencies(bdioNodeFactory, package, metadataResource);
+                // Create component node
+                string componentName = packageRef.Id;
+                string componentVersion = packageRef.Version.ToString(); // Note: Could be ToSemanticString()
+                string componentBdioId = bdioPropertyHelper.CreateBdioId(componentName, componentVersion);
+                BdioExternalIdentifier componentExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(componentName, componentVersion);
+                BdioComponent component = bdioNodeFactory.CreateComponent(componentName, componentVersion, componentBdioId, componentExternalIdentifier);
+
+                // Add references
+                List<PackageDependency> packageDependencies = GetPackageDependencies(packageRef, metadataResource);
+                foreach (PackageDependency packageDependency in packageDependencies)
+                {
+                    // Create node from dependency info
+                    string dependencyName = packageDependency.Id;
+                    string dependencyVersion = GetDependencyVersion(packageDependency, packages);
+                    string dependencyBdioId = bdioPropertyHelper.CreateBdioId(dependencyName, dependencyVersion);
+                    BdioExternalIdentifier dependencyExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(dependencyName, dependencyVersion);
+                    BdioComponent dependency = bdioNodeFactory.CreateComponent(dependencyName, dependencyVersion, dependencyBdioId, dependencyExternalIdentifier);
+
+                    // Add relationship
+                    bdioPropertyHelper.AddRelationship(component, dependency);
+                }
+
+                bdioComponents.Add(component);
             }
 
-
+            // Note: Change from writing to string to writing to file
             StringBuilder stringBuilder = new StringBuilder();
             TextWriter textWriter = new StringWriter(stringBuilder);
             BdioWriter writer = new BdioWriter(textWriter);
+            writer.WriteBdioNode(bdioBillOfMaterials);
+            writer.WriteBdioNode(bdioProject);
+            writer.WriteBdioNodes(bdioComponents);
 
             writer.Dispose();
-            //Console.WriteLine(stringBuilder.ToJToken());
+            Console.WriteLine(stringBuilder.ToString());
         }
 
-        public void WriteDependencies(BdioNodeFactory factory, PackageDependency packageDependency, PackageMetadataResource metadataResource)
+        private string GetDependencyVersion(PackageDependency packageDependency, List<NuGet.PackageReference> packages)
         {
-            Console.WriteLine("Direct dependencies of " + packageDependency.Id);
-            // Gets all versions of package in cache
-            List<IPackageSearchMetadata> searchMetadata = new List<IPackageSearchMetadata>(metadataResource.GetMetadataAsync(packageDependency.Id, true, true, new Logger(), CancellationToken.None).Result);
-            foreach (IPackageSearchMetadata metadata in searchMetadata)
+            string version = null;
+            foreach (NuGet.PackageReference packageRef in packages)
             {
-                // Gets dependencyGroup in each version
-                foreach (PackageDependencyGroup dependencySet in metadata.DependencySets)
+                if(packageRef.Id == packageDependency.Id)
                 {
-                    foreach (PackageDependency dependency in dependencySet.Packages)
-                    {
-                        // Access to the dependecy here
-
-                        //FileVersionInfo file = FileVersionInfo.GetVersionInfo(@"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6 Tools\WSatUI.dll");
-                        //Console.WriteLine(file.FileVersion);
-                        Console.WriteLine("\t{1}\t\t{0}", dependency.Id, dependency.VersionRange);
-
-                    }
+                    version = packageRef.Version.ToString();
+                    break;
                 }
             }
-            Console.WriteLine("--------------------------------------------");
+            return version;
         }
 
+        public List<PackageDependency> GetPackageDependencies(NuGet.PackageReference packageDependency, PackageMetadataResource metadataResource)
+        {
+            List<PackageDependency> dependencies = new List<PackageDependency>();
+            //Console.WriteLine($"Direct dependencies of {packageDependency.Id}/{packageDependency.Version}");
 
+            //Gets all versions of package in package repository
+            List<IPackageSearchMetadata> matchingPackages = new List<IPackageSearchMetadata>(metadataResource.GetMetadataAsync(packageDependency.Id, true, true, new Logger(), CancellationToken.None).Result);
+            foreach (IPackageSearchMetadata matchingPackage in matchingPackages)
+            {
+                // Check if the matching package is the same as the version defined
+                if (matchingPackage.Identity.Version.ToString() == packageDependency.Version.ToString())
+                {
+                    // Gets every dependency set in the package
+                    foreach (PackageDependencyGroup dependencySet in matchingPackage.DependencySets)
+                    {
+                        // Grab the dependency set for the target framework. We only care about majors and minors in the version
+                        if (FrameworksMatch(dependencySet, packageDependency))
+                        {
+                            dependencies.AddRange(dependencySet.Packages);
+                            //Console.WriteLine(dependencySet.Packages.ToJToken());
+                        }
+                        break; // Search no more
+
+                    }
+                    break; // Search no more
+                }
+            }
+            //Console.WriteLine("--------------------------------------------");
+            return dependencies;
+        }
+
+        private bool FrameworksMatch(PackageDependencyGroup framework1, NuGet.PackageReference framework2)
+        {
+            bool majorMatch = framework1.TargetFramework.Version.Major == framework2.TargetFramework.Version.Major;
+            bool minorMatch = framework1.TargetFramework.Version.Minor == framework2.TargetFramework.Version.Minor;
+            return majorMatch && minorMatch;
+        }
     }
 
     public class Logger : NuGet.Common.ILogger
