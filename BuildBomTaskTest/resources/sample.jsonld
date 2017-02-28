@@ -29,13 +29,13 @@
     "relationship": []
   },
   {
-    "revision": "8.0.3",
-    "@id": "data:Newtonsoft.Json/8.0.3",
+    "revision": "9.0.1",
+    "@id": "data:Newtonsoft.Json/9.0.1",
     "@type": "Component",
     "name": "Newtonsoft.Json",
     "externalIdentifier": {
       "externalSystemTypeId": "nuget",
-      "externalId": "Newtonsoft.Json/8.0.3"
+      "externalId": "Newtonsoft.Json/9.0.1"
     },
     "relationship": []
   },
@@ -358,7 +358,7 @@
     },
     "relationship": [
       {
-        "related": "data:Newtonsoft.Json/8.0.3",
+        "related": "data:Newtonsoft.Json/9.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -430,7 +430,7 @@
     },
     "relationship": [
       {
-        "related": "data:Newtonsoft.Json/8.0.3",
+        "related": "data:Newtonsoft.Json/9.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -494,7 +494,7 @@
     },
     "relationship": [
       {
-        "related": "data:Newtonsoft.Json/8.0.3",
+        "related": "data:Newtonsoft.Json/9.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {

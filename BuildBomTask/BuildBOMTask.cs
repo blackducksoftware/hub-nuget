@@ -9,13 +9,13 @@ using NuGet.Protocol.Core.v2;
 using NuGet.Configuration;
 using System.Diagnostics;
 using System.IO;
-using com.blackducksoftware.integration.hub.bdio.simple;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
-using com.blackducksoftware.integration.hub.bdio.simple.model;
 using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {

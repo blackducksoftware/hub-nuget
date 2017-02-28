@@ -1,5 +1,5 @@
-﻿using com.blackducksoftware.integration.hub.bdio.simple;
-using com.blackducksoftware.integration.hub.bdio.simple.model;
+﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
