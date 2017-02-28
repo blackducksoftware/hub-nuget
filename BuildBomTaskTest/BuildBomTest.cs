@@ -22,12 +22,11 @@ namespace com.blackducksoftware.integration.hub.nuget
             task.HubUsername = "sysadmin";
             task.HubPassword = "blackduck";
 
-            //task.DeployHubBdio = true;
-            //task.Execute();
-            //task.Deploy(bdioContent);
-
             BdioContent bdioContent = task.BuildBOM();
             bdioContent.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
+
+            System.Threading.Tasks.Task deployTask = task.Deploy(bdioContent);
+            deployTask.Wait();
 
             VerifyJsonArraysEqual(Properties.Resources.sample, bdioContent.ToString()); 
         }

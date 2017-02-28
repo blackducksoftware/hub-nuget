@@ -16,7 +16,7 @@ namespace com.blackducksoftware.integration.hub.nuget
 
         }
 
-        public BlackDuckIntegrationException(HttpStatusCode statusCode, HttpContent content) : base($"Response returned with status-code:{statusCode} \ncontent:{content.ReadAsStringAsync()}")
+        public BlackDuckIntegrationException(HttpResponseMessage content) : base($"Response returned with: {content.ReasonPhrase}")
         {
        
         }

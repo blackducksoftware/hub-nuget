@@ -231,13 +231,12 @@ namespace com.blackducksoftware.integration.hub.nuget
             using (HttpClient client = await CreateClient())
             {
                 await LinkedDataAPI(client, bdioContent);
-
             }
         }
 
         public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
         {
-            HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/json-ld");
+            HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
             HttpResponseMessage response = await client.PostAsync($"{HubUrl}/api/bom-import", content);
             VerifySuccess(response);
         }
@@ -274,7 +273,7 @@ namespace com.blackducksoftware.integration.hub.nuget
         {
             if (!response.IsSuccessStatusCode)
             {
-                throw new BlackDuckIntegrationException(response.StatusCode, response.Content);
+                throw new BlackDuckIntegrationException(response);
             }
         }
 
