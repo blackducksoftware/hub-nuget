@@ -24,7 +24,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             bdioContent.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
 
             System.Threading.Tasks.Task deployTask = task.Deploy(bdioContent);
-            deployTask.Wait();
+            deployTask.GetAwaiter().GetResult();
 
             VerifyJsonArraysEqual(Properties.Resources.sample, bdioContent.ToString()); 
         }

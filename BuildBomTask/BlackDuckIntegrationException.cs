@@ -11,6 +11,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         }
 
+        public BlackDuckIntegrationException(string message) : base(message)
+        {
+        }
+
         public BlackDuckIntegrationException(HttpResponseMessage content) : base($"Response returned with: {content.ReasonPhrase}")
         {
        

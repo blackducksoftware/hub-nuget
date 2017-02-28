@@ -16,6 +16,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
+using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
+using Newtonsoft.Json.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -71,9 +73,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         [DisplayName("hub.deploy.bdio")]
         public bool DeployHubBdio { get; set; } = false;
         [DisplayName("hub.create.report")]
-        public bool CreateHubReport { get; set; } = false;
+        public bool HubCreateHubReport { get; set; } = false;
         [DisplayName("hub.check.policies")]
-        public bool CheckPolicies { get; set; } = false;
+        public bool HubCheckPolicies { get; set; } = false;
 
         public string ProjectPath { get; set; }
         public string PackagesConfigPath { get; set; }
@@ -88,7 +90,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             if (DeployHubBdio)
             {
                 Task deployTask = Deploy(bdioContent);
-                deployTask.Wait();          
+                deployTask.Wait();
             }
 
             return true;
@@ -229,7 +231,93 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             using (HttpClient client = await CreateClient())
             {
                 await LinkedDataAPI(client, bdioContent);
+                await Task.Delay(1000);
+                await WaitForScanComplete(client);
             }
+        }
+
+        public async Task WaitForScanComplete(HttpClient client)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            string codeLocationId = null;
+
+            while (stopwatch.Elapsed.Seconds < HubScanTimeout)
+            {
+                Console.WriteLine("Checking scan summary status");
+                PageCodeLocationView codeLocations = await CodeLocationsAPI(client);
+                if (codeLocations.TotalCount > 0)
+                {
+                    CodeLocationView codeLocation = codeLocations.Items[0];
+                    codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("No code locations found. Trying again...");
+                }
+            }
+
+            string currentStatus = "UNKOWN";
+            while (stopwatch.Elapsed.Seconds < HubScanTimeout)
+            {
+                PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
+                if (scanSummaries.TotalCount == 0)
+                {
+                    throw new BlackDuckIntegrationException($"There are no scan summaries for id: {codeLocationId}");
+                }
+                ScanSummaryView scanSummary = scanSummaries.Items[0];
+                string scanStatus = scanSummary.Status;
+
+                if (!scanStatus.Equals(currentStatus))
+                {
+                    currentStatus = scanStatus;
+                    Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds/1000.0}");
+                }
+
+                if (currentStatus.Equals("COMPLETE"))
+                {
+                    stopwatch.Stop();
+                    break;
+                }
+                else
+                {
+                    Thread.Sleep(500);
+                }
+            }
+
+            if (stopwatch.Elapsed.Seconds > HubScanTimeout)
+            {
+                throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
+            }
+        }
+
+        public void GenerateReports(HttpClient client)
+        {
+
+        }
+
+        public void CheckPolicies(HttpClient client)
+        {
+
+        }
+
+        public async Task<PageScanSummaryView> ScanSummariesAPI(HttpClient client, string codeLocationId)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations/{codeLocationId}/scan-summaries?sort=updated%20asc");
+            VerifySuccess(response);
+            string content = await response.Content.ReadAsStringAsync();
+            PageScanSummaryView scanSummaries = JToken.Parse(content).FromJToken<PageScanSummaryView>();
+            return scanSummaries;
+        }
+
+        public async Task<PageCodeLocationView> CodeLocationsAPI(HttpClient client)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations?q={HubProjectName}%2F0.0&codeLocationType=BOM_IMPORT");
+            VerifySuccess(response);
+            string content = await response.Content.ReadAsStringAsync();
+            PageCodeLocationView codeLocations = JToken.Parse(content).FromJToken<PageCodeLocationView>();
+            return codeLocations;
         }
 
         public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
@@ -237,21 +325,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
             HttpResponseMessage response = await client.PostAsync($"{HubUrl}/api/bom-import", content);
             VerifySuccess(response);
-        }
-
-        public void WaitForScanComplete()
-        {
-
-        }
-
-        public void GenerateReportsAPI(HttpClient client)
-        {
-
-        }
-
-        public void CheckPoliciesAPI(HttpClient client)
-        {
-
         }
 
         public async Task<HttpClient> CreateClient()
@@ -279,7 +352,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 throw new BlackDuckIntegrationException(response);
             }
         }
-
 
 
 

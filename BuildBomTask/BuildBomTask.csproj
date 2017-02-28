@@ -157,6 +157,13 @@
     <Compile Include="BdioContent.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
     <Compile Include="BuildBOMTask.cs" />
+    <Compile Include="Model\CodeLocation\CodeLocationView.cs" />
+    <Compile Include="Model\HubView.cs" />
+    <Compile Include="Model\Link.cs" />
+    <Compile Include="Model\Metadata.cs" />
+    <Compile Include="Model\CodeLocation\PageCodeLocationView.cs" />
+    <Compile Include="Model\ScanSummary\ScanSummaryView.cs" />
+    <Compile Include="Model\ScanSummary\PageScanSummaryView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
