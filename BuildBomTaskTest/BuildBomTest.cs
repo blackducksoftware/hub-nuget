@@ -18,27 +18,31 @@ namespace com.blackducksoftware.integration.hub.nuget
             task.PackagesConfigPath = $"{task.ProjectPath}/packages.config";
             task.ProjectFilePath = $"{task.ProjectPath}/BuildBomTask.csproj";
             task.PackagesRepoPath = $"{task.ProjectPath}/../packages";
+            task.HubUrl = "http://int-hub01.dc1.lan:8080";
+            task.HubUsername = "sysadmin";
+            task.HubPassword = "blackduck";
 
-            StringBuilder stringBuilder = new StringBuilder();
-            TextWriter textWriter = new StringWriter(stringBuilder);
-            task.Writer = textWriter;
-   
-            task.Execute();
+            //task.DeployHubBdio = true;
+            //task.Execute();
+            //task.Deploy(bdioContent);
 
-            VerifyJsonArraysEqual(Properties.Resources.sample, stringBuilder.ToString()); 
+            BdioContent bdioContent = task.BuildBOM();
+            bdioContent.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
+
+            VerifyJsonArraysEqual(Properties.Resources.sample, bdioContent.ToString()); 
         }
 
-        private void VerifyJsonArraysEqual(string expectedJson, string actualJson)
+        private void VerifyJsonArraysEqual(string expectedString, string actualString)
         {
-            JArray expected = JArray.Parse(expectedJson);
-            JArray actual = JArray.Parse(actualJson);
+            JArray expected = JArray.Parse(expectedString);
+            JArray actual = JArray.Parse(actualString);
 
             Assert.AreEqual(expected.Count, actual.Count, string.Format("Expected count [{0}] \t Actual count [{1}]", expected.Count, actual.Count));
 
-            foreach (JToken expectedToken in expectedJson)
+            foreach (JToken expectedToken in expected)
             {
                 bool found = false;
-                foreach (JToken actualToken in actualJson)
+                foreach (JToken actualToken in actual)
                 {
                     if (JToken.DeepEquals(expectedToken, actualToken))
                     {
@@ -48,7 +52,7 @@ namespace com.blackducksoftware.integration.hub.nuget
                 }
                 if (!found)
                 {
-                    Assert.IsTrue(false, string.Format("\n{0}\ndoes not exist in\n{1}", expectedToken.ToString(), expectedJson.ToString()));
+                    Assert.IsTrue(false, string.Format("\n{0}\ndoes not exist in\n{1}", expectedToken, actual));
                 }
             }
         }
