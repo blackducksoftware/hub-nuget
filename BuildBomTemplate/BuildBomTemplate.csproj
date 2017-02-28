@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Required properties that this project needs.  There parameters must be passed to the MSBuild Command line via the /p: command line argument -->
+  <PropertyGroup>
+    <BuildBomTaskAssemblyPath></BuilBuildBomTaskAssemblyPath>
+    <hub.url></hub.url>
+    <hub.username></hub.username>
+    <hub.password></hub.password>
+    <hub.timeout>120</hub.timeout>
+    <hub.project.name>$(MSBuildProjectName)</hub.project.name>
+    <hub.version.name></hub.version.name>
+    <!-- proxy settings -->
+    <hub.proxy.host></hub.proxy.host>
+    <hub.proxy.port></hub.proxy.port>
+    <hub.proxy.username></hub.proxy.username>
+    <hub.proxy.password></hub.proxy.password>
+    <!-- task feature config -->
+    <hub.scan.timeout>300</hub.scan.timeout>
+    <hub.output.directory>$(ProjectDir)\$(OutputPath)</hub.output.directory>
+    <excluded.modules></excluded.modules>
+    <hub.ignore.failure>false</hub.ignore.failure>
+    <hub.create.flat.list>false</hub.create.flat.list>
+    <hub.create.bdio>true</hub.create.bdio>
+    <hub.deploy.bdio>true</hub.deploy.bdio>
+    <hub.create.report>false</hub.create.report>
+    <hub.check.policies>false</hub.check.policies>
+  </PropertyGroup>
+  <!-- Define the assembly location of the MSBuild task that will be executed. 
+       The caller of this file must specify BDSTaskDirectory in their call to the MSBuild command.
+  -->
+  <UsingTask TaskName="Com.Blackducksoftware.Integration.Hub.Nuget.BuildBomTask" AssemblyName="BuildBomTask"/>
+  <!-- Define the target that will call the task to look up the dependencies. -->
+  <Target Name="GenerateBdio">
+    <BuildBomTask 
+      HubUrl="$(hub.url)"
+      HubUsername="$(hub.username)"
+      HubPassword="$(hub.password)"
+      HubTimeout="$(hub.timeout)"
+      HubProjectName="$(hub.project.name)"
+      HubVersionName="$(hub.version.name)"
+      HubProxyHost="$(hub.proxy.host)"
+      HubProxyPort="$(hub.proxy.port)"
+      HubProxyUsername="$(hub.proxy.username)"
+      HubProxyPassword="$(hub.proxy.password)"
+      HubScanTimeout="$(hub.scan.timeout)"
+      OutputDirectory="$(hub.output.directory)"
+      ExcludedModules= "$(excluded.modules)";
+      HubIgnoreFailure="$(hub.ignore.failure)"
+      CreateFlatDependencyList="$(hub.create.flat.list)"
+      CreateHubBdio="$(hub.create.bdio)"
+      DeployHubBdio="$(hub.deploy.bdio)"
+      CreateHubReport="$(hub.create.report)"
+      CheckPolicies="$(hub.check.policies)"  
+      PackagesConfigPath="$(ProjectDir)\packages.config"
+      PackagesRepoPath="$(PackagesDirectory)" 
+    />
+  </Target>
+</Project>
