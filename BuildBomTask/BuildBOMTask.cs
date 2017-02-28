@@ -13,12 +13,11 @@ using com.blackducksoftware.integration.hub.bdio.simple;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using com.blackducksoftware.integration.hub.bdio.simple.model;
-using System.Net;
 using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace com.blackducksoftware.integration.hub.nuget
+namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     public class BuildBOMTask : Microsoft.Build.Utilities.Task
     {
@@ -88,10 +87,9 @@ namespace com.blackducksoftware.integration.hub.nuget
 
             if (DeployHubBdio)
             {
-                Deploy(bdioContent);             
+                Task deployTask = Deploy(bdioContent);
+                deployTask.Wait();          
             }
-            // Write BDIO
-            //WriteBdio(bdio, Writer);
 
             return true;
         }
@@ -239,6 +237,11 @@ namespace com.blackducksoftware.integration.hub.nuget
             HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
             HttpResponseMessage response = await client.PostAsync($"{HubUrl}/api/bom-import", content);
             VerifySuccess(response);
+        }
+
+        public void WaitForScanComplete()
+        {
+
         }
 
         public void GenerateReportsAPI(HttpClient client)

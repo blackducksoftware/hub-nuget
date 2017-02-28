@@ -6,7 +6,7 @@
     <ProjectGuid>{A143B0AE-B903-44AF-899A-7BFB545A3D11}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.blackducksoftware.integration.hub.nuget</RootNamespace>
+    <RootNamespace>Com.Blackducksoftware.Integration.Hub.Nuget</RootNamespace>
     <AssemblyName>BuildBomTaskTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

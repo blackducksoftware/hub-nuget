@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using System.Text;
-using System.IO;
 
-namespace com.blackducksoftware.integration.hub.nuget
+namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     [TestFixture]
     public class BuildBomTest

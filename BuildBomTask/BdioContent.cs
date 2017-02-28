@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace com.blackducksoftware.integration.hub.nuget
+namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     public class BdioContent
     {
