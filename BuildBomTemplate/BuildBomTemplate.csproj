@@ -3,27 +3,27 @@
   <!-- Required properties that this project needs.  There parameters must be passed to the MSBuild Command line via the /p: command line argument -->
   <PropertyGroup>
     <BuildBomTaskAssemblyPath></BuilBuildBomTaskAssemblyPath>
-    <hub.url></hub.url>
-    <hub.username></hub.username>
-    <hub.password></hub.password>
-    <hub.timeout>120</hub.timeout>
-    <hub.project.name>$(MSBuildProjectName)</hub.project.name>
-    <hub.version.name></hub.version.name>
+    <hub_url></hub_url>
+    <hub_username></hub_username>
+    <hub_password></hub_password>
+    <hub_timeout>120</hub_timeout>
+    <hub_project_name>$(MSBuildProjectName)</hub_project_name>
+    <hub_version_name></hub_version_name>
     <!-- proxy settings -->
-    <hub.proxy.host></hub.proxy.host>
-    <hub.proxy.port></hub.proxy.port>
-    <hub.proxy.username></hub.proxy.username>
-    <hub.proxy.password></hub.proxy.password>
+    <hub_proxy_host></hub_proxy_host>
+    <hub_proxy_port></hub_proxy_port>
+    <hub_proxy_username></hub_proxy_username>
+    <hub_proxy_password></hub_proxy_password>
     <!-- task feature config -->
-    <hub.scan.timeout>300</hub.scan.timeout>
-    <hub.output.directory>$(ProjectDir)\$(OutputPath)</hub.output.directory>
-    <excluded.modules></excluded.modules>
-    <hub.ignore.failure>false</hub.ignore.failure>
-    <hub.create.flat.list>false</hub.create.flat.list>
-    <hub.create.bdio>true</hub.create.bdio>
-    <hub.deploy.bdio>true</hub.deploy.bdio>
-    <hub.create.report>false</hub.create.report>
-    <hub.check.policies>false</hub.check.policies>
+    <hub_scan_timeout>300</hub_scan_timeout>
+    <hub_output_directory>$(ProjectDir)\$(OutputPath)</hub_output_directory>
+    <excluded_modules></excluded_modules>
+    <hub_ignore_failure>false</hub_ignore_failure>
+    <hub_create_flat_list>false</hub_create_flat_list>
+    <hub_create_bdio>true</hub_create_bdio>
+    <hub_deploy_bdio>true</hub_deploy_bdio>
+    <hub_create_report>false</hub_create_report>
+    <hub_check_policies>false</hub_check_policies>
   </PropertyGroup>
   <!-- Define the assembly location of the MSBuild task that will be executed. 
        The caller of this file must specify BDSTaskDirectory in their call to the MSBuild command.
