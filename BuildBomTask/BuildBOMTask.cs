@@ -231,7 +231,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             using (HttpClient client = await CreateClient())
             {
                 await LinkedDataAPI(client, bdioContent);
-                await Task.Delay(1000);
                 await WaitForScanComplete(client);
             }
         }
@@ -242,7 +241,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             string codeLocationId = null;
 
-            while (stopwatch.Elapsed.Seconds < HubScanTimeout)
+            while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
                 Console.WriteLine("Checking scan summary status");
                 PageCodeLocationView codeLocations = await CodeLocationsAPI(client);
@@ -258,8 +257,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
             }
 
+            if(codeLocationId == null)
+            {
+                throw new BlackDuckIntegrationException($"Failed to get the codelocation for {HubProjectName]} ");
+            }
+
             string currentStatus = "UNKOWN";
-            while (stopwatch.Elapsed.Seconds < HubScanTimeout)
+            while(stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
                 PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
                 if (scanSummaries.TotalCount == 0)
@@ -272,7 +276,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 if (!scanStatus.Equals(currentStatus))
                 {
                     currentStatus = scanStatus;
-                    Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds/1000.0}");
+                    Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
                 }
 
                 if (currentStatus.Equals("COMPLETE"))
@@ -286,7 +290,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
             }
 
-            if (stopwatch.Elapsed.Seconds > HubScanTimeout)
+            if (stopwatch.ElapsedMilliseconds / 1000 > HubScanTimeout)
             {
                 throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
             }
