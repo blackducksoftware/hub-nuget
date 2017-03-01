@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace com.blackducksoftware.integration.hub.nuget.Properties {
+namespace Com.Blackducksoftware.Integration.Hub.Nuget.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace com.blackducksoftware.integration.hub.nuget.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("com.blackducksoftware.integration.hub.nuget.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Com.Blackducksoftware.Integration.Hub.Nuget.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,10 +61,7 @@ namespace com.blackducksoftware.integration.hub.nuget.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test Name:	ExecuteTaskTest
-        ///Test Outcome:	Passed
-        ///Result StandardOutput:	
-        ///[
+        ///   Looks up a localized string similar to [
         ///  {
         ///    &quot;specVersion&quot;: &quot;1.1.0&quot;,
         ///    &quot;@id&quot;: &quot;uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5&quot;,
@@ -79,7 +76,13 @@ namespace com.blackducksoftware.integration.hub.nuget.Properties {
         ///    &quot;name&quot;: &quot;BuildBomTask&quot;,
         ///    &quot;externalIdentifier&quot;: {
         ///      &quot;externalSystemTypeId&quot;: &quot;nuget&quot;,
-        ///      &quot;externalId&quot;: &quot;BuildBomTask/0. [rest of string was truncated]&quot;;.
+        ///      &quot;externalId&quot;: &quot;BuildBomTask/0.0.1&quot;
+        ///    },
+        ///    &quot;relationship&quot;: []
+        ///  },
+        ///  {
+        ///    &quot;revision&quot;: &quot;2.1.1&quot;,
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string sample {
             get {

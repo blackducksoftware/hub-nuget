@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using System.ComponentModel;
 using NuGet.Protocol.Core.Types;
 using System.Collections.Generic;
@@ -10,14 +9,19 @@ using NuGet.Protocol.Core.v2;
 using NuGet.Configuration;
 using System.Diagnostics;
 using System.IO;
-using com.blackducksoftware.integration.hub.bdio.simple;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
-using com.blackducksoftware.integration.hub.bdio.simple.model;
+using System.Text;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
+using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
+using Newtonsoft.Json.Linq;
 
-namespace com.blackducksoftware.integration.hub.nuget
+namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
-    public class BuildBOMTask : Task
+    public class BuildBOMTask : Microsoft.Build.Utilities.Task
     {
         #region Hub Properties
         [Required]
@@ -69,9 +73,9 @@ namespace com.blackducksoftware.integration.hub.nuget
         [DisplayName("hub.deploy.bdio")]
         public bool DeployHubBdio { get; set; } = false;
         [DisplayName("hub.create.report")]
-        public bool CreateHubReport { get; set; } = false;
+        public bool HubCreateHubReport { get; set; } = false;
         [DisplayName("hub.check.policies")]
-        public bool CheckPolicies { get; set; } = false;
+        public bool HubCheckPolicies { get; set; } = false;
 
         public string ProjectPath { get; set; }
         public string PackagesConfigPath { get; set; }
@@ -80,6 +84,20 @@ namespace com.blackducksoftware.integration.hub.nuget
         public TextWriter Writer { get; set; }
 
         public override bool Execute()
+        {
+            BdioContent bdioContent = BuildBOM();
+
+            if (DeployHubBdio)
+            {
+                Task deployTask = Deploy(bdioContent);
+                deployTask.Wait();
+            }
+
+            return true;
+        }
+
+        #region Generate BDIO
+        public BdioContent BuildBOM()
         {
             // Load the packages.config file into a list of Packages
             NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile(PackagesConfigPath);
@@ -94,19 +112,15 @@ namespace com.blackducksoftware.integration.hub.nuget
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
 
             // Create BDIO 
-            Bdio bdio = BuildBOM(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
-
-            // Write BDIO
-            WriteBdio(bdio, Writer);
-
-            return true;
+            BdioContent bdioContent = BuildBOMFromMetadata(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
+            return bdioContent;
         }
 
-        public Bdio BuildBOM(List<NuGet.PackageReference> packages, PackageMetadataResource metadataResource)
+        public BdioContent BuildBOMFromMetadata(List<NuGet.PackageReference> packages, PackageMetadataResource metadataResource)
         {
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
-            Bdio bdio = new Bdio();
+            BdioContent bdio = new BdioContent();
 
             // Create bdio bill of materials node
             BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubProjectName);
@@ -152,7 +166,7 @@ namespace com.blackducksoftware.integration.hub.nuget
             return bdio;
         }
 
-        public void WriteBdio(Bdio bdio, TextWriter textWriter)
+        public void WriteBdio(BdioContent bdio, TextWriter textWriter)
         {
             BdioWriter writer = new BdioWriter(textWriter);
             writer.WriteBdioNode(bdio.BillOfMaterials);
@@ -209,7 +223,140 @@ namespace com.blackducksoftware.integration.hub.nuget
             bool minorMatch = framework1.TargetFramework.Version.Minor == framework2.TargetFramework.Version.Minor;
             return majorMatch && minorMatch;
         }
+        #endregion
+
+        #region Deploy
+        public async Task Deploy(BdioContent bdioContent)
+        {
+            using (HttpClient client = await CreateClient())
+            {
+                await LinkedDataAPI(client, bdioContent);
+                await Task.Delay(1000);
+                await WaitForScanComplete(client);
+            }
+        }
+
+        public async Task WaitForScanComplete(HttpClient client)
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            string codeLocationId = null;
+
+            while (stopwatch.Elapsed.Seconds < HubScanTimeout)
+            {
+                Console.WriteLine("Checking scan summary status");
+                PageCodeLocationView codeLocations = await CodeLocationsAPI(client);
+                if (codeLocations.TotalCount > 0)
+                {
+                    CodeLocationView codeLocation = codeLocations.Items[0];
+                    codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("No code locations found. Trying again...");
+                }
+            }
+
+            string currentStatus = "UNKOWN";
+            while (stopwatch.Elapsed.Seconds < HubScanTimeout)
+            {
+                PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
+                if (scanSummaries.TotalCount == 0)
+                {
+                    throw new BlackDuckIntegrationException($"There are no scan summaries for id: {codeLocationId}");
+                }
+                ScanSummaryView scanSummary = scanSummaries.Items[0];
+                string scanStatus = scanSummary.Status;
+
+                if (!scanStatus.Equals(currentStatus))
+                {
+                    currentStatus = scanStatus;
+                    Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds/1000.0}");
+                }
+
+                if (currentStatus.Equals("COMPLETE"))
+                {
+                    stopwatch.Stop();
+                    break;
+                }
+                else
+                {
+                    Thread.Sleep(500);
+                }
+            }
+
+            if (stopwatch.Elapsed.Seconds > HubScanTimeout)
+            {
+                throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
+            }
+        }
+
+        public void GenerateReports(HttpClient client)
+        {
+
+        }
+
+        public void CheckPolicies(HttpClient client)
+        {
+
+        }
+
+        public async Task<PageScanSummaryView> ScanSummariesAPI(HttpClient client, string codeLocationId)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations/{codeLocationId}/scan-summaries?sort=updated%20asc");
+            VerifySuccess(response);
+            string content = await response.Content.ReadAsStringAsync();
+            PageScanSummaryView scanSummaries = JToken.Parse(content).FromJToken<PageScanSummaryView>();
+            return scanSummaries;
+        }
+
+        public async Task<PageCodeLocationView> CodeLocationsAPI(HttpClient client)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations?q={HubProjectName}%2F0.0&codeLocationType=BOM_IMPORT");
+            VerifySuccess(response);
+            string content = await response.Content.ReadAsStringAsync();
+            PageCodeLocationView codeLocations = JToken.Parse(content).FromJToken<PageCodeLocationView>();
+            return codeLocations;
+        }
+
+        public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
+        {
+            HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
+            HttpResponseMessage response = await client.PostAsync($"{HubUrl}/api/bom-import", content);
+            VerifySuccess(response);
+        }
+
+        public async Task<HttpClient> CreateClient()
+        {
+            HttpClient client = new HttpClient();
+            client.Timeout = new TimeSpan(0, 0, HubTimeout);
+
+            Dictionary<string, string> credentials = new Dictionary<string, string>
+            {
+                {"j_username", HubUsername },
+                {"j_password", HubPassword }
+            };
+
+            HttpContent content = new FormUrlEncodedContent(credentials);
+            HttpResponseMessage response = await client.PostAsync($"{HubUrl}/j_spring_security_check", content);
+            VerifySuccess(response);
+
+            return client;
+        }
+
+        private void VerifySuccess(HttpResponseMessage response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new BlackDuckIntegrationException(response);
+            }
+        }
+
+
+
     }
+    #endregion
 
     public class Logger : NuGet.Common.ILogger
     {

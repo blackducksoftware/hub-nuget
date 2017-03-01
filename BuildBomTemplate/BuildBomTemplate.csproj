@@ -44,7 +44,7 @@
       HubProxyPassword="$(hub.proxy.password)"
       HubScanTimeout="$(hub.scan.timeout)"
       OutputDirectory="$(hub.output.directory)"
-      ExcludedModules= "$(excluded.modules)";
+      ExcludedModules= "$(excluded.modules)"
       HubIgnoreFailure="$(hub.ignore.failure)"
       CreateFlatDependencyList="$(hub.create.flat.list)"
       CreateHubBdio="$(hub.create.bdio)"
