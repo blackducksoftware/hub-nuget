@@ -1,10 +1,12 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
+﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
+using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -28,6 +30,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             // Task options
             task.CreateFlatDependencyList = true;
+            task.CreateHubBdio = true;
 
             // Deploy resources
             File.WriteAllLines($"{task.OutputDirectory}/packages.config", Resources.packages.Split('\n'));
@@ -35,13 +38,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             // Run task
             task.Execute();
 
-            // Building BOM
-            /*
-            BdioContent bdioContent = task.BuildBOM();
-            bdioContent.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
-            VerifyJsonArraysEqual(Properties.Resources.sample, bdioContent.ToString());
-
             // Deploy BOM to hub
+            /* 
             System.Threading.Tasks.Task deployTask = task.Deploy(bdioContent);
             deployTask.GetAwaiter().GetResult();
             //*/
@@ -76,29 +74,39 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             WriteArrayToConsole(actualFlatList.ToArray());
         }
 
-        private void VerifyJsonArraysEqual(string expectedString, string actualString)
+        [Test]
+        public void BuildBOMTest()
         {
-            JArray expected = JArray.Parse(expectedString);
-            JArray actual = JArray.Parse(actualString);
+            string actualString = File.ReadAllText($"{task.OutputDirectory}/{task.HubProjectName}.jsonld");
+            BdioContent expected = ParseBdio(Resources.sample_bdio);
+            BdioContent actual = ParseBdio(actualString);
+            actual.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
+            // Change UUID to match the sample file
+            Assert.AreEqual(expected, actual);
+        }
 
-            Assert.AreEqual(expected.Count, actual.Count, string.Format("Expected count [{0}] \t Actual count [{1}]", expected.Count, actual.Count));
-
-            foreach (JToken expectedToken in expected)
+        private BdioContent ParseBdio(string bdio)
+        {
+            BdioContent bdioContent = new BdioContent();
+            JToken jBdio = JArray.Parse(bdio);
+            foreach (JToken jComponent in jBdio)
             {
-                bool found = false;
-                foreach (JToken actualToken in actual)
+                BdioNode node = jComponent.ToObject<BdioNode>();
+                if (node.Type.Equals("BillOfMaterials"))
                 {
-                    if (JToken.DeepEquals(expectedToken, actualToken))
-                    {
-                        found = true;
-                        break;
-                    }
+                    bdioContent.BillOfMaterials = jComponent.ToObject<BdioBillOfMaterials>();
                 }
-                if (!found)
+                else if (node.Type.Equals("Project"))
                 {
-                    Assert.IsTrue(false, string.Format("\n{0}\ndoes not exist in\n{1}", expectedToken, actual));
+                    bdioContent.Project = jComponent.ToObject<BdioProject>();
+                }
+                else if (node.Type.Equals("Component"))
+                {
+                    bdioContent.Components.Add(jComponent.ToObject<BdioComponent>());
                 }
             }
+            return bdioContent;
+
         }
 
         private void WriteArrayToConsole(object[] objects)

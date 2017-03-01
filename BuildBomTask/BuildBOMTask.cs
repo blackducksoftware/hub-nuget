@@ -81,6 +81,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             if (CreateHubBdio)
             {
                 BdioContent bdioContent = BuildBOM();
+                File.WriteAllText($"{OutputDirectory}/{HubProjectName}.jsonld", bdioContent.ToString());
             }
 
             if (DeployHubBdio)
@@ -222,9 +223,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                         if (FrameworksMatch(dependencySet, packageDependency))
                         {
                             dependencies.AddRange(dependencySet.Packages);
+                            break;
                         }
-                        break;
-
                     }
                     break;
                 }
