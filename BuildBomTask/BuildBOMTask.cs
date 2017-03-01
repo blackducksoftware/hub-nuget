@@ -25,76 +25,91 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
     {
         #region Hub Properties
         [Required]
-        [DisplayName("hub.url")]
         public string HubUrl { get; set; }
 
         [Required]
-        [DisplayName("hub.username")]
         public string HubUsername { get; set; }
 
         [Required]
-        [DisplayName("hub.password")]
         public string HubPassword { get; set; }
 
-        [DisplayName("hub.timeout")]
         public int HubTimeout { get; set; } = 120;
-        [DisplayName("hub.project.name")]
         public string HubProjectName { get; set; }
-        [DisplayName("hub.version.name")]
         public string HubVersionName { get; set; }
         #endregion
 
         #region Proxy Properties
-        [DisplayName("hub.proxy.host")]
         public string HubProxyHost { get; set; }
-        [DisplayName("hub.proxy.port")]
         public string HubProxyPort { get; set; }
-        [DisplayName("hub.proxy.username")]
         public string HubProxyUsername { get; set; }
-        [DisplayName("hub.proxy.password")]
         public string HubProxyPassword { get; set; }
 
         #endregion
 
-        [DisplayName("hub.scan.timeout")]
         public int HubScanTimeout { get; set; } = 300;
-        [DisplayName("hub.output.directory")]
         public string OutputDirectory { get; set; }
-        // [DisplayName("included.scopes")]
-        // public String IncludedScopes { get; set; }
-        [DisplayName("excluded.modules")]
         public string ExcludedModules { get; set; } = "";
-        [DisplayName("hub.ignore.failure")]
         public bool HubIgnoreFailure { get; set; } = false;
-        [DisplayName("hub.create.flat.list")]
         public bool CreateFlatDependencyList { get; set; } = false;
-        [DisplayName("hub.create.bdio")]
         public bool CreateHubBdio { get; set; } = false;
-        [DisplayName("hub.deploy.bdio")]
         public bool DeployHubBdio { get; set; } = false;
-        [DisplayName("hub.create.report")]
-        public bool HubCreateHubReport { get; set; } = false;
-        [DisplayName("hub.check.policies")]
-        public bool HubCheckPolicies { get; set; } = false;
+        public bool CreateHubReport { get; set; } = false;
+        public bool CheckPolicies { get; set; } = false;
 
-        public string ProjectPath { get; set; }
         public string PackagesConfigPath { get; set; }
-        public string ProjectFilePath { get; set; }
         public string PackagesRepoPath { get; set; }
-        public TextWriter Writer { get; set; }
 
         public override bool Execute()
         {
-            BdioContent bdioContent = BuildBOM();
+            // Creates output directory if it doesn't already exist
+            Directory.CreateDirectory(OutputDirectory);
+
+            if (CreateFlatDependencyList)
+            {
+                List<NuGet.PackageReference> packages = GenerateFlatList();
+                BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+                using (StreamWriter file = new StreamWriter($"{OutputDirectory}/{HubProjectName}_flat.txt", false, Encoding.UTF8))
+                {
+                    foreach (NuGet.PackageReference packageReference in packages)
+                    {
+                        string externalId = bdioPropertyHelper.CreateNugetExternalId(packageReference.Id, packageReference.Version.ToString());
+                        file.WriteLine(externalId);
+                    }
+                }
+            }
+
+            if (CreateHubBdio)
+            {
+                BdioContent bdioContent = BuildBOM();
+            }
 
             if (DeployHubBdio)
             {
-                Task deployTask = Deploy(bdioContent);
-                deployTask.Wait();
+                //Task deployTask = Deploy(bdioContent);
+                //deployTask.Wait();
+            }
+
+            if (CreateHubReport)
+            {
+
+            }
+
+            if (CheckPolicies)
+            {
+
             }
 
             return true;
         }
+
+        #region Make Flat List
+        public List<NuGet.PackageReference> GenerateFlatList()
+        {
+            // Load the packages.config file into a list of Packages
+            NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile(PackagesConfigPath);
+            return new List<NuGet.PackageReference>(configFile.GetPackageReferences());
+        }
+        #endregion
 
         #region Generate BDIO
         public BdioContent BuildBOM()
@@ -257,13 +272,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
             }
 
-            if(codeLocationId == null)
+            if (codeLocationId == null)
             {
-                throw new BlackDuckIntegrationException($"Failed to get the codelocation for {HubProjectName]} ");
+                throw new BlackDuckIntegrationException($"Failed to get the codelocation for {HubProjectName} ");
             }
 
             string currentStatus = "UNKOWN";
-            while(stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
+            while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
                 PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
                 if (scanSummaries.TotalCount == 0)
@@ -301,7 +316,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         }
 
-        public void CheckPolicies(HttpClient client)
+        public void CheckPolicy(HttpClient client)
         {
 
         }
