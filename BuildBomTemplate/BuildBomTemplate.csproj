@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Required properties that this project needs.  There parameters must be passed to the MSBuild Command line via the /p: command line argument -->
   <PropertyGroup>
-    <BuildBomTaskAssemblyPath></BuilBuildBomTaskAssemblyPath>
+    <BuildBomTaskAssemblyPath></BuildBomTaskAssemblyPath>
     <hub_url></hub_url>
     <hub_username></hub_username>
     <hub_password></hub_password>
