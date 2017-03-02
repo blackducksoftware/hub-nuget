@@ -1,7 +1,8 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Com.Blackducksoftware.Integration.Hub.Nuget;
-using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Global;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Model;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
@@ -16,6 +17,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
     public class BuildBomTest
     {
 
+        HubServerConfig HubServerConfig;
         private BuildBOMTask task = new BuildBOMTask();
         private int oldScanCount;
 
@@ -31,12 +33,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.HubUsername = "sysadmin";
             task.HubPassword = "blackduck";
 
+            // Server setup
+            HubCredentials credentials = new HubCredentials(task.HubUsername, task.HubPassword);
+            HubCredentials proxyCredentials = new HubCredentials(task.HubProxyUsername, task.HubProxyPassword);
+            HubProxyInfo proxyInfo = new HubProxyInfo(task.HubProxyHost, task.HubProxyPort, proxyCredentials);
+            HubServerConfig = new HubServerConfig(task.HubUrl, task.HubTimeout, credentials, proxyInfo);
+
             // Task options
             task.CreateFlatDependencyList = true;
             task.CreateHubBdio = true;
             task.DeployHubBdio = true;
 
-            using (HttpClient client = task.CreateClient().Result)
+            using (HttpClient client = task.CreateClient(HubServerConfig))
             {
                 oldScanCount = task.GetCurrentScanSummaries(client).Result;
             }
@@ -93,7 +101,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void DeploymentTest()
         {
             PageScanSummaryView scanSummaries = null;
-            using (HttpClient client = task.CreateClient().Result)
+            using (HttpClient client = task.CreateClient(HubServerConfig))
             {
                 PageCodeLocationView codeLocations = task.CodeLocationsAPI(client).Result;
                 if (codeLocations.TotalCount > 0)

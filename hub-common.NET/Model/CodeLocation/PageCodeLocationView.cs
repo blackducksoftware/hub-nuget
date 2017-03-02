@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model.CodeLocation
+namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model
 {
     public class PageCodeLocationView
     {

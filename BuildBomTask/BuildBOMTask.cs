@@ -16,8 +16,9 @@ using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Newtonsoft.Json.Linq;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Model.ScanSummary;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Model.CodeLocation;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Global;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Rest;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Model;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -61,6 +62,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public override bool Execute()
         {
+            // Reset Connection Setup
+            HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
+            HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
+            HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
+            HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
+
             // Creates output directory if it doesn't already exist
             Directory.CreateDirectory(OutputDirectory);
             string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
@@ -87,9 +94,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (DeployHubBdio)
             {
+
                 string bdio = File.ReadAllText(bdioFilePath);
                 BdioContent bdioContent = ParseBdio(bdio);
-                Task deployTask = Deploy(bdioContent);
+                Task deployTask = Deploy(bdioContent, hubServerConfig);
                 deployTask.Wait();
             }
 
@@ -268,9 +276,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         #endregion
 
         #region Deploy
-        public async Task Deploy(BdioContent bdioContent)
+        public async Task Deploy(BdioContent bdioContent, HubServerConfig hubServerConfig)
         {
-            using (HttpClient client = await CreateClient())
+            using (HttpClient client = CreateClient(hubServerConfig))
             {
                 int currentSummaries = await GetCurrentScanSummaries(client);
                 await LinkedDataAPI(client, bdioContent);
@@ -381,22 +389,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             VerifySuccess(response);
         }
 
-        public async Task<HttpClient> CreateClient()
+        public HttpClient CreateClient(HubServerConfig hubServerConfig)
         {
-            HttpClient client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 0, HubTimeout);
-
-            Dictionary<string, string> credentials = new Dictionary<string, string>
-            {
-                {"j_username", HubUsername },
-                {"j_password", HubPassword }
-            };
-
-            HttpContent content = new FormUrlEncodedContent(credentials);
-            HttpResponseMessage response = await client.PostAsync($"{HubUrl}/j_spring_security_check", content);
-            VerifySuccess(response);
-
-            return client;
+            CredentialsResetConnection crc = new CredentialsResetConnection(hubServerConfig);
+            return crc;
         }
 
         private void VerifySuccess(HttpResponseMessage response)
@@ -416,10 +412,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public void CheckPolicy(HttpClient client)
         {
-            
+
         }
     }
-    
+
 
     public class Logger : NuGet.Common.ILogger
     {

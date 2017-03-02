@@ -157,19 +157,18 @@
     <Compile Include="BdioContent.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
     <Compile Include="BuildBOMTask.cs" />
-    <Compile Include="Model\CodeLocation\CodeLocationView.cs" />
-    <Compile Include="Model\HubView.cs" />
-    <Compile Include="Model\Link.cs" />
-    <Compile Include="Model\Metadata.cs" />
-    <Compile Include="Model\CodeLocation\PageCodeLocationView.cs" />
-    <Compile Include="Model\ScanSummary\ScanSummaryView.cs" />
-    <Compile Include="Model\ScanSummary\PageScanSummaryView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolutionBuildBOMTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\hub-common.NET\hub-common.NET.csproj">
+      <Project>{4e4672d6-070a-4903-b930-a2bffd95b195}</Project>
+      <Name>hub-common.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

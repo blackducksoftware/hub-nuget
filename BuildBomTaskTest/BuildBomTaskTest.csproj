@@ -79,6 +79,10 @@
       <Project>{8829ab44-952b-4361-9694-e887c6450b45}</Project>
       <Name>BuildBomTask</Name>
     </ProjectReference>
+    <ProjectReference Include="..\hub-common.NET\hub-common.NET.csproj">
+      <Project>{4E4672D6-070A-4903-B930-A2BFFD95B195}</Project>
+      <Name>hub-common.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

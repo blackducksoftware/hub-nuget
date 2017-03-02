@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Com.Blackducksoftware.Integration.HubCommon.NET.Api;
+using Newtonsoft.Json;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model.ScanSummary
+namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model
 {
     public class ScanSummaryView : HubView
     {
