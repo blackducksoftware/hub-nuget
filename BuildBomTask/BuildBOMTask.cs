@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Build.Framework;
-using System.ComponentModel;
 using NuGet.Protocol.Core.Types;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,8 +15,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
-using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
 using Newtonsoft.Json.Linq;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Model.ScanSummary;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Model.CodeLocation;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -416,7 +416,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public void CheckPolicy(HttpClient client)
         {
-
+            
         }
     }
     

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Com.Blackducksoftware.Integration.Hub.Nuget.Model
+namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model
 {
     public class HubView
     {
