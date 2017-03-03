@@ -97,8 +97,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void BuildBOMTest()
         {
             string actualString = File.ReadAllText($"{task.OutputDirectory}/{task.HubProjectName}.jsonld");
-            BdioContent expected = BuildBOMTask.ParseBdio(Resources.sample_bdio);
-            BdioContent actual = BuildBOMTask.ParseBdio(actualString);
+            BdioContent expected = BdioContent.Parse(Resources.sample_bdio);
+            BdioContent actual = BdioContent.Parse(actualString);
             actual.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
             // Change UUID to match the sample file
             Assert.AreEqual(expected, actual);
