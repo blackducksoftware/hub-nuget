@@ -1,4 +1,4 @@
-﻿using Com.Blackducksoftware.Integration.HubCommon.NET.Global;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Rest
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
 {
     public class RestConnection : HttpClient
     {

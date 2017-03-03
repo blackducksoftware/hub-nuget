@@ -1,7 +1,7 @@
-﻿using Com.Blackducksoftware.Integration.HubCommon.NET.Model;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Newtonsoft.Json;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Api
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
 {
     public class HubView : HubResponse
     {

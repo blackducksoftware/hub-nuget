@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Newtonsoft.Json.Linq;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Global;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Rest;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Model;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {

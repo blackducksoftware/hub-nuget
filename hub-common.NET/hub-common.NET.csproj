@@ -7,7 +7,7 @@
     <ProjectGuid>{4E4672D6-070A-4903-B930-A2BFFD95B195}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Com.Blackducksoftware.Integration.HubCommon.NET</RootNamespace>
+    <RootNamespace>Com.Blackducksoftware.Integration.Hub.Common.Net</RootNamespace>
     <AssemblyName>HubCommon.NET</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

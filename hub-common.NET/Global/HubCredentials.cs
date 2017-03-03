@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Global
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Global
 {
     public class HubCredentials
     {

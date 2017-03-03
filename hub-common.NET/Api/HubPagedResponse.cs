@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Api
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
 {
     public class HubPagedResponse<HubView>
     {

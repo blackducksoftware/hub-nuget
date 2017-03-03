@@ -1,8 +1,8 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Com.Blackducksoftware.Integration.Hub.Nuget;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Global;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Model;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;

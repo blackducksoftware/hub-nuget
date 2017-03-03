@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model
 {
     public class Metadata
     {
