@@ -2,7 +2,8 @@
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Build.BuildEngine;
-using Microsoft.Build.Utilities;
+using Microsoft.Build.Framework;
+using System.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -17,21 +18,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             try
             {
                 Dictionary<string,string> projectData = ParseSolutionFile(SolutionPath);
-                if(!projectData.Empty())
+                if(projectData.Count > 0)
                 {
-                    string solutionDirectory = Path.GetDirectoryName(solutionPath);
-                    foreach(string key in projectData)
+                    string solutionDirectory = Path.GetDirectoryName(SolutionPath);
+                    foreach(string key in projectData.Keys)
                     {
                         string projectRelativePath = projectData[key];
                         List<string> projectPathSegments = new List<string>();
-                        projectPathSegments.add(solutionDirectory);
-                        projectPathSegments.add(Path.GetDirectoryName(projectRelativePath));
+                        projectPathSegments.Add(solutionDirectory);
+                        projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
 
                         HubProjectName = key;
                         HubVersionName = GetProjectAssemblyVersion(projectPathSegments);
                         PackagesConfigPath = CreateProjectPackageConfigPath(projectPathSegments);
                         OutputDirectory = CreateOutputDirectoryPath(solutionDirectory,projectRelativePath);
-                        bool projectResult = base.execute();
+                        bool projectResult = base.Execute();
                         if(projectResult)
                         {
                             Console.WriteLine("Generated Bdio file for project {0}",projectData[key]);
@@ -57,7 +58,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
                 else
                 {   result = false;
-                    throw new BlackDuckIntegrationException(ex);
+                    throw new BlackDuckIntegrationException(ex.Message);
                 }
             }
 
@@ -66,7 +67,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private string CreatePath(List<string> pathSegments)
         {
-            return String.Join(Path.PathSeparator,pathSegments);
+            return String.Join(String.Format("{0}",Path.PathSeparator),pathSegments);
         }
 
         private Project CreateProjectObject(string solutionDirectory, string projectRelativePath)
@@ -74,8 +75,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             Engine buildEngine = Engine.GlobalEngine;
             Project project = new Project(buildEngine);
             List<string> pathSegments = new List<string>();
-            pathSegments.add(solutionDirectory);
-            pathSegments.add(projectRelativePath);
+            pathSegments.Add(solutionDirectory);
+            pathSegments.Add(projectRelativePath);
             project.Load(CreatePath(pathSegments));
 
             return project;
@@ -96,12 +97,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     if(equalIndex > -1)
                     {
                         string projectValuesCSV = projectText.Substring(equalIndex);
-                        projectValues.ReplaceAll("\"","");
-                        string[] projectValues = projectValuesCSV.Split(",");
+                        projectValuesCSV.Replace ("\"","");
+                        string[] projectValues = projectValuesCSV.Split(new char[] { ',' });
 
                         if(projectValues.Length >= 2)
                         {
-                            projectDataMap.put(projectValues[0].Trim(), projectValues[1].Trim());
+                            projectDataMap[projectValues[0].Trim()]= projectValues[1].Trim();
                         }
                     }
                 }
@@ -117,16 +118,16 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private string GetProjectAssemblyVersion(List<string> projectPathSegments)
         {
-            string version = DateTime.Now().ToString("yyyy-MM-dd_HH-mm-ss");
+            string version = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             List<string> pathSegments = new List<string>(projectPathSegments);
-            pathSegments.add("Properties");
-            pathSegments.add("AssemblyInfo.cs");
+            pathSegments.Add("Properties");
+            pathSegments.Add("AssemblyInfo.cs");
             string path = CreatePath(pathSegments);
 
             if(File.Exists(path))
             {
-                string[] contents = File.ReadAllLines(path);
-                var versionText = contents.( text => text.Contains("[assembly: AssemblyVersion"));
+                List<string> contents = new List<string>(File.ReadAllLines(path));
+                var versionText = contents.FindAll( text => text.Contains("[assembly: AssemblyVersion"));
                 foreach(string text in versionText)
                 {
                     int firstParen = text.IndexOf("(");
@@ -135,7 +136,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     int start = firstParen + 2;
                     // exclude the ')' and the " characters
                     int end = lastParen - 2;
-                    version = item.Substring(start, end);
+                    version = text.Substring(start, end);
                 }
             }
             return version;
@@ -144,13 +145,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         private string CreateProjectPackageConfigPath(List<string> projectPathSegments)
         {
             List<string> pathSegments = new List<string>(projectPathSegments);
-            pathSegments.add("packages.config");
+            pathSegments.Add("packages.config");
             return CreatePath(pathSegments);
         }
 
         private string CreateOutputDirectoryPath(string solutionDirectory, string projectRelativePath)
         {
-            if(String.IsNotNullOrEmpty(OutputDirectory))
+            if(!String.IsNullOrWhiteSpace(OutputDirectory))
             {
                 return OutputDirectory;
             }
@@ -160,16 +161,16 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 if(project != null)
                 {
                     BuildPropertyGroup propertyGroup = project.EvaluatedProperties;
-                    string builddirectory = propertyGroup.Item["OutputPath"];
+                    string builddirectory = propertyGroup["OutputPath"].Value;
 
                     List<string> pathSegments = new List<string>();
-                    pathSegments.add(solutionDirectory);
-                    pathSegments.add(builddirectory);
+                    pathSegments.Add(solutionDirectory);
+                    pathSegments.Add(builddirectory);
                     return CreatePath(pathSegments);
                 }
                 else
                 {
-                    // shouldn't get here
+                    return null;
                 }
             }
         }

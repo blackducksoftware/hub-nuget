@@ -73,6 +73,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SolutionBomTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildBomTask\BuildBomTask.csproj">
