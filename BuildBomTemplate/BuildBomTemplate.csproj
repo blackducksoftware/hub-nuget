@@ -16,7 +16,7 @@
     <hub_proxy_password></hub_proxy_password>
     <!-- task feature config -->
     <hub_scan_timeout>300</hub_scan_timeout>
-    <hub_output_directory>$(ProjectDir)\$(OutputPath)</hub_output_directory>
+    <hub_output_directory></hub_output_directory>
     <excluded_modules></excluded_modules>
     <hub_ignore_failure>false</hub_ignore_failure>
     <hub_create_flat_list>false</hub_create_flat_list>
@@ -25,19 +25,17 @@
     <hub_create_report>false</hub_create_report>
     <hub_check_policies>false</hub_check_policies>
   </PropertyGroup>
-  <!-- Define the assembly location of the MSBuild task that will be executed. 
+  <!-- Define the assembly location of the MSBuild task that will be executed.
        The caller of this file must specify BDSTaskDirectory in their call to the MSBuild command.
   -->
-  <UsingTask TaskName="Com.Blackducksoftware.Integration.Hub.Nuget.BuildBomTask" AssemblyName="BuildBomTask"/>
+  <UsingTask TaskName="Com.Blackducksoftware.Integration.Hub.Nuget.SolutionBuildBOMTask" AssemblyName="BuildBomTask"/>
   <!-- Define the target that will call the task to look up the dependencies. -->
   <Target Name="GenerateBdio">
-    <BuildBomTask 
+    <BuildBomTask
       HubUrl="$(hub_url)"
       HubUsername="$(hub_username)"
       HubPassword="$(hub_password)"
       HubTimeout="$(hub_timeout)"
-      HubProjectName="$(hub_project_name)"
-      HubVersionName="$(hub_version_name)"
       HubProxyHost="$(hub_proxy_host)"
       HubProxyPort="$(hub_proxy_port)"
       HubProxyUsername="$(hub_proxy_username)"
@@ -50,9 +48,8 @@
       CreateHubBdio="$(hub_create_bdio)"
       DeployHubBdio="$(hub_deploy_bdio)"
       CreateHubReport="$(hub_create_report)"
-      CheckPolicies="$(hub_check_policies)"  
-      PackagesConfigPath="$(ProjectDir)\packages.config"
-      PackagesRepoPath="$(PackagesDirectory)" 
+      CheckPolicies="$(hub_check_policies)"
+      SolutionPath="$(SolutionPath)"
     />
   </Target>
 </Project>
