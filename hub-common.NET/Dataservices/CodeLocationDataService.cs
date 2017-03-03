@@ -16,14 +16,35 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         }
 
-        public List<CodeLocationView> FetchCodeLocations()
+        public List<CodeLocationView> FetchCodeLocations(string q, int limit)
         {
             HubRequest request = new HubRequest(RestConnection);
-            request.QueryParameters.Add(HubRequest.Q_LIMIT, "1");
+            request.QueryParameters.Add(HubRequest.Q_LIMIT, limit.ToString());
+            request.QueryParameters.Add("q", q);
             request.UrlSegments.Add($"api/codelocations");
+            Console.WriteLine(request.BuildUri().ToString());
             HubPagedResponse<CodeLocationView> response = request.ExecuteGetForResponsePaged<CodeLocationView>();
             List<CodeLocationView> codeLocations = response.Items;
             return codeLocations;
+        }
+
+        public CodeLocationView GetCodeLocationView(string bdioId)
+        {
+            string q = $"url:{bdioId}";
+            List<CodeLocationView> codeLocations = FetchCodeLocations(q, 1);
+            if (codeLocations != null && codeLocations.Count > 0)
+            {
+                return codeLocations[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public string GetCodeLocationId(CodeLocationView codeLocation)
+        {
+            return codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
         }
     }
 }

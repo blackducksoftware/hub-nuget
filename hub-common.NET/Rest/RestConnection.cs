@@ -42,7 +42,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
                 NameValueCollection parameters = HttpUtility.ParseQueryString(string.Empty);
                 foreach (KeyValuePair<string, string> queryParameter in queryParameters)
                 {
-                    parameters[queryParameter.Key] = queryParameter.Value;
+                    string key = Uri.EscapeDataString(queryParameter.Key);
+                    string value = Uri.EscapeDataString(queryParameter.Value);
+                    parameters[key] = value;
                 }
                 uriBuilder.Query = parameters.ToString();
             }

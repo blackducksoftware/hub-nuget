@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Text;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -22,6 +23,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         HubServerConfig HubServerConfig;
         private BuildBOMTask task = new BuildBOMTask();
+        private string BdioId;
         private int oldScanCount;
 
         [OneTimeSetUp]
@@ -43,38 +45,26 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             HubServerConfig = new HubServerConfig(task.HubUrl, task.HubTimeout, credentials, proxyInfo);
 
             // Task options
-            task.CreateFlatDependencyList = false;
-            task.CreateHubBdio = false;
-            task.DeployHubBdio = false;
+            task.CreateFlatDependencyList = true;
+            task.CreateHubBdio = true;
+            task.DeployHubBdio = true;
 
-            using (HttpClient client = task.CreateClient(HubServerConfig))
+            // Initialize helper properties
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+            BdioId = bdioPropertyHelper.CreateBdioId(task.HubProjectName, task.HubVersionName);
+            task.BdioId = BdioId;
+            using (RestConnection restConnection = task.CreateClient(HubServerConfig))
             {
-                oldScanCount = task.GetCurrentScanSummaries(client).Result;
+                task.CodeLocationDataService = new CodeLocationDataService(restConnection);
+                oldScanCount = task.GetCurrentScanSummaries(restConnection);
             }
 
             // Deploy resources
+            Directory.CreateDirectory(task.OutputDirectory);
             File.WriteAllLines($"{task.OutputDirectory}/packages.config", Resources.packages.Split('\n'));
 
             // Run task
             task.Execute();
-
-            // Generate Report
-
-            // Check policies
-        }
-
-        [Test]
-        public void Other()
-        {
-            using(RestConnection restConnection = task.CreateClient(HubServerConfig))
-            {
-                CodeLocationDataService codeLocationDS = new CodeLocationDataService(restConnection);
-                List<CodeLocationView> codeLocations = codeLocationDS.FetchCodeLocations();
-                foreach(CodeLocationView codeLocation in codeLocations)
-                {
-                    Console.WriteLine(codeLocation.Json);
-                }
-            }
         }
 
         [Test]
@@ -116,20 +106,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         [Test]
         public void DeploymentTest()
-        {
-            PageScanSummaryView scanSummaries = null;
-            using (HttpClient client = task.CreateClient(HubServerConfig))
+        {      
+            using (RestConnection restConnection = task.CreateClient(HubServerConfig))
             {
-                PageCodeLocationView codeLocations = task.CodeLocationsAPI(client).Result;
-                if (codeLocations.TotalCount > 0)
+                PageScanSummaryView scanSummaries = null;
+                CodeLocationDataService codeLocationDS = new CodeLocationDataService(restConnection);
+                CodeLocationView codeLocation = codeLocationDS.GetCodeLocationView(BdioId);
+                Assert.IsNotNull(codeLocation);
+                if (codeLocation != null)
                 {
-                    CodeLocationView codeLocation = codeLocations.Items[0];
-                    string codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
-                    scanSummaries = task.ScanSummariesAPI(client, codeLocationId).Result;
+                    string codeLocationId = codeLocationDS.GetCodeLocationId(codeLocation);
+                    scanSummaries = task.ScanSummariesAPI(restConnection, codeLocationId).Result;
                 }
+                Assert.IsNotNull(scanSummaries);
+                Assert.Greater(scanSummaries.TotalCount, oldScanCount);
             }
-            Assert.IsNotNull(scanSummaries);
-            Assert.Greater(scanSummaries.TotalCount, oldScanCount);
         }
 
 
