@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Com.Blackducksoftware.Integration.Hub.Nuget.Model
+namespace Com.Blackducksoftware.Integration.HubCommon.NET.Model.ScanSummary
 {
     public class PageScanSummaryView : HubView
     {

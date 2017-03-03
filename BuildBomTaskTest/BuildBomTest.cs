@@ -1,12 +1,14 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
+using Com.Blackducksoftware.Integration.Hub.Nuget;
+using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -14,7 +16,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
     public class BuildBomTest
     {
 
-        BuildBOMTask task = new BuildBOMTask();
+        private BuildBOMTask task = new BuildBOMTask();
+        private int oldScanCount;
 
         [OneTimeSetUp]
         public void ExecuteTaskTest()
@@ -31,18 +34,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             // Task options
             task.CreateFlatDependencyList = true;
             task.CreateHubBdio = true;
+            task.DeployHubBdio = true;
+
+            using (HttpClient client = task.CreateClient().Result)
+            {
+                oldScanCount = task.GetCurrentScanSummaries(client).Result;
+            }
 
             // Deploy resources
             File.WriteAllLines($"{task.OutputDirectory}/packages.config", Resources.packages.Split('\n'));
 
             // Run task
             task.Execute();
-
-            // Deploy BOM to hub
-            /* 
-            System.Threading.Tasks.Task deployTask = task.Deploy(bdioContent);
-            deployTask.GetAwaiter().GetResult();
-            //*/
 
             // Generate Report
 
@@ -78,36 +81,33 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void BuildBOMTest()
         {
             string actualString = File.ReadAllText($"{task.OutputDirectory}/{task.HubProjectName}.jsonld");
-            BdioContent expected = ParseBdio(Resources.sample_bdio);
-            BdioContent actual = ParseBdio(actualString);
+            BdioContent expected = BuildBOMTask.ParseBdio(Resources.sample_bdio);
+            BdioContent actual = BuildBOMTask.ParseBdio(actualString);
             actual.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
             // Change UUID to match the sample file
             Assert.AreEqual(expected, actual);
+            Console.WriteLine($"EXPECTED\n{expected}\nACTUAL\n{actual}");
         }
 
-        private BdioContent ParseBdio(string bdio)
+        [Test]
+        public void DeploymentTest()
         {
-            BdioContent bdioContent = new BdioContent();
-            JToken jBdio = JArray.Parse(bdio);
-            foreach (JToken jComponent in jBdio)
+            PageScanSummaryView scanSummaries = null;
+            using (HttpClient client = task.CreateClient().Result)
             {
-                BdioNode node = jComponent.ToObject<BdioNode>();
-                if (node.Type.Equals("BillOfMaterials"))
+                PageCodeLocationView codeLocations = task.CodeLocationsAPI(client).Result;
+                if (codeLocations.TotalCount > 0)
                 {
-                    bdioContent.BillOfMaterials = jComponent.ToObject<BdioBillOfMaterials>();
-                }
-                else if (node.Type.Equals("Project"))
-                {
-                    bdioContent.Project = jComponent.ToObject<BdioProject>();
-                }
-                else if (node.Type.Equals("Component"))
-                {
-                    bdioContent.Components.Add(jComponent.ToObject<BdioComponent>());
+                    CodeLocationView codeLocation = codeLocations.Items[0];
+                    string codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
+                    scanSummaries = task.ScanSummariesAPI(client, codeLocationId).Result;
                 }
             }
-            return bdioContent;
-
+            Assert.IsNotNull(scanSummaries);
+            Assert.Greater(scanSummaries.TotalCount, oldScanCount);
         }
+
+
 
         private void WriteArrayToConsole(object[] objects)
         {

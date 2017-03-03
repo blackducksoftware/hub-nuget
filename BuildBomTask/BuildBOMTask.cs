@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Build.Framework;
-using System.ComponentModel;
 using NuGet.Protocol.Core.Types;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,8 +15,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
-using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
 using Newtonsoft.Json.Linq;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Model.ScanSummary;
+using Com.Blackducksoftware.Integration.HubCommon.NET.Model.CodeLocation;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -63,6 +63,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         {
             // Creates output directory if it doesn't already exist
             Directory.CreateDirectory(OutputDirectory);
+            string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
 
             if (CreateFlatDependencyList)
             {
@@ -81,13 +82,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             if (CreateHubBdio)
             {
                 BdioContent bdioContent = BuildBOM();
-                File.WriteAllText($"{OutputDirectory}/{HubProjectName}.jsonld", bdioContent.ToString());
+                File.WriteAllText(bdioFilePath, bdioContent.ToString());
             }
 
             if (DeployHubBdio)
             {
-                //Task deployTask = Deploy(bdioContent);
-                //deployTask.Wait();
+                string bdio = File.ReadAllText(bdioFilePath);
+                BdioContent bdioContent = ParseBdio(bdio);
+                Task deployTask = Deploy(bdioContent);
+                deployTask.Wait();
             }
 
             if (CreateHubReport)
@@ -101,6 +104,30 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
 
             return true;
+        }
+
+        public static BdioContent ParseBdio(string bdio)
+        {
+            BdioContent bdioContent = new BdioContent();
+            JToken jBdio = JArray.Parse(bdio);
+            foreach (JToken jComponent in jBdio)
+            {
+                BdioNode node = jComponent.ToObject<BdioNode>();
+                if (node.Type.Equals("BillOfMaterials"))
+                {
+                    bdioContent.BillOfMaterials = jComponent.ToObject<BdioBillOfMaterials>();
+                }
+                else if (node.Type.Equals("Project"))
+                {
+                    bdioContent.Project = jComponent.ToObject<BdioProject>();
+                }
+                else if (node.Type.Equals("Component"))
+                {
+                    bdioContent.Components.Add(jComponent.ToObject<BdioComponent>());
+                }
+            }
+            return bdioContent;
+
         }
 
         #region Make Flat List
@@ -245,12 +272,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         {
             using (HttpClient client = await CreateClient())
             {
+                int currentSummaries = await GetCurrentScanSummaries(client);
                 await LinkedDataAPI(client, bdioContent);
-                await WaitForScanComplete(client);
+                await WaitForScanComplete(client, currentSummaries);
             }
         }
 
-        public async Task WaitForScanComplete(HttpClient client)
+        public async Task WaitForScanComplete(HttpClient client, int currentSummaries)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -285,13 +313,16 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 {
                     throw new BlackDuckIntegrationException($"There are no scan summaries for id: {codeLocationId}");
                 }
-                ScanSummaryView scanSummary = scanSummaries.Items[0];
-                string scanStatus = scanSummary.Status;
-
-                if (!scanStatus.Equals(currentStatus))
+                else if (scanSummaries.TotalCount > currentSummaries)
                 {
-                    currentStatus = scanStatus;
-                    Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
+                    ScanSummaryView scanSummary = scanSummaries.Items[0];
+                    string scanStatus = scanSummary.Status;
+
+                    if (!scanStatus.Equals(currentStatus))
+                    {
+                        currentStatus = scanStatus;
+                        Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
+                    }
                 }
 
                 if (currentStatus.Equals("COMPLETE"))
@@ -311,14 +342,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
         }
 
-        public void GenerateReports(HttpClient client)
+        public async Task<int> GetCurrentScanSummaries(HttpClient client)
         {
-
-        }
-
-        public void CheckPolicy(HttpClient client)
-        {
-
+            Console.WriteLine("Checking scan summary status");
+            PageCodeLocationView codeLocations = await CodeLocationsAPI(client);
+            if (codeLocations.TotalCount > 0)
+            {
+                CodeLocationView codeLocation = codeLocations.Items[0];
+                string codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
+                PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
+                return scanSummaries.TotalCount;
+            }
+            return 0;
         }
 
         public async Task<PageScanSummaryView> ScanSummariesAPI(HttpClient client, string codeLocationId)
@@ -372,10 +407,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
         }
 
+        #endregion
 
+        public void GenerateReports(HttpClient client)
+        {
 
+        }
+
+        public void CheckPolicy(HttpClient client)
+        {
+            
+        }
     }
-    #endregion
+    
 
     public class Logger : NuGet.Common.ILogger
     {
