@@ -65,24 +65,36 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         // Currently public for testing
         public CodeLocationDataService CodeLocationDataService;
         public ScanSummariesDataService ScanSummariesDataService;
-        public string BdioId;
+        public DeployBdioDataService DeployBdioDataService;
         public RestConnection RestConnection;
+        public string BdioId;
 
         public override bool Execute()
         {
             // Reset Connection Setup
-            HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
-            HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
-            HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
-            HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
             if (RestConnection == null)
             {
+                HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
+                HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
+                HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
+                HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
                 RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
                 RestConnection = restConnection;
             }
 
             // Setup DataServices
-            CodeLocationDataService = new CodeLocationDataService(RestConnection);
+            if (CodeLocationDataService == null)
+            {
+                CodeLocationDataService = new CodeLocationDataService(RestConnection);
+            }
+            if (ScanSummariesDataService == null)
+            {
+                ScanSummariesDataService = new ScanSummariesDataService(RestConnection);
+            }
+            if (DeployBdioDataService == null)
+            {
+                DeployBdioDataService = new DeployBdioDataService(RestConnection);
+            }
 
             // Set helper properties
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
@@ -113,18 +125,26 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (DeployHubBdio)
             {
+                Console.WriteLine($"[DEPLOY] Deploying BDIO to hub @ {HubUrl}");
+
                 string bdio = File.ReadAllText(bdioFilePath);
                 BdioContent bdioContent = BdioContent.Parse(bdio);
-                Task deployTask = Deploy(bdioContent, hubServerConfig);
-                deployTask.Wait();
+
+                CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(bdioContent.Project.Id);
+                int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
+
+                HttpResponseMessage response = DeployBdioDataService.Deploy(bdioContent);
+
+                WaitForScanComplete(RestConnection, currentSummaries);
+                Console.WriteLine("[DEPLOY] Finished deployment");
             }
 
-            if (CreateHubReport)
+            if (CheckPolicies)
             {
 
             }
 
-            if (CheckPolicies)
+            if (CreateHubReport)
             {
 
             }
@@ -133,15 +153,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         }
 
         #region Make Flat List
+
         public List<NuGet.PackageReference> GenerateFlatList()
         {
             // Load the packages.config file into a list of Packages
             NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile(PackagesConfigPath);
             return new List<NuGet.PackageReference>(configFile.GetPackageReferences());
         }
+
         #endregion
 
         #region Generate BDIO
+
         public BdioContent BuildBOM()
         {
             // Load the packages.config file into a list of Packages
@@ -267,18 +290,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             bool minorMatch = framework1.TargetFramework.Version.Minor == framework2.TargetFramework.Version.Minor;
             return majorMatch && minorMatch;
         }
+
         #endregion
 
         #region Deploy
-        public async Task Deploy(BdioContent bdioContent, HubServerConfig hubServerConfig)
-        {
-            Console.WriteLine($"[DEPLOY] Deploying BDIO to hub @ {hubServerConfig.Url}");
-            CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
-            int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
-            await LinkedDataAPI(RestConnection, bdioContent);
-            WaitForScanComplete(RestConnection, currentSummaries);
-            Console.WriteLine("[DEPLOY] Finished deployment");
-        }
 
         public void WaitForScanComplete(HttpClient client, int currentSummaries)
         {
@@ -323,17 +338,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                         currentStatus = scanStatus;
                         Console.WriteLine($"[DEPLOY] \tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
                     }
+                    if (currentStatus.Equals("COMPLETE"))
+                    {
+                        stopwatch.Stop();
+                        break;
+                    }
                 }
-
-                if (currentStatus.Equals("COMPLETE"))
-                {
-                    stopwatch.Stop();
-                    break;
-                }
-                else
-                {
-                    Thread.Sleep(500);
-                }
+                Thread.Sleep(500);
             }
 
             if (stopwatch.ElapsedMilliseconds / 1000 > HubScanTimeout)
@@ -342,29 +353,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
         }
 
-        public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
-        {
-            HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
-            HttpResponseMessage response = await client.PostAsync($"{HubUrl}/api/bom-import", content);
-        }
-
-        public RestConnection CreateClient(HubServerConfig hubServerConfig)
-        {
-            CredentialsResetConnection crc = new CredentialsResetConnection(hubServerConfig);
-            return crc;
-        }
-
-        #endregion
-
-        public void GenerateReports(HttpClient client)
-        {
-
-        }
-
-        public void CheckPolicy(HttpClient client)
-        {
-
-        }
+        #endregion        
     }
 
 

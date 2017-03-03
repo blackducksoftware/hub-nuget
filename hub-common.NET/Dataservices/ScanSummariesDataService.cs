@@ -52,6 +52,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         public string GetCodeLocationId(CodeLocationView codeLocation)
         {
+            if(codeLocation == null)
+            {
+                return null;
+            }
             return codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
         }
     }
