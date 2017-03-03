@@ -384,15 +384,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             return scanSummaries;
         }
 
-        public async Task<PageCodeLocationView> CodeLocationsAPIs(HttpClient client)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations?q={HubProjectName}%2F0.0&codeLocationType=BOM_IMPORT");
-            VerifySuccess(response);
-            string content = await response.Content.ReadAsStringAsync();
-            PageCodeLocationView codeLocations = JToken.Parse(content).FromJToken<PageCodeLocationView>();
-            return codeLocations;
-        }
-
         public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
         {
             HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
