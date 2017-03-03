@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using Microsoft.Build.BuildEngine;
 using Microsoft.Build.Utilities;
 
@@ -139,6 +140,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
             return version;
         }
+
         private string CreateProjectPackageConfigPath(List<string> projectPathSegments)
         {
             List<string> pathSegments = new List<string>(projectPathSegments);

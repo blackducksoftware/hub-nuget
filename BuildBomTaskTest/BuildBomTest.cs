@@ -1,14 +1,15 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
-using Com.Blackducksoftware.Integration.Hub.Nuget;
-using Com.Blackducksoftware.Integration.Hub.Nuget.Model;
-using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
-using Newtonsoft.Json.Linq;
+﻿using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Text;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -16,7 +17,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
     public class BuildBomTest
     {
 
+        HubServerConfig HubServerConfig;
         private BuildBOMTask task = new BuildBOMTask();
+        private string BdioId;
         private int oldScanCount;
 
         [OneTimeSetUp]
@@ -31,25 +34,38 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.HubUsername = "sysadmin";
             task.HubPassword = "blackduck";
 
+            // Server setup
+            HubCredentials credentials = new HubCredentials(task.HubUsername, task.HubPassword);
+            HubCredentials proxyCredentials = new HubCredentials(task.HubProxyUsername, task.HubProxyPassword);
+            HubProxyInfo proxyInfo = new HubProxyInfo(task.HubProxyHost, task.HubProxyPort, proxyCredentials);
+            HubServerConfig = new HubServerConfig(task.HubUrl, task.HubTimeout, credentials, proxyInfo);
+
             // Task options
             task.CreateFlatDependencyList = true;
             task.CreateHubBdio = true;
             task.DeployHubBdio = true;
 
-            using (HttpClient client = task.CreateClient().Result)
+            // Initialize helper properties
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+            BdioId = bdioPropertyHelper.CreateBdioId(task.HubProjectName, task.HubVersionName);
+            task.BdioId = BdioId;
+
+            task.RestConnection = task.CreateClient(HubServerConfig);
+            task.CodeLocationDataService = new CodeLocationDataService(task.RestConnection);
+            task.ScanSummariesDataService = new ScanSummariesDataService(task.RestConnection);
+            CodeLocationView codeLocationView = task.CodeLocationDataService.GetCodeLocationView(task.BdioId);
+            oldScanCount = 0;
+            if (codeLocationView != null)
             {
-                oldScanCount = task.GetCurrentScanSummaries(client).Result;
+                oldScanCount = task.ScanSummariesDataService.GetScanSummaries(codeLocationView).TotalCount;
             }
 
             // Deploy resources
+            Directory.CreateDirectory(task.OutputDirectory);
             File.WriteAllLines($"{task.OutputDirectory}/packages.config", Resources.packages.Split('\n'));
 
             // Run task
             task.Execute();
-
-            // Generate Report
-
-            // Check policies
         }
 
         [Test]
@@ -81,8 +97,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void BuildBOMTest()
         {
             string actualString = File.ReadAllText($"{task.OutputDirectory}/{task.HubProjectName}.jsonld");
-            BdioContent expected = BuildBOMTask.ParseBdio(Resources.sample_bdio);
-            BdioContent actual = BuildBOMTask.ParseBdio(actualString);
+            BdioContent expected = BdioContent.Parse(Resources.sample_bdio);
+            BdioContent actual = BdioContent.Parse(actualString);
             actual.BillOfMaterials.Id = "uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5";
             // Change UUID to match the sample file
             Assert.AreEqual(expected, actual);
@@ -92,22 +108,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         [Test]
         public void DeploymentTest()
         {
-            PageScanSummaryView scanSummaries = null;
-            using (HttpClient client = task.CreateClient().Result)
+            using (RestConnection restConnection = task.CreateClient(HubServerConfig))
             {
-                PageCodeLocationView codeLocations = task.CodeLocationsAPI(client).Result;
-                if (codeLocations.TotalCount > 0)
-                {
-                    CodeLocationView codeLocation = codeLocations.Items[0];
-                    string codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
-                    scanSummaries = task.ScanSummariesAPI(client, codeLocationId).Result;
-                }
+                HubPagedResponse<ScanSummaryView> scanSummaries = null;
+                CodeLocationDataService codeLocationDS = new CodeLocationDataService(restConnection);
+                CodeLocationView codeLocation = codeLocationDS.GetCodeLocationView(BdioId);
+                Assert.IsNotNull(codeLocation);
+
+                scanSummaries = task.ScanSummariesDataService.GetScanSummaries(codeLocation);
+                Assert.IsNotNull(scanSummaries);
+                Assert.Greater(scanSummaries.TotalCount, oldScanCount);
             }
-            Assert.IsNotNull(scanSummaries);
-            Assert.Greater(scanSummaries.TotalCount, oldScanCount);
         }
-
-
 
         private void WriteArrayToConsole(object[] objects)
         {

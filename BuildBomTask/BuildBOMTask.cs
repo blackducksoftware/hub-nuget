@@ -16,8 +16,11 @@ using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Newtonsoft.Json.Linq;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Model.ScanSummary;
-using Com.Blackducksoftware.Integration.HubCommon.NET.Model.CodeLocation;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -59,8 +62,32 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public string PackagesConfigPath { get; set; }
         public string PackagesRepoPath { get; set; }
 
+        // Currently public for testing
+        public CodeLocationDataService CodeLocationDataService;
+        public ScanSummariesDataService ScanSummariesDataService;
+        public string BdioId;
+        public RestConnection RestConnection;
+
         public override bool Execute()
         {
+            // Reset Connection Setup
+            HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
+            HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
+            HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
+            HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
+            if (RestConnection == null)
+            {
+                RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
+                RestConnection = restConnection;
+            }
+
+            // Setup DataServices
+            CodeLocationDataService = new CodeLocationDataService(RestConnection);
+
+            // Set helper properties
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+            BdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
+
             // Creates output directory if it doesn't already exist
             Directory.CreateDirectory(OutputDirectory);
             string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
@@ -68,7 +95,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             if (CreateFlatDependencyList)
             {
                 List<NuGet.PackageReference> packages = GenerateFlatList();
-                BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
                 using (StreamWriter file = new StreamWriter($"{OutputDirectory}/{HubProjectName}_flat.txt", false, Encoding.UTF8))
                 {
                     foreach (NuGet.PackageReference packageReference in packages)
@@ -88,8 +114,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             if (DeployHubBdio)
             {
                 string bdio = File.ReadAllText(bdioFilePath);
-                BdioContent bdioContent = ParseBdio(bdio);
-                Task deployTask = Deploy(bdioContent);
+                BdioContent bdioContent = BdioContent.Parse(bdio);
+                Task deployTask = Deploy(bdioContent, hubServerConfig);
                 deployTask.Wait();
             }
 
@@ -104,30 +130,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
 
             return true;
-        }
-
-        public static BdioContent ParseBdio(string bdio)
-        {
-            BdioContent bdioContent = new BdioContent();
-            JToken jBdio = JArray.Parse(bdio);
-            foreach (JToken jComponent in jBdio)
-            {
-                BdioNode node = jComponent.ToObject<BdioNode>();
-                if (node.Type.Equals("BillOfMaterials"))
-                {
-                    bdioContent.BillOfMaterials = jComponent.ToObject<BdioBillOfMaterials>();
-                }
-                else if (node.Type.Equals("Project"))
-                {
-                    bdioContent.Project = jComponent.ToObject<BdioProject>();
-                }
-                else if (node.Type.Equals("Component"))
-                {
-                    bdioContent.Components.Add(jComponent.ToObject<BdioComponent>());
-                }
-            }
-            return bdioContent;
-
         }
 
         #region Make Flat List
@@ -268,60 +270,58 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         #endregion
 
         #region Deploy
-        public async Task Deploy(BdioContent bdioContent)
+        public async Task Deploy(BdioContent bdioContent, HubServerConfig hubServerConfig)
         {
-            using (HttpClient client = await CreateClient())
-            {
-                int currentSummaries = await GetCurrentScanSummaries(client);
-                await LinkedDataAPI(client, bdioContent);
-                await WaitForScanComplete(client, currentSummaries);
-            }
+            Console.WriteLine($"[DEPLOY] Deploying BDIO to hub @ {hubServerConfig.Url}");
+            CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
+            int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
+            await LinkedDataAPI(RestConnection, bdioContent);
+            WaitForScanComplete(RestConnection, currentSummaries);
+            Console.WriteLine("[DEPLOY] Finished deployment");
         }
 
-        public async Task WaitForScanComplete(HttpClient client, int currentSummaries)
+        public void WaitForScanComplete(HttpClient client, int currentSummaries)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-
-            string codeLocationId = null;
+            CodeLocationView codeLocation = null;
 
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
-                Console.WriteLine("Checking scan summary status");
-                PageCodeLocationView codeLocations = await CodeLocationsAPI(client);
-                if (codeLocations.TotalCount > 0)
+                Console.WriteLine("[DEPLOY] Checking scan summary status");
+                codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
+                if (codeLocation != null)
                 {
-                    CodeLocationView codeLocation = codeLocations.Items[0];
-                    codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
                     break;
                 }
                 else
                 {
-                    Console.WriteLine("No code locations found. Trying again...");
+                    Console.WriteLine("[DEPLOY] No code locations found. Trying again...");
+                    Thread.Sleep(500);
                 }
             }
 
-            if (codeLocationId == null)
+            if (codeLocation == null)
             {
-                throw new BlackDuckIntegrationException($"Failed to get the codelocation for {HubProjectName} ");
+                throw new BlackDuckIntegrationException($"[DEPLOY] Failed to get the codelocation for {HubProjectName} ");
             }
 
+            string codeLocationId = CodeLocationDataService.GetCodeLocationId(codeLocation);
             string currentStatus = "UNKOWN";
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
-                PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
-                if (scanSummaries.TotalCount == 0)
+                HubPagedResponse<ScanSummaryView> scanSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation);
+                if (scanSummaries == null || scanSummaries.Items[0] == null)
                 {
-                    throw new BlackDuckIntegrationException($"There are no scan summaries for id: {codeLocationId}");
+                    throw new BlackDuckIntegrationException($"[DEPLOY] There are no scan summaries for id: {codeLocationId}");
                 }
                 else if (scanSummaries.TotalCount > currentSummaries)
                 {
                     ScanSummaryView scanSummary = scanSummaries.Items[0];
                     string scanStatus = scanSummary.Status;
-
                     if (!scanStatus.Equals(currentStatus))
                     {
                         currentStatus = scanStatus;
-                        Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
+                        Console.WriteLine($"[DEPLOY] \tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
                     }
                 }
 
@@ -338,73 +338,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (stopwatch.ElapsedMilliseconds / 1000 > HubScanTimeout)
             {
-                throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
+                throw new BlackDuckIntegrationException($"[DEPLOY] Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
             }
-        }
-
-        public async Task<int> GetCurrentScanSummaries(HttpClient client)
-        {
-            Console.WriteLine("Checking scan summary status");
-            PageCodeLocationView codeLocations = await CodeLocationsAPI(client);
-            if (codeLocations.TotalCount > 0)
-            {
-                CodeLocationView codeLocation = codeLocations.Items[0];
-                string codeLocationId = codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
-                PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
-                return scanSummaries.TotalCount;
-            }
-            return 0;
-        }
-
-        public async Task<PageScanSummaryView> ScanSummariesAPI(HttpClient client, string codeLocationId)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations/{codeLocationId}/scan-summaries?sort=updated%20asc");
-            VerifySuccess(response);
-            string content = await response.Content.ReadAsStringAsync();
-            PageScanSummaryView scanSummaries = JToken.Parse(content).FromJToken<PageScanSummaryView>();
-            return scanSummaries;
-        }
-
-        public async Task<PageCodeLocationView> CodeLocationsAPI(HttpClient client)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations?q={HubProjectName}%2F0.0&codeLocationType=BOM_IMPORT");
-            VerifySuccess(response);
-            string content = await response.Content.ReadAsStringAsync();
-            PageCodeLocationView codeLocations = JToken.Parse(content).FromJToken<PageCodeLocationView>();
-            return codeLocations;
         }
 
         public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
         {
             HttpContent content = new StringContent(bdio.ToString(), Encoding.UTF8, "application/ld+json");
             HttpResponseMessage response = await client.PostAsync($"{HubUrl}/api/bom-import", content);
-            VerifySuccess(response);
         }
 
-        public async Task<HttpClient> CreateClient()
+        public RestConnection CreateClient(HubServerConfig hubServerConfig)
         {
-            HttpClient client = new HttpClient();
-            client.Timeout = new TimeSpan(0, 0, HubTimeout);
-
-            Dictionary<string, string> credentials = new Dictionary<string, string>
-            {
-                {"j_username", HubUsername },
-                {"j_password", HubPassword }
-            };
-
-            HttpContent content = new FormUrlEncodedContent(credentials);
-            HttpResponseMessage response = await client.PostAsync($"{HubUrl}/j_spring_security_check", content);
-            VerifySuccess(response);
-
-            return client;
-        }
-
-        private void VerifySuccess(HttpResponseMessage response)
-        {
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new BlackDuckIntegrationException(response);
-            }
+            CredentialsResetConnection crc = new CredentialsResetConnection(hubServerConfig);
+            return crc;
         }
 
         #endregion
@@ -416,10 +363,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public void CheckPolicy(HttpClient client)
         {
-            
+
         }
     }
-    
+
 
     public class Logger : NuGet.Common.ILogger
     {
