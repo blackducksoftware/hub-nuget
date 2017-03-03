@@ -3,6 +3,7 @@ using Com.Blackducksoftware.Integration.Hub.Nuget;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
@@ -10,6 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -40,9 +43,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             HubServerConfig = new HubServerConfig(task.HubUrl, task.HubTimeout, credentials, proxyInfo);
 
             // Task options
-            task.CreateFlatDependencyList = true;
-            task.CreateHubBdio = true;
-            task.DeployHubBdio = true;
+            task.CreateFlatDependencyList = false;
+            task.CreateHubBdio = false;
+            task.DeployHubBdio = false;
 
             using (HttpClient client = task.CreateClient(HubServerConfig))
             {
@@ -58,6 +61,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             // Generate Report
 
             // Check policies
+        }
+
+        [Test]
+        public void Other()
+        {
+            using(RestConnection restConnection = task.CreateClient(HubServerConfig))
+            {
+                CodeLocationDataService codeLocationDS = new CodeLocationDataService(restConnection);
+                List<CodeLocationView> codeLocations = codeLocationDS.FetchCodeLocations();
+                foreach(CodeLocationView codeLocation in codeLocations)
+                {
+                    Console.WriteLine(codeLocation.Json);
+                }
+            }
         }
 
         [Test]

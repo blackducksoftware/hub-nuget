@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
-    class DeployBdioDataservice : Dataservice
+    public class LinkedDataDataService : DataService
     {
-        public DeployBdioDataservice(RestConnection resetConnection) : base(resetConnection)
+        public LinkedDataDataService(RestConnection resetConnection) : base(resetConnection)
         {
 
         }

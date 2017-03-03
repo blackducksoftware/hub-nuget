@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
-    class Dataservice
+    public class DataService
     {
-        public Dataservice(RestConnection restConnection)
-        {
+        public RestConnection RestConnection { get; set; }
 
+        public DataService(RestConnection restConnection)
+        {
+            RestConnection = restConnection;
         }
     }
 }

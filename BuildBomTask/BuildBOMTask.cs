@@ -94,7 +94,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (DeployHubBdio)
             {
-
                 string bdio = File.ReadAllText(bdioFilePath);
                 BdioContent bdioContent = ParseBdio(bdio);
                 Task deployTask = Deploy(bdioContent, hubServerConfig);
@@ -389,7 +388,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             VerifySuccess(response);
         }
 
-        public HttpClient CreateClient(HubServerConfig hubServerConfig)
+        public RestConnection CreateClient(HubServerConfig hubServerConfig)
         {
             CredentialsResetConnection crc = new CredentialsResetConnection(hubServerConfig);
             return crc;
