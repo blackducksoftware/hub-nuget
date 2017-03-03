@@ -1,11 +1,12 @@
 ﻿using System;
-using Microsoft.Build.Construction;
+//using Microsoft.Build.Construction;
 using Microsoft.Build.Utilities;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     public class SolutionBuildBOMTask : BuildBOMTask
     {
+        /*
         [Required]
         public string SolutionPath { get; set; }
 
@@ -66,5 +67,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
             return version;
         }
+        */
     }
 }
