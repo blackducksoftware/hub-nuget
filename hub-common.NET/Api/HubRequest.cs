@@ -30,7 +30,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             JObject jobject = ExecuteGetForResponseJson();
             HubPagedResponse<T> response = jobject.ToObject<HubPagedResponse<T>>();
             response.Json = jobject.ToString();
-            foreach(T item in response.Items)
+            foreach(T item in response)
             {
                 item.Json = jobject.ToString();
             }
