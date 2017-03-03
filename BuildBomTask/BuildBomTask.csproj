@@ -154,7 +154,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BdioContent.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
     <Compile Include="BuildBOMTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

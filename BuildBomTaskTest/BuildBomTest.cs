@@ -50,7 +50,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             BdioId = bdioPropertyHelper.CreateBdioId(task.HubProjectName, task.HubVersionName);
             task.BdioId = BdioId;
 
-            task.RestConnection = task.CreateClient(HubServerConfig);
+            task.RestConnection = new CredentialsResetConnection(HubServerConfig);
             task.CodeLocationDataService = new CodeLocationDataService(task.RestConnection);
             task.ScanSummariesDataService = new ScanSummariesDataService(task.RestConnection);
             CodeLocationView codeLocationView = task.CodeLocationDataService.GetCodeLocationView(task.BdioId);
@@ -108,17 +108,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         [Test]
         public void DeploymentTest()
         {
-            using (RestConnection restConnection = task.CreateClient(HubServerConfig))
-            {
-                HubPagedResponse<ScanSummaryView> scanSummaries = null;
-                CodeLocationDataService codeLocationDS = new CodeLocationDataService(restConnection);
-                CodeLocationView codeLocation = codeLocationDS.GetCodeLocationView(BdioId);
-                Assert.IsNotNull(codeLocation);
+            HubPagedResponse<ScanSummaryView> scanSummaries = null;
+            CodeLocationDataService codeLocationDS = new CodeLocationDataService(task.RestConnection);
+            CodeLocationView codeLocation = codeLocationDS.GetCodeLocationView(BdioId);
+            Assert.IsNotNull(codeLocation);
 
-                scanSummaries = task.ScanSummariesDataService.GetScanSummaries(codeLocation);
-                Assert.IsNotNull(scanSummaries);
-                Assert.Greater(scanSummaries.TotalCount, oldScanCount);
-            }
+            scanSummaries = task.ScanSummariesDataService.GetScanSummaries(codeLocation);
+            Assert.IsNotNull(scanSummaries);
+            Assert.Greater(scanSummaries.TotalCount, oldScanCount);
         }
 
         private void WriteArrayToConsole(object[] objects)

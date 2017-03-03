@@ -27,9 +27,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             JObject jobject = ExecuteGetForResponseJson();
             HubPagedResponse<T> response = jobject.ToObject<HubPagedResponse<T>>();
             response.Json = jobject.ToString();
-            foreach(T item in response.Items)
+            if (response.Items != null)
             {
-                item.Json = jobject.ToString();
+                foreach (T item in response.Items)
+                {
+                    item.Json = jobject.ToString();
+                }
             }
             return response;
         }
@@ -64,18 +67,23 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             return hubResponse;
         }
 
-        public string ExecutePost(string content)
+        public HttpResponseMessage ExecuteJsonPost(string content)
         {
             HttpContent httpContent = RestConnection.CreateHttpContentJson(content);
             return ExecutePost(httpContent);
         }
 
-        public string ExecutePost(HttpContent httpContent)
+        public HttpResponseMessage ExecuteJsonLDPost(string content)
+        {
+            HttpContent httpContent = RestConnection.CreateHttpContentJsonLD(content);
+            return ExecutePost(httpContent);
+        }
+
+        public HttpResponseMessage ExecutePost(HttpContent httpContent)
         {
             BuildUri();
             HttpResponseMessage response = RestConnection.CreatePostRequest(Uri, httpContent);
-            string responseMessage = response.Content.ReadAsStringAsync().Result;
-            return responseMessage;
+            return response;
         }
 
         public Uri BuildUri()
