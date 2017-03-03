@@ -18,7 +18,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters.Add(HubRequest.Q_LIMIT, limit.ToString());
             request.QueryParameters.Add("q", q);
-            request.UrlSegments.Add($"api/codelocations");
+            request.Path = $"api/codelocations";
             Console.WriteLine(request.BuildUri().ToString());
             HubPagedResponse<CodeLocationView> response = request.ExecuteGetForResponsePaged<CodeLocationView>();
             List<CodeLocationView> codeLocations = response.Items;

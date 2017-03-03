@@ -9,10 +9,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
     public class HubRequest
     {
         public static string Q_LIMIT = "limit";
+        public static string Q_SORT = "sort";
 
         private RestConnection RestConnection;
         private Uri Uri;
-        public List<string> UrlSegments = new List<string>();
+        public string Path = "";
         public Dictionary<string, string> QueryParameters = new Dictionary<string, string>();
         public string Q;
 
@@ -85,7 +86,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             }
             if (Uri == null)
             {
-                Uri = RestConnection.CreateURI(RestConnection.GetBaseUrl(), UrlSegments, QueryParameters);
+                Uri = RestConnection.CreateURI(RestConnection.GetBaseUrl(), Path, QueryParameters);
             }
             return Uri;
         }

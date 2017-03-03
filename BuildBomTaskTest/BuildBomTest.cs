@@ -9,6 +9,7 @@ using System.Text;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -48,10 +49,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioId = bdioPropertyHelper.CreateBdioId(task.HubProjectName, task.HubVersionName);
             task.BdioId = BdioId;
-            using (RestConnection restConnection = task.CreateClient(HubServerConfig))
+
+            task.RestConnection = task.CreateClient(HubServerConfig);
+            task.CodeLocationDataService = new CodeLocationDataService(task.RestConnection);
+            task.ScanSummariesDataService = new ScanSummariesDataService(task.RestConnection);
+            CodeLocationView codeLocationView = task.CodeLocationDataService.GetCodeLocationView(task.BdioId);
+            oldScanCount = 0;
+            if (codeLocationView != null)
             {
-                task.CodeLocationDataService = new CodeLocationDataService(restConnection);
-                oldScanCount = task.GetCurrentScanSummaries(restConnection);
+                oldScanCount = task.ScanSummariesDataService.GetScanSummaries(codeLocationView).TotalCount;
             }
 
             // Deploy resources
@@ -101,24 +107,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         [Test]
         public void DeploymentTest()
-        {      
+        {
             using (RestConnection restConnection = task.CreateClient(HubServerConfig))
             {
-                PageScanSummaryView scanSummaries = null;
+                HubPagedResponse<ScanSummaryView> scanSummaries = null;
                 CodeLocationDataService codeLocationDS = new CodeLocationDataService(restConnection);
                 CodeLocationView codeLocation = codeLocationDS.GetCodeLocationView(BdioId);
                 Assert.IsNotNull(codeLocation);
-                if (codeLocation != null)
-                {
-                    string codeLocationId = codeLocationDS.GetCodeLocationId(codeLocation);
-                    scanSummaries = task.ScanSummariesAPI(restConnection, codeLocationId).Result;
-                }
+
+                scanSummaries = task.ScanSummariesDataService.GetScanSummaries(codeLocation);
                 Assert.IsNotNull(scanSummaries);
                 Assert.Greater(scanSummaries.TotalCount, oldScanCount);
             }
         }
-
-
 
         private void WriteArrayToConsole(object[] objects)
         {

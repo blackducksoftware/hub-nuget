@@ -24,16 +24,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
             return HubServerConfig.Url;
         }
 
-        public Uri CreateURI(string baseUrl, List<string> urlSegments, Dictionary<string, string> queryParameters)
+        public Uri CreateURI(string baseUrl,string path, Dictionary<string, string> queryParameters)
         {
             UriBuilder uriBuilder = new UriBuilder(baseUrl);
-            if (urlSegments != null)
-            {
-                foreach (string urlSegment in urlSegments)
-                {
-                    uriBuilder.Path += $"/{urlSegment}";
-                }
-            }
+            uriBuilder.Path = path;
             if (queryParameters != null)
             {
                 NameValueCollection parameters = HttpUtility.ParseQueryString(string.Empty);

@@ -53,18 +53,17 @@
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
     <Compile Include="Dataservices\DataService.cs" />
     <Compile Include="Dataservices\LinkedDataDataService.cs" />
+    <Compile Include="Dataservices\ScanSummariesDataService.cs" />
     <Compile Include="Global\HubCredentials.cs" />
     <Compile Include="Global\HubProxyInfo.cs" />
     <Compile Include="Rest\CredentialsResetConnection.cs" />
     <Compile Include="Rest\RestConnection.cs" />
-    <Compile Include="Model\CodeLocation\CodeLocationView.cs" />
-    <Compile Include="Model\CodeLocation\PageCodeLocationView.cs" />
+    <Compile Include="Model\CodeLocationView.cs" />
     <Compile Include="Api\HubResponse.cs" />
     <Compile Include="Api\HubView.cs" />
     <Compile Include="Model\Link.cs" />
     <Compile Include="Model\Metadata.cs" />
-    <Compile Include="Model\ScanSummary\PageScanSummaryView.cs" />
-    <Compile Include="Model\ScanSummary\ScanSummaryView.cs" />
+    <Compile Include="Model\ScanSummaryView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Global\HubServerConfig.cs" />
   </ItemGroup>

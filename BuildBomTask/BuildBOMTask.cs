@@ -20,6 +20,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -63,8 +64,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         // Currently public for testing
         public CodeLocationDataService CodeLocationDataService;
+        public ScanSummariesDataService ScanSummariesDataService;
         public string BdioId;
-        private RestConnection RestConnection;
+        public RestConnection RestConnection;
 
         public override bool Execute()
         {
@@ -73,14 +75,17 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
             HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
             HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
-            RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
-            RestConnection = restConnection;
+            if (RestConnection == null)
+            {
+                RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
+                RestConnection = restConnection;
+            }
 
             // Setup DataServices
             CodeLocationDataService = new CodeLocationDataService(RestConnection);
 
             // Set helper properties
-            BdioPropertyHelper bdioPropertyHelper= new BdioPropertyHelper();
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
 
             // Creates output directory if it doesn't already exist
@@ -291,45 +296,43 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         #region Deploy
         public async Task Deploy(BdioContent bdioContent, HubServerConfig hubServerConfig)
         {
-            using (RestConnection restConnection = CreateClient(hubServerConfig))
-            {
-                int currentSummaries = GetCurrentScanSummaries(restConnection);
-                await LinkedDataAPI(restConnection, bdioContent);
-                await WaitForScanComplete(restConnection, currentSummaries);
-            }
+            CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
+            int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
+            await LinkedDataAPI(RestConnection, bdioContent);
+            WaitForScanComplete(RestConnection, currentSummaries);
         }
 
-        public async Task WaitForScanComplete(HttpClient client, int currentSummaries)
+        public void WaitForScanComplete(HttpClient client, int currentSummaries)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-
-            string codeLocationId = null;
+            CodeLocationView codeLocation = null;
 
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
                 Console.WriteLine("Checking scan summary status");
-                CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
+                codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
                 if (codeLocation != null)
                 {
-                    codeLocationId = CodeLocationDataService.GetCodeLocationId(codeLocation);
                     break;
                 }
                 else
                 {
                     Console.WriteLine("No code locations found. Trying again...");
+                    Thread.Sleep(500);
                 }
             }
 
-            if (codeLocationId == null)
+            if (codeLocation == null)
             {
                 throw new BlackDuckIntegrationException($"Failed to get the codelocation for {HubProjectName} ");
             }
 
+            string codeLocationId = CodeLocationDataService.GetCodeLocationId(codeLocation);
             string currentStatus = "UNKOWN";
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
-                PageScanSummaryView scanSummaries = await ScanSummariesAPI(client, codeLocationId);
-                if (scanSummaries.TotalCount == 0)
+                HubPagedResponse<ScanSummaryView> scanSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation);
+                if (scanSummaries == null || scanSummaries.Items[0] == null)
                 {
                     throw new BlackDuckIntegrationException($"There are no scan summaries for id: {codeLocationId}");
                 }
@@ -337,7 +340,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 {
                     ScanSummaryView scanSummary = scanSummaries.Items[0];
                     string scanStatus = scanSummary.Status;
-
                     if (!scanStatus.Equals(currentStatus))
                     {
                         currentStatus = scanStatus;
@@ -360,28 +362,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
             }
-        }
-
-        public int GetCurrentScanSummaries(RestConnection restConnection)
-        {
-            Console.WriteLine("Checking scan summary status");
-            CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
-            if (codeLocation != null)
-            {
-                string codeLocationId = CodeLocationDataService.GetCodeLocationId(codeLocation);
-                PageScanSummaryView scanSummaries = ScanSummariesAPI(restConnection, codeLocationId).Result;
-                return scanSummaries.TotalCount;
-            }
-            return 0;
-        }
-
-        public async Task<PageScanSummaryView> ScanSummariesAPI(HttpClient client, string codeLocationId)
-        {
-            HttpResponseMessage response = await client.GetAsync($"{HubUrl}/api/codelocations/{codeLocationId}/scan-summaries?sort=updated%20asc");
-            VerifySuccess(response);
-            string content = await response.Content.ReadAsStringAsync();
-            PageScanSummaryView scanSummaries = JToken.Parse(content).FromJToken<PageScanSummaryView>();
-            return scanSummaries;
         }
 
         public async Task LinkedDataAPI(HttpClient client, BdioContent bdio)
