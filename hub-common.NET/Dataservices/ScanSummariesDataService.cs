@@ -10,7 +10,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
     public class ScanSummariesDataService : DataService
-    {
+    { 
         public ScanSummariesDataService(RestConnection restConnection) : base(restConnection)
         {
         }
@@ -52,7 +52,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         public string GetCodeLocationId(CodeLocationView codeLocation)
         {
-            if(codeLocation == null)
+            if (codeLocation == null)
             {
                 return null;
             }

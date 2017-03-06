@@ -53,6 +53,8 @@
   <ItemGroup>
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
+    <Compile Include="Constants\PolicyStatus.cs" />
+    <Compile Include="Constants\ScanStatus.cs" />
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
     <Compile Include="Dataservices\DataService.cs" />
     <Compile Include="Dataservices\DeployBdioDataService.cs" />
@@ -62,9 +64,10 @@
     <Compile Include="Global\HubCredentials.cs" />
     <Compile Include="Global\HubProxyInfo.cs" />
     <Compile Include="Items\Item.cs" />
+    <Compile Include="Items\PolicyStatusItem.cs" />
     <Compile Include="Items\ProjectItem.cs" />
     <Compile Include="Model\ComplexLicenseView.cs" />
-    <Compile Include="Model\NameValuePairView.cs" />
+    <Compile Include="Model\ViolationCountView.cs" />
     <Compile Include="Model\ProjectVersionView.cs" />
     <Compile Include="Model\ProjectView.cs" />
     <Compile Include="Model\VersionBomPolicyStatusView.cs" />

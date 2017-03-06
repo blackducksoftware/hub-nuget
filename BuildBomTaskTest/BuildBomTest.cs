@@ -11,6 +11,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Constants;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -45,6 +46,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.CreateFlatDependencyList = true;
             task.CreateHubBdio = true;
             task.DeployHubBdio = true;
+            task.CheckPolicies = true;
 
             // Initialize helper properties
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
@@ -122,15 +124,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         [Test]
         public void PolicyCheckTest()
         {
-            Console.WriteLine($"[POLICY] Checking policies of {task.HubProjectName}");
-            ProjectItem project = task.ProjectDataService.GetMostRecentProjectItem(task.HubProjectName);
-            VersionBomPolicyStatusView policyStatus = task.PolicyDataService.GetPolicyStatus(project.ProjectId, project.VersionId);
-            Console.WriteLine($"[POLICY] {policyStatus.OverallStatus}");
-            if (policyStatus.OverallStatus != "NOT_IN_VIOLATION")
-            {
-
-            }
-            Console.WriteLine(policyStatus.Json);
+            Console.WriteLine(task.GetPolicies().Json);
+            PolicyStatusItem policyStatus = new PolicyStatusItem(task.GetPolicies());
+            Assert.AreEqual(PolicyStatus.NOT_IN_VIOLATION, policyStatus.OverallStatus);
+            Assert.AreEqual(0, policyStatus.InViolationCount);
+            Assert.AreEqual(0, policyStatus.InViolationOverriddenCount);
+            Assert.AreEqual(25, policyStatus.NotInViolationCount);
         }
 
         private void WriteArrayToConsole(object[] objects)

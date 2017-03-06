@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model
 {
-    public class NameValuePairView : HubResponse
+    public class ViolationCountView : HubResponse
     {
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

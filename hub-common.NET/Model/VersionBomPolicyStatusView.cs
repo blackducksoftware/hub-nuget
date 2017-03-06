@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model
 {
     public class VersionBomPolicyStatusView : HubResponse
-    {
+    { 
         [JsonProperty(PropertyName = "componentVersionStatusCounts")]
-        public List<NameValuePairView> ComponentVersionStatusCounts { get; set; }
+        public List<ViolationCountView> ComponentVersionStatusCounts { get; set; }
 
         [JsonProperty(PropertyName = "overallStatus")]
         public string OverallStatus { get; set; }
