@@ -32,5 +32,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model
         {
             return ExtractIds(url).First();
         }
+        
+        public string GetId(string url, int index)
+        {
+            List<string> ids = ExtractIds(url);
+            return ids[index];
+        }
     }
 }

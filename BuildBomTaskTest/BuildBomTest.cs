@@ -10,6 +10,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -116,6 +117,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             scanSummaries = task.ScanSummariesDataService.GetScanSummaries(codeLocation);
             Assert.IsNotNull(scanSummaries);
             Assert.Greater(scanSummaries.TotalCount, oldScanCount);
+        }
+
+        [Test]
+        public void PolicyCheckTest()
+        {
+            Console.WriteLine($"[POLICY] Checking policies of {task.HubProjectName}");
+            ProjectItem project = task.ProjectDataService.GetMostRecentProjectItem(task.HubProjectName);
+            VersionBomPolicyStatusView policyStatus = task.PolicyDataService.GetPolicyStatus(project.ProjectId, project.VersionId);
+            Console.WriteLine($"[POLICY] {policyStatus.OverallStatus}");
+            if (policyStatus.OverallStatus != "NOT_IN_VIOLATION")
+            {
+
+            }
+            Console.WriteLine(policyStatus.Json);
         }
 
         private void WriteArrayToConsole(object[] objects)

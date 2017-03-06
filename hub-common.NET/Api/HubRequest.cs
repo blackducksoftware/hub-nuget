@@ -10,6 +10,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
     {
         public static string Q_LIMIT = "limit";
         public static string Q_SORT = "sort";
+        public static string Q_QUERY = "q";
 
         private RestConnection RestConnection;
         private Uri Uri;
@@ -37,7 +38,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             return response;
         }
 
-        public T ExecuteGetForResponse<T>() where T : HubView
+        public T ExecuteGetForResponse<T>() where T : HubResponse
         {
             JObject jobject = ExecuteGetForResponseJson();
             T result = jobject.ToObject<T>();

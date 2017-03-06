@@ -21,6 +21,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -66,6 +67,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public CodeLocationDataService CodeLocationDataService;
         public ScanSummariesDataService ScanSummariesDataService;
         public DeployBdioDataService DeployBdioDataService;
+        public ProjectDataService ProjectDataService;
+        public PolicyDataService PolicyDataService;
+
         public RestConnection RestConnection;
         public string BdioId;
 
@@ -95,6 +99,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 DeployBdioDataService = new DeployBdioDataService(RestConnection);
             }
+            if (ProjectDataService == null)
+            {
+                ProjectDataService = new ProjectDataService(RestConnection);
+            }
+            if (PolicyDataService == null)
+            {
+                PolicyDataService = new PolicyDataService(RestConnection);
+            }
 
             // Set helper properties
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
@@ -119,8 +131,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (CreateHubBdio)
             {
+                Console.WriteLine($"[CREATE] Buidling BDIO");
                 BdioContent bdioContent = BuildBOM();
                 File.WriteAllText(bdioFilePath, bdioContent.ToString());
+                Console.WriteLine($"[CREATE] Created Bdio @ {bdioFilePath}");
             }
 
             if (DeployHubBdio)
@@ -141,7 +155,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (CheckPolicies)
             {
+                Console.WriteLine($"[POLICY] Checking policies of {HubProjectName}");
+                ProjectItem project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
+                VersionBomPolicyStatusView policyStatus = PolicyDataService.GetPolicyStatus(project.ProjectId, project.VersionId);
+                Console.WriteLine($"[POLICY] {policyStatus.OverallStatus}");
+                if (policyStatus.OverallStatus != "NOT_IN_VIOLATION")
+                {
 
+                }
             }
 
             if (CreateHubReport)
