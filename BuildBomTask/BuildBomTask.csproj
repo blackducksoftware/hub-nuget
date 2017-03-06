@@ -171,13 +171,27 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\RiskReport\css\HubBomReport.css" />
-    <Content Include="Resources\RiskReport\images\Hub_BD_logo.png" />
-    <Content Include="Resources\RiskReport\js\HubBomReportFunctions.js" />
-    <Content Include="Resources\RiskReport\js\HubRiskReport.js" />
-    <Content Include="Resources\RiskReport\js\jquery-3.1.1.min.js" />
-    <Content Include="Resources\RiskReport\riskreport.html" />
-    <Content Include="Resources\RiskReport\js\Sortable.js" />
+    <Content Include="Resources\RiskReport\css\HubBomReport.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\images\Hub_BD_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\HubBomReportFunctions.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\HubRiskReport.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\jquery-3.1.1.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\riskreport.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\Sortable.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
