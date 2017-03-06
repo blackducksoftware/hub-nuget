@@ -25,7 +25,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     {
                         string projectRelativePath = projectData[key];
                         List<string> projectPathSegments = new List<string>();
-                        projectPathSegments.Add(solutionDirectory);
+                         projectPathSegments.Add(solutionDirectory);
                         projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
 
                         HubProjectName = key;
@@ -67,7 +67,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private string CreatePath(List<string> pathSegments)
         {
-            return String.Join(String.Format("{0}",Path.PathSeparator),pathSegments);
+            return String.Join(String.Format("{0}",Path.DirectorySeparatorChar),pathSegments);
         }
 
         private Project CreateProjectObject(string solutionDirectory, string projectRelativePath)
@@ -97,7 +97,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     if(equalIndex > -1)
                     {
                         string projectValuesCSV = projectText.Substring(equalIndex);
-                        projectValuesCSV.Replace ("\"","");
+                        projectValuesCSV = projectValuesCSV.Replace ("\"","");
                         string[] projectValues = projectValuesCSV.Split(new char[] { ',' });
 
                         if(projectValues.Length >= 2)
@@ -135,8 +135,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     // exclude the '(' and the " characters
                     int start = firstParen + 2;
                     // exclude the ')' and the " characters
-                    int end = lastParen - 2;
-                    version = text.Substring(start, end);
+                    int end = lastParen - 1;
+                    version = text.Substring(start, (end - start));
                 }
             }
             return version;
