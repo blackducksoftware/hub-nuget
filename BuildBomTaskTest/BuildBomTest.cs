@@ -65,7 +65,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             // Deploy resources
             Directory.CreateDirectory(task.OutputDirectory);
-            File.WriteAllLines($"{task.OutputDirectory}/packages.config", Resources.packages.Split('\n'));
+            File.WriteAllText($"{task.OutputDirectory}/packages.config", Resources.packages);
 
             // Run task
             task.Execute();

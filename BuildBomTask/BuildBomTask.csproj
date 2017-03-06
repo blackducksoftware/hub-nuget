@@ -170,6 +170,15 @@
       <Name>hub-common.NET</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\RiskReport\css\HubBomReport.css" />
+    <Content Include="Resources\RiskReport\images\Hub_BD_logo.png" />
+    <Content Include="Resources\RiskReport\js\HubBomReportFunctions.js" />
+    <Content Include="Resources\RiskReport\js\HubRiskReport.js" />
+    <Content Include="Resources\RiskReport\js\jquery-3.1.1.min.js" />
+    <Content Include="Resources\RiskReport\riskreport.html" />
+    <Content Include="Resources\RiskReport\js\Sortable.js" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
