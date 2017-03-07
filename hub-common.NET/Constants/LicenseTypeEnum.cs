@@ -1,21 +1,22 @@
 ﻿
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Constants
 {
-    class LicenseType
+    class LicenseTypeEnum
     {
         private readonly string Type;
 
-        public static readonly LicenseType CONJUNCTIVE = new LicenseType("CONJUNCTIVE");
-        public static readonly LicenseType DISJUNCTIVE = new LicenseType("DISJUNCTIVE");
+        public static readonly LicenseTypeEnum IN_VIOLATION = new LicenseTypeEnum("IN_VIOLATION");
+        public static readonly LicenseTypeEnum IN_VIOLATION_OVERRIDDEN = new LicenseTypeEnum("IN_VIOLATION_OVERRIDDEN");
+        public static readonly LicenseTypeEnum NOT_IN_VIOLATION = new LicenseTypeEnum("NOT_IN_VIOLATION");
 
-        public LicenseType(string type)
+        public LicenseTypeEnum(string type)
         {
             Type = type;
         }
 
         public override bool Equals(object obj)
         {
-            var other = obj as LicenseType;
+            var other = obj as LicenseTypeEnum;
             if (other == null)
                 return false;
             return Type == other.Type;

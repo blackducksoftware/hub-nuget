@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report
 {
-    class VersionBomLicenseView: HubResponse
+    public class VersionBomLicenseView: HubResponse
     {
         [JsonProperty(PropertyName = "license")]
         public string License { get; set; }

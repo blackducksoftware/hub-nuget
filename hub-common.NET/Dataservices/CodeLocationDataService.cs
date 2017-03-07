@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {

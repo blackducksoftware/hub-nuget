@@ -1,6 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,8 @@ using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -125,8 +126,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void PolicyCheckTest()
         {
             Console.WriteLine(task.GetPolicies().Json);
-            PolicyStatusItem policyStatus = new PolicyStatusItem(task.GetPolicies());
-            Assert.AreEqual(PolicyStatus.NOT_IN_VIOLATION, policyStatus.OverallStatus);
+            PolicyStatus policyStatus = new PolicyStatus(task.GetPolicies());
+            Assert.AreEqual(PolicyStatusEnum.NOT_IN_VIOLATION, policyStatus.OverallStatus);
             Assert.AreEqual(0, policyStatus.InViolationCount);
             Assert.AreEqual(0, policyStatus.InViolationOverriddenCount);
             Assert.AreEqual(25, policyStatus.NotInViolationCount);

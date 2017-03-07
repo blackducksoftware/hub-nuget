@@ -1,7 +1,7 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Newtonsoft.Json;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation
 {
     public class CodeLocationView : HubView
     {

@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -25,10 +19,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             return response;
         }
 
-        public PolicyStatusItem GetPolicyStatus(string projectId, string versionId)
+        public PolicyStatus GetPolicyStatus(string projectId, string versionId)
         {
             VersionBomPolicyStatusView policyView = GetVersionBomPolicyStatusView(projectId, versionId);
-            PolicyStatusItem policyStatus = new PolicyStatusItem(policyView);
+            PolicyStatus policyStatus = new PolicyStatus(policyView);
             return policyStatus;
         }
     }

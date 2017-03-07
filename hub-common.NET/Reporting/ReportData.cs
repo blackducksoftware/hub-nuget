@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Reporting

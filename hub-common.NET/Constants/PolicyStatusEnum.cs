@@ -1,22 +1,22 @@
 ﻿
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Constants
 {
-    public sealed class PolicyStatus
+    public sealed class PolicyStatusEnum
     {
         private readonly string Status;
 
-        public static readonly PolicyStatus IN_VIOLATION = new PolicyStatus("IN_VIOLATION");
-        public static readonly PolicyStatus IN_VIOLATION_OVERRIDDEN = new PolicyStatus("IN_VIOLATION_OVERRIDDEN");
-        public static readonly PolicyStatus NOT_IN_VIOLATION = new PolicyStatus("NOT_IN_VIOLATION");
+        public static readonly PolicyStatusEnum IN_VIOLATION = new PolicyStatusEnum("IN_VIOLATION");
+        public static readonly PolicyStatusEnum IN_VIOLATION_OVERRIDDEN = new PolicyStatusEnum("IN_VIOLATION_OVERRIDDEN");
+        public static readonly PolicyStatusEnum NOT_IN_VIOLATION = new PolicyStatusEnum("NOT_IN_VIOLATION");
 
-        public PolicyStatus(string statusName)
+        public PolicyStatusEnum(string statusName)
         {
             Status = statusName;
         }
 
         public override bool Equals(object obj)
         {
-            var other = obj as PolicyStatus;
+            var other = obj as PolicyStatusEnum;
             if (other == null)
                 return false;
             return Status == other.Status;

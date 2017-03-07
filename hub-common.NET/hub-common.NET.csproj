@@ -53,10 +53,10 @@
   <ItemGroup>
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
-    <Compile Include="Constants\LicenseType.cs" />
-    <Compile Include="Constants\PolicyStatus.cs" />
-    <Compile Include="Constants\ScanStatus.cs" />
-    <Compile Include="Dataservices\BomRequestDataService.cs" />
+    <Compile Include="Constants\LicenseTypeEnum.cs" />
+    <Compile Include="Constants\PolicyStatusEnum.cs" />
+    <Compile Include="Constants\ScanStatusEnum.cs" />
+    <Compile Include="Dataservices\AggregateBomDataService.cs" />
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
     <Compile Include="Dataservices\DataService.cs" />
     <Compile Include="Dataservices\DeployBdioDataService.cs" />
@@ -66,27 +66,26 @@
     <Compile Include="Dataservices\ScanSummariesDataService.cs" />
     <Compile Include="Global\HubCredentials.cs" />
     <Compile Include="Global\HubProxyInfo.cs" />
-    <Compile Include="Items\BomComponentItem.cs" />
+    <Compile Include="Items\BomComponent.cs" />
     <Compile Include="Items\Item.cs" />
-    <Compile Include="Items\PolicyStatusItem.cs" />
-    <Compile Include="Items\ProjectItem.cs" />
-    <Compile Include="Model\ComplexLicenseView.cs" />
-    <Compile Include="Model\VersionBomComponentView.cs" />
-    <Compile Include="Model\VersionBomLicenseView.cs" />
-    <Compile Include="Model\ViolationCountView.cs" />
-    <Compile Include="Model\ProjectVersionView.cs" />
-    <Compile Include="Model\ProjectView.cs" />
-    <Compile Include="Model\VersionBomPolicyStatusView.cs" />
-    <Compile Include="Reporting\BomComponent.cs" />
+    <Compile Include="Items\PolicyStatus.cs" />
+    <Compile Include="Items\Project.cs" />
+    <Compile Include="Model\ComplexLicense\ComplexLicenseView.cs" />
+    <Compile Include="Model\Report\VersionBomComponentView.cs" />
+    <Compile Include="Model\Report\VersionBomLicenseView.cs" />
+    <Compile Include="Model\Report\ViolationCountView.cs" />
+    <Compile Include="Model\Project\ProjectVersionView.cs" />
+    <Compile Include="Model\Project\ProjectView.cs" />
+    <Compile Include="Model\PolicyStatus\VersionBomPolicyStatusView.cs" />
     <Compile Include="Reporting\ReportData.cs" />
     <Compile Include="Rest\CredentialsResetConnection.cs" />
     <Compile Include="Rest\RestConnection.cs" />
-    <Compile Include="Model\CodeLocationView.cs" />
+    <Compile Include="Model\CodeLocation\CodeLocationView.cs" />
     <Compile Include="Api\HubResponse.cs" />
     <Compile Include="Api\HubView.cs" />
     <Compile Include="Model\Link.cs" />
     <Compile Include="Model\Metadata.cs" />
-    <Compile Include="Model\ScanSummaryView.cs" />
+    <Compile Include="Model\ScanStatus\ScanSummaryView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Global\HubServerConfig.cs" />
   </ItemGroup>
@@ -119,6 +118,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

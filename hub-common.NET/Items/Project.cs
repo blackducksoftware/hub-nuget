@@ -1,9 +1,8 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
-using Newtonsoft.Json;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
 {
-    public class ProjectItem
+    public class Project
     {
 
         public string ProjectId { get; private set; }

@@ -129,7 +129,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 string outputPath = null;
                 Engine buildEngine = Engine.GlobalEngine;
-                Project project = new Project(buildEngine);
+                Microsoft.Build.BuildEngine.Project project = new Microsoft.Build.BuildEngine.Project(buildEngine);
                 project.Load($"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj");
                 if (project != null)
                 {
@@ -170,7 +170,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 string outputPath = null;
                 Engine buildEngine = Engine.GlobalEngine;
-                Project project = new Project(buildEngine);
+                Microsoft.Build.BuildEngine.Project project = new Microsoft.Build.BuildEngine.Project(buildEngine);
                 project.Load($"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj");
                 if (project != null)
                 {

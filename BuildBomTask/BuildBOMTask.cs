@@ -12,17 +12,17 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using System.Text;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
-using Newtonsoft.Json.Linq;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -160,7 +160,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 {
                     Console.WriteLine($"Checking policies of {HubProjectName}");
 
-                    PolicyStatusItem policyStatus = new PolicyStatusItem(GetPolicies());
+                    PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
 
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.Append("The Hub found: ");
@@ -171,7 +171,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     stringBuilder.Append(policyStatus.NotInViolationCount);
                     stringBuilder.Append(" components not in violation.");
 
-                    if (policyStatus.OverallStatus == PolicyStatus.IN_VIOLATION)
+                    if (policyStatus.OverallStatus == PolicyStatusEnum.IN_VIOLATION)
                     {
                         string error = $"The Hub found: {policyStatus.InViolationCount} components in violation\n";
                         throw new BlackDuckIntegrationException(error);
@@ -366,7 +366,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
 
             string codeLocationId = CodeLocationDataService.GetCodeLocationId(codeLocation);
-            ScanStatus currentStatus = ScanStatus.UNSTARTED;
+            ScanStatusEnum currentStatus = ScanStatusEnum.UNSTARTED;
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
                 HubPagedResponse<ScanSummaryView> scanSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation);
@@ -377,13 +377,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 else if (scanSummaries.TotalCount > currentSummaries)
                 {
                     ScanSummaryView scanSummary = scanSummaries.Items[0];
-                    ScanStatus scanStatus = new ScanStatus(scanSummary.Status);
+                    ScanStatusEnum scanStatus = new ScanStatusEnum(scanSummary.Status);
                     if (!scanStatus.Equals(currentStatus))
                     {
                         currentStatus = scanStatus;
                         Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
                     }
-                    if (currentStatus.Equals(ScanStatus.COMPLETE))
+                    if (currentStatus.Equals(ScanStatusEnum.COMPLETE))
                     {
                         stopwatch.Stop();
                         break;
@@ -402,7 +402,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public VersionBomPolicyStatusView GetPolicies()
         {
-            ProjectItem project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
+            Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
             VersionBomPolicyStatusView policyStatus = PolicyDataService.GetVersionBomPolicyStatusView(project.ProjectId, project.VersionId);
             return policyStatus;
         }

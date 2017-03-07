@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -58,9 +54,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             return recent;
         }
 
-        public ProjectItem GetMostRecentProjectItem(string projectName)
+        public Project GetMostRecentProjectItem(string projectName)
         {
-            ProjectItem projectItem = new ProjectItem();
+            Project projectItem = new Project();
             ProjectView projectView = GetProjectView(projectName);
             projectItem.ProjectView = projectView; // Sets the project Id
             ProjectVersionView versionView = GetMostRecentVersion(projectItem.ProjectId);
