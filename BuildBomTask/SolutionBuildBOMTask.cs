@@ -14,24 +14,38 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public override bool Execute()
         {
-            bool result = false;
+            bool result = true;
             try
             {
                 Dictionary<string,string> projectData = ParseSolutionFile(SolutionPath);
                 if(projectData.Count > 0)
                 {
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
-                    foreach(string key in projectData.Keys)
+                    PackagesRepoPath = $"{solutionDirectory}{Path.DirectorySeparatorChar}packages";
+
+                    bool useProjectOutputDir = false;
+
+                    if (String.IsNullOrWhiteSpace(OutputDirectory))
+                    {
+                        useProjectOutputDir = true;
+                    }
+
+                    foreach (string key in projectData.Keys)
                     {
                         string projectRelativePath = projectData[key];
                         List<string> projectPathSegments = new List<string>();
-                         projectPathSegments.Add(solutionDirectory);
+                        projectPathSegments.Add(solutionDirectory);
                         projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
 
                         HubProjectName = key;
                         HubVersionName = GetProjectAssemblyVersion(projectPathSegments);
                         PackagesConfigPath = CreateProjectPackageConfigPath(projectPathSegments);
-                        OutputDirectory = CreateOutputDirectoryPath(solutionDirectory,projectRelativePath);
+
+                        if (useProjectOutputDir) // create 
+                        {
+                            OutputDirectory = CreateOutputDirectoryPath(solutionDirectory, projectRelativePath);
+                        }
+
                         bool projectResult = base.Execute();
                         if(projectResult)
                         {
@@ -96,7 +110,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     int equalIndex = projectText.IndexOf("=");
                     if(equalIndex > -1)
                     {
-                        string projectValuesCSV = projectText.Substring(equalIndex);
+                        string projectValuesCSV = projectText.Substring(equalIndex+1);
                         projectValuesCSV = projectValuesCSV.Replace ("\"","");
                         string[] projectValues = projectValuesCSV.Split(new char[] { ',' });
 
@@ -151,27 +165,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private string CreateOutputDirectoryPath(string solutionDirectory, string projectRelativePath)
         {
-            if(!String.IsNullOrWhiteSpace(OutputDirectory))
+            Project project = CreateProjectObject(solutionDirectory, projectRelativePath);
+            if(project != null)
             {
-                return OutputDirectory;
+                BuildPropertyGroup propertyGroup = project.EvaluatedProperties;
+                string builddirectory = propertyGroup["OutputPath"].Value;
+
+                List<string> pathSegments = new List<string>();
+                pathSegments.Add(solutionDirectory);
+                pathSegments.Add(Path.GetDirectoryName(projectRelativePath));
+                pathSegments.Add(builddirectory);
+                return CreatePath(pathSegments);
             }
             else
             {
-                Project project = CreateProjectObject(solutionDirectory, projectRelativePath);
-                if(project != null)
-                {
-                    BuildPropertyGroup propertyGroup = project.EvaluatedProperties;
-                    string builddirectory = propertyGroup["OutputPath"].Value;
-
-                    List<string> pathSegments = new List<string>();
-                    pathSegments.Add(solutionDirectory);
-                    pathSegments.Add(builddirectory);
-                    return CreatePath(pathSegments);
-                }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
         }
     }

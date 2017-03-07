@@ -53,24 +53,32 @@
   <ItemGroup>
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
+    <Compile Include="Constants\LicenseType.cs" />
     <Compile Include="Constants\PolicyStatus.cs" />
     <Compile Include="Constants\ScanStatus.cs" />
+    <Compile Include="Dataservices\BomRequestDataService.cs" />
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
     <Compile Include="Dataservices\DataService.cs" />
     <Compile Include="Dataservices\DeployBdioDataService.cs" />
     <Compile Include="Dataservices\PolicyDataService.cs" />
     <Compile Include="Dataservices\ProjectDataService.cs" />
+    <Compile Include="Dataservices\RiskReportDataService.cs" />
     <Compile Include="Dataservices\ScanSummariesDataService.cs" />
     <Compile Include="Global\HubCredentials.cs" />
     <Compile Include="Global\HubProxyInfo.cs" />
+    <Compile Include="Items\BomComponentItem.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\PolicyStatusItem.cs" />
     <Compile Include="Items\ProjectItem.cs" />
     <Compile Include="Model\ComplexLicenseView.cs" />
+    <Compile Include="Model\VersionBomComponentView.cs" />
+    <Compile Include="Model\VersionBomLicenseView.cs" />
     <Compile Include="Model\ViolationCountView.cs" />
     <Compile Include="Model\ProjectVersionView.cs" />
     <Compile Include="Model\ProjectView.cs" />
     <Compile Include="Model\VersionBomPolicyStatusView.cs" />
+    <Compile Include="Reporting\BomComponent.cs" />
+    <Compile Include="Reporting\ReportData.cs" />
     <Compile Include="Rest\CredentialsResetConnection.cs" />
     <Compile Include="Rest\RestConnection.cs" />
     <Compile Include="Model\CodeLocationView.cs" />
@@ -87,6 +95,29 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\RiskReport\css\HubBomReport.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\images\Hub_BD_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\HubBomReportFunctions.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\HubRiskReport.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\jquery-3.1.1.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\js\Sortable.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\RiskReport\riskreport.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

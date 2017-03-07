@@ -56,8 +56,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public string ExcludedModules { get; set; } = "";
         public bool HubIgnoreFailure { get; set; } = false;
         public bool CreateFlatDependencyList { get; set; } = false;
-        public bool CreateHubBdio { get; set; } = false;
-        public bool DeployHubBdio { get; set; } = false;
+        public bool CreateHubBdio { get; set; } = true;
+        public bool DeployHubBdio { get; set; } = true;
         public bool CreateHubReport { get; set; } = false;
         public bool CheckPolicies { get; set; } = false;
 
