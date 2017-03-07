@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -18,7 +19,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters.Add(HubRequest.Q_LIMIT, limit.ToString());
             request.QueryParameters.Add(HubRequest.Q_QUERY, q);
-            request.Path = $"api/codelocations";
+            request.Path = $"api/{ApiLinks.CODE_LOCATION_LINK}";
             Console.WriteLine(request.BuildUri().ToString());
             HubPagedResponse<CodeLocationView> response = request.ExecuteGetForResponsePaged<CodeLocationView>();
             List<CodeLocationView> codeLocations = response.Items;

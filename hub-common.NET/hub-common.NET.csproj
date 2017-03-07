@@ -53,9 +53,11 @@
   <ItemGroup>
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
-    <Compile Include="Constants\LicenseTypeEnum.cs" />
-    <Compile Include="Constants\PolicyStatusEnum.cs" />
-    <Compile Include="Constants\ScanStatusEnum.cs" />
+    <Compile Include="Model\Constants\ApiLinks.cs" />
+    <Compile Include="Model\Constants\LicenseTypeEnum.cs" />
+    <Compile Include="Model\Constants\PolicyStatusEnum.cs" />
+    <Compile Include="Model\Constants\RiskCountEnum.cs" />
+    <Compile Include="Model\Constants\ScanStatusEnum.cs" />
     <Compile Include="Dataservices\AggregateBomDataService.cs" />
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
     <Compile Include="Dataservices\DataService.cs" />
@@ -71,6 +73,9 @@
     <Compile Include="Items\PolicyStatus.cs" />
     <Compile Include="Items\Project.cs" />
     <Compile Include="Model\ComplexLicense\ComplexLicenseView.cs" />
+    <Compile Include="Model\Report\ActivityDataView.cs" />
+    <Compile Include="Model\Report\RiskCountView.cs" />
+    <Compile Include="Model\Report\RiskProfileView.cs" />
     <Compile Include="Model\Report\VersionBomComponentView.cs" />
     <Compile Include="Model\Report\VersionBomLicenseView.cs" />
     <Compile Include="Model\Report\ViolationCountView.cs" />

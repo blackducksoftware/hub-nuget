@@ -3,6 +3,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -21,7 +22,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters.Add(HubRequest.Q_SORT, "updated asc");
-            request.Path = $"api/codelocations/{codeLocationId}/scan-summaries";
+            request.Path = $"api/{ApiLinks.CODE_LOCATION_LINK}/{codeLocationId}/{ApiLinks.SCAN_SUMMARIES_LINK}";
             Console.WriteLine(request.BuildUri().ToString());
             HubPagedResponse<ScanSummaryView> response = request.ExecuteGetForResponsePaged<ScanSummaryView>();
             return response;
@@ -34,11 +35,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         public ScanSummaryView GetMostRecentScanSummary(string codeLocationId)
         {
-            HubRequest request = new HubRequest(RestConnection);
-            request.QueryParameters.Add(HubRequest.Q_SORT, "updated asc");
-            request.Path = $"api/codelocations/{codeLocationId}/scan-summaries";
-            Console.WriteLine(request.BuildUri().ToString());
-            HubPagedResponse<ScanSummaryView> response = request.ExecuteGetForResponsePaged<ScanSummaryView>();
+            HubPagedResponse<ScanSummaryView> response = GetScanSummaries(codeLocationId);
             ScanSummaryView scanSummary = null;
             if (response.Items != null)
             {

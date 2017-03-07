@@ -3,6 +3,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -16,7 +17,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         public HubPagedResponse<ProjectView> GetPagedProjectView(string projectName)
         {
             HubRequest hubRequest = new HubRequest(RestConnection);
-            hubRequest.Path = $"api/projects";
+            hubRequest.Path = $"api/{ApiLinks.PROJECTS_LINK}";
             hubRequest.QueryParameters.Add(HubRequest.Q_QUERY, $"name:{projectName}");
             HubPagedResponse<ProjectView> response = hubRequest.ExecuteGetForResponsePaged<ProjectView>();
             return response;
@@ -26,7 +27,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             HubRequest hubRequest = new HubRequest(RestConnection);
             hubRequest.QueryParameters.Add(HubRequest.Q_SORT, "updatedAt asc"); // Sort it by most recent
-            hubRequest.Path = $"api/projects/{projectId}/versions";
+            hubRequest.Path = $"api/{ApiLinks.PROJECTS_LINK}/{projectId}/{ApiLinks.VERSIONS_LINK}";
             HubPagedResponse<ProjectVersionView> response = hubRequest.ExecuteGetForResponsePaged<ProjectVersionView>();
             return response;
         }

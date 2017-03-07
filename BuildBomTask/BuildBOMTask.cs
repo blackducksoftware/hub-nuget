@@ -19,10 +19,10 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Constants;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {

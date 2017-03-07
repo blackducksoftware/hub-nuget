@@ -1,5 +1,5 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Constants;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using System.Collections.Generic;
 

@@ -5,6 +5,8 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Reporting;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
+using System;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -32,13 +34,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             List<BomComponent> components = new List<BomComponent>();
 
             List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(projectItem);
-            foreach(VersionBomComponentView bomEntry in bomEntries)
+            foreach (VersionBomComponentView bomEntry in bomEntries)
             {
-                //BomComponentItem component = CreateBomComponentFromBomComponentView(bomEntry);
+                BomComponent component = CreateBomComponentFromBomComponentView(bomEntry);
+                string componentPolicyStatusURL = null;
+                if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
+                {
+                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, component.ComponentVersion);
+                }
             }
 
             return reportData;
         }
+
+
 
         private string GetReportProjectUrl(string projectId)
         {
@@ -57,75 +66,81 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             }
             return url;
         }
-        /*
-        private BomComponentItem CreateBomComponentFromBomComponentView(VersionBomComponentView bomEntry)
+
+        private string GetComponentPolicyUrl(string versionUrl, string componentUrl)
         {
-            
-            BomComponentItem component = new BomComponentItem();
+            string componentVersionSegments = componentUrl.Substring(componentUrl.IndexOf(ApiLinks.COMPONENTS_LINK));
+            return $"{versionUrl}/{componentVersionSegments}/{ApiLinks.POLICY_STATUS_LINK}";
+        }
+
+        private BomComponent CreateBomComponentFromBomComponentView(VersionBomComponentView bomEntry)
+        {
+
+            BomComponent component = new BomComponent();
             component.ComponentName = bomEntry.ComponentName;
-            component.ComponentURL =GetReportProjectUrl(bomEntry.Component);
-            component.ComponentVersion =bomEntry.ComponentVersionName;
-            component.ComponentVersionURL = getReportVersionUrl(bomEntry.ComponentVersion, true);
+            component.ComponentURL = GetReportProjectUrl(bomEntry.Component);
+            component.ComponentVersion = bomEntry.ComponentVersionName;
+            component.ComponentVersionURL = GetReportVersionUrl(bomEntry.ComponentVersion, true);
 
             if (bomEntry.SecurityRiskProfile != null && bomEntry.SecurityRiskProfile.Counts != null
-                    && !bomEntry.SecurityRiskProfile.Counts.isEmpty())
+                    && bomEntry.SecurityRiskProfile.Counts.Count != 0)
             {
-                for (final RiskCountView count : bomEntry.SecurityRiskProfile.Counts)
+                foreach (RiskCountView count in bomEntry.SecurityRiskProfile.Counts)
                 {
                     if (count.CountType == RiskCountEnum.HIGH && count.Count > 0)
                     {
-                        component.SecurityRiskHighCount(count.Count);
+                        component.SecurityRiskHighCount = count.Count;
                     }
                     else if (count.CountType == RiskCountEnum.MEDIUM && count.Count > 0)
                     {
-                        component.SecurityRiskMediumCount(count.Count);
+                        component.SecurityRiskMediumCount = count.Count;
                     }
                     else if (count.CountType == RiskCountEnum.LOW && count.Count > 0)
                     {
-                        component.SecurityRiskLowCount(count.Count);
+                        component.SecurityRiskLowCount = count.Count;
                     }
                 }
             }
             if (bomEntry.LicenseRiskProfile != null && bomEntry.LicenseRiskProfile.Counts != null
-                    && !bomEntry.LicenseRiskProfile.Counts.isEmpty())
+                    && bomEntry.LicenseRiskProfile.Counts.Count != 0)
             {
-                for (final RiskCountView count : bomEntry.LicenseRiskProfile.Counts)
+                foreach (RiskCountView count in bomEntry.LicenseRiskProfile.Counts)
                 {
                     if (count.CountType == RiskCountEnum.HIGH && count.Count > 0)
                     {
-                        component.LicenseRiskHighCount(count.Count);
+                        component.LicenseRiskHighCount = count.Count;
                     }
                     else if (count.CountType == RiskCountEnum.MEDIUM && count.Count > 0)
                     {
-                        component.LicenseRiskMediumCount(count.Count);
+                        component.LicenseRiskMediumCount = count.Count;
                     }
                     else if (count.CountType == RiskCountEnum.LOW && count.Count > 0)
                     {
-                        component.LicenseRiskLowCount(count.Count);
+                        component.LicenseRiskLowCount = count.Count;
                     }
                 }
             }
             if (bomEntry.OperationalRiskProfile != null && bomEntry.OperationalRiskProfile.Counts != null
-                    && !bomEntry.OperationalRiskProfile.Counts.isEmpty())
+                    && bomEntry.OperationalRiskProfile.Counts.Count != 0)
             {
-                for (final RiskCountView count : bomEntry.OperationalRiskProfile.Counts)
+                foreach (RiskCountView count in bomEntry.OperationalRiskProfile.Counts)
                 {
                     if (count.CountType == RiskCountEnum.HIGH && count.Count > 0)
                     {
-                        component.OperationalRiskHighCount(count.Count);
+                        component.OperationalRiskHighCount = count.Count;
                     }
                     else if (count.CountType == RiskCountEnum.MEDIUM && count.Count > 0)
                     {
-                        component.OperationalRiskMediumCount(count.Count);
+                        component.OperationalRiskMediumCount = count.Count;
                     }
                     else if (count.CountType == RiskCountEnum.LOW && count.Count > 0)
                     {
-                        component.OperationalRiskLowCount(count.Count);
+                        component.OperationalRiskLowCount = count.Count;
                     }
                 }
             }
             return component;
+
         }
-        //*/
     }
 }

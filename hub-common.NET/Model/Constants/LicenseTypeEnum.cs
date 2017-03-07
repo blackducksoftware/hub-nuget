@@ -1,5 +1,5 @@
 ﻿
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Constants
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants
 {
     class LicenseTypeEnum
     {

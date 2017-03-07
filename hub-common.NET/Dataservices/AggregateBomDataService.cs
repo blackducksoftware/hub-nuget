@@ -3,6 +3,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -27,7 +28,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         public HubPagedResponse<VersionBomComponentView> GetPagedBomEntries(string projectId, string versionId)
         {
             HubRequest request = new HubRequest(RestConnection);
-            request.Path = $"/api/projects/{projectId}/versions/{versionId}/components";
+            request.Path = $"/api/{ApiLinks.PROJECTS_LINK}/{projectId}/{ApiLinks.VERSIONS_LINK}/{versionId}/{ApiLinks.COMPONENTS_LINK}";
             HubPagedResponse<VersionBomComponentView> response = request.ExecuteGetForResponsePaged<VersionBomComponentView>();
             return response;
         }
