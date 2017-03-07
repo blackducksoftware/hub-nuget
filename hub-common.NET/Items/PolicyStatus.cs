@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
 {
-    public class PolicyStatus : Item
+    public class PolicyStatus
     {
         public PolicyStatusEnum OverallStatus { get; set; }
 

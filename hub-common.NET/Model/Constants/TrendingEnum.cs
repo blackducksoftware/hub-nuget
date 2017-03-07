@@ -1,21 +1,22 @@
 ﻿
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants
 {
-    class LicenseTypeEnum
+    public class TrendingEnum
     {
         private readonly string Type;
 
-        public static readonly LicenseTypeEnum CONJUNCTIVE = new LicenseTypeEnum("CONJUNCTIVE");
-        public static readonly LicenseTypeEnum DISJUNCTIVE = new LicenseTypeEnum("DISJUNCTIVE");
+        public static readonly TrendingEnum DECREASING = new TrendingEnum("DECREASING");
+        public static readonly TrendingEnum STABLE = new TrendingEnum("STABLE");
+        public static readonly TrendingEnum INCREASING = new TrendingEnum("INCREASING");
 
-        public LicenseTypeEnum(string type)
+        public TrendingEnum(string type)
         {
             Type = type;
         }
 
         public override bool Equals(object obj)
         {
-            var other = obj as LicenseTypeEnum;
+            var other = obj as TrendingEnum;
             if (other == null)
                 return false;
             return Type == other.Type;

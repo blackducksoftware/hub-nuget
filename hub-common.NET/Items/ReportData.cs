@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Reporting
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
 {
     public class ReportData
     {

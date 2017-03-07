@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Reporting;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
 using System;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -40,10 +39,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 string componentPolicyStatusURL = null;
                 if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
                 {
-                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, component.ComponentVersion);
+                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
+                } else
+                {
+                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
                 }
+
+                HubRequest request = new HubRequest(RestConnection);
+                request.Uri = new Uri(componentPolicyStatusURL);
+                BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
+                component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
+                components.Add(component);
             }
 
+            reportData.SetComponents(components);
             return reportData;
         }
 

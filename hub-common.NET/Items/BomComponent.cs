@@ -1,6 +1,6 @@
 ﻿namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
 {
-    public class BomComponent: Item
+    public class BomComponent
     {
         public string PolicyStatus { get; set; }
         public string ComponentName { get; set; }

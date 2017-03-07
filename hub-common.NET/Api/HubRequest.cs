@@ -13,7 +13,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
         public static string Q_QUERY = "q";
 
         private RestConnection RestConnection;
-        private Uri Uri;
+        public Uri Uri;
         public string Path = "";
         public Dictionary<string, string> QueryParameters = new Dictionary<string, string>();
         public string Q;
