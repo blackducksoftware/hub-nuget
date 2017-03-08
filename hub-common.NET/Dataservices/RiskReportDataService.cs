@@ -3,9 +3,10 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using System;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -18,21 +19,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             AggregateBomDataService = new AggregateBomDataService(restConnection);
         }
 
-        public ReportData GetReportData(Project projectItem)
+        public ReportData GetReportData(Project project)
         {
-            ProjectView projectView = projectItem.ProjectView;
-            ProjectVersionView versionView = projectItem.ProjectVersionView;
+            ProjectView projectView = project.ProjectView;
+            ProjectVersionView versionView = project.ProjectVersionView;
             ReportData reportData = new ReportData();
             reportData.ProjectName = projectView.Name;
-            reportData.ProjectURL = GetReportProjectUrl(projectItem.ProjectId);
+            reportData.ProjectURL = GetReportProjectUrl(project.ProjectId);
             reportData.ProjectVersion = versionView.VersionName;
-            reportData.ProjectVersionURL = GetReportVersionUrl(projectItem.VersionId, false);
+            reportData.ProjectVersionURL = GetReportVersionUrl(project.VersionId, false);
             reportData.Phase = versionView.Phase;
             reportData.Distribution = versionView.Distribution;
 
             List<BomComponent> components = new List<BomComponent>();
 
-            List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(projectItem);
+            List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(project);
             foreach (VersionBomComponentView bomEntry in bomEntries)
             {
                 BomComponent component = CreateBomComponentFromBomComponentView(bomEntry);

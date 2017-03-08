@@ -1,4 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using System.Collections.Generic;
 using System.Net;
 
@@ -10,8 +11,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
         public string ProjectURL { get; set; }
         public string ProjectVersion { get; set; }
         public string ProjectVersionURL { get; set; }
-        public string Phase { get; set; }
-        public string Distribution { get; set; }
+        public PhaseEnum Phase { get; set; }
+        public DistributionEnum Distribution { get; set; }
 
         public List<BomComponent> Components { get; private set; }
         public int TotalComponents { get; private set; }

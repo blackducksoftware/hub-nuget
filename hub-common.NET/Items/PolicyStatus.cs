@@ -1,5 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using System.Collections.Generic;
 
@@ -22,7 +22,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
 
         public PolicyStatus(VersionBomPolicyStatusView policyView)
         {
-            OverallStatus = new PolicyStatusEnum(policyView.OverallStatus);
+            OverallStatus = policyView.OverallStatus;
             UpdatedAt = policyView.UpdatedAt;
 
             List<ViolationCountView> counts = policyView.ComponentVersionStatusCounts;

@@ -1,4 +1,4 @@
-﻿namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants
+﻿namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global
 {
     public class ApiLinks
     {

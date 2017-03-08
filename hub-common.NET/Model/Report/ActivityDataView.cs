@@ -1,5 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Newtonsoft.Json;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report
@@ -16,6 +16,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report
         public string LastCommitDate { get; set; }
 
         [JsonProperty(PropertyName = "trending")]
+        [JsonConverter(typeof(HubEnumConverter<TrendingEnum>))]
         public TrendingEnum Trending { get; set; }
     }
 }

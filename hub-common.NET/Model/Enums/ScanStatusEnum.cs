@@ -1,10 +1,8 @@
 ﻿
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums
 {
-    public sealed class ScanStatusEnum
+    public sealed class ScanStatusEnum : HubEnum
     {
-        private readonly string Status;
-
         public static readonly ScanStatusEnum UNSTARTED = new ScanStatusEnum("UNSTARTED");
         public static readonly ScanStatusEnum SCANNING = new ScanStatusEnum("SCANNING");
         public static readonly ScanStatusEnum SAVING_SCAN_DATA = new ScanStatusEnum("SAVING_SCAN_DATA");
@@ -22,27 +20,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants
         public static readonly ScanStatusEnum ERROR_BUILDING_BOM = new ScanStatusEnum("ERROR_BUILDING_BOM");
         public static readonly ScanStatusEnum ERROR = new ScanStatusEnum("ERROR");
 
-        public ScanStatusEnum(string statusName)
+        public ScanStatusEnum()
         {
-            Status = statusName;
+
         }
 
-        public override bool Equals(object obj)
+        public ScanStatusEnum(string value) : base(value)
         {
-            var other = obj as ScanStatusEnum;
-            if (other == null)
-                return false;
-            return Status == other.Status;
-        }
-
-        public override int GetHashCode()
-        {
-            return Status.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return Status;
         }
     }
 }

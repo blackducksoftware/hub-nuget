@@ -1,4 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -13,7 +14,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report
         public string LicenseDisplay { get; set; }
 
         [JsonProperty(PropertyName = "licenseType")]
-        public string LicenseType { get; set; }
+        [JsonConverter(typeof(HubEnumConverter<LicenseTypeEnum>))]
+        public LicenseTypeEnum LicenseType { get; set; }
 
         [JsonProperty(PropertyName = "licenses")]
         public List<VersionBomLicenseView> Licenses { get; set; }

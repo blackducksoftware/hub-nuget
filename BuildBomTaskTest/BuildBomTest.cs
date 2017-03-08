@@ -12,7 +12,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -48,6 +48,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.CreateHubBdio = true;
             task.DeployHubBdio = true;
             task.CheckPolicies = true;
+            task.CreateHubReport = true;
 
             // Initialize helper properties
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
