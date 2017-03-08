@@ -1,4 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Newtonsoft.Json;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus
@@ -6,7 +7,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus
     public class ScanSummaryView : HubView
     {
         [JsonProperty(PropertyName = "status")]
-        public string Status { get; set; }
+        [JsonConverter(typeof(HubEnumConverter<ScanStatusEnum>))]
+        public ScanStatusEnum Status { get; set; }
 
         [JsonProperty(PropertyName = "createdAt")]
         public string CreatedAt { get; set; }

@@ -1,18 +1,15 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ComplexLicense;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project
 {
     public class ProjectVersionView: HubView
     {
         [JsonProperty(PropertyName = "distribution")]
-        public string Distribution { get; set; }
+        [JsonConverter(typeof(HubEnumConverter<DistributionEnum>))]
+        public DistributionEnum Distribution { get; set; }
 
         [JsonProperty(PropertyName = "license")]
         public ComplexLicenseView License { get; set; }
@@ -21,7 +18,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project
         public string Nickname { get; set; }
 
         [JsonProperty(PropertyName = "phase")]
-        public string Phase { get; set; }
+        [JsonConverter(typeof(HubEnumConverter<PhaseEnum>))]
+        public PhaseEnum Phase { get; set; }
 
         [JsonProperty(PropertyName = "releaseComments")]
         public string ReleaseComments { get; set; }

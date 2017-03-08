@@ -54,13 +54,19 @@
   <ItemGroup>
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
-    <Compile Include="Model\Constants\ApiLinks.cs" />
-    <Compile Include="Model\Constants\TrendingEnum.cs" />
-    <Compile Include="Model\Constants\VersionBomPolicyStatusOverallStatusEnum.cs" />
-    <Compile Include="Model\Constants\LicenseTypeEnum.cs" />
-    <Compile Include="Model\Constants\PolicyStatusEnum.cs" />
-    <Compile Include="Model\Constants\RiskCountEnum.cs" />
-    <Compile Include="Model\Constants\ScanStatusEnum.cs" />
+    <Compile Include="Global\ApiLinks.cs" />
+    <Compile Include="Model\Enums\SourceEnum.cs" />
+    <Compile Include="Model\Enums\PhaseEnum.cs" />
+    <Compile Include="Model\Enums\DistributionPhaseEnum.cs" />
+    <Compile Include="Model\Enums\HubEnum.cs" />
+    <Compile Include="Model\Enums\HubEnumConverter.cs" />
+    <Compile Include="Model\Enums\CodeLocationTypeEnum.cs" />
+    <Compile Include="Model\Enums\TrendingEnum.cs" />
+    <Compile Include="Model\Enums\VersionBomPolicyStatusOverallStatusEnum.cs" />
+    <Compile Include="Model\Enums\LicenseTypeEnum.cs" />
+    <Compile Include="Model\Enums\PolicyStatusEnum.cs" />
+    <Compile Include="Model\Enums\RiskCountEnum.cs" />
+    <Compile Include="Model\Enums\ScanStatusEnum.cs" />
     <Compile Include="Dataservices\AggregateBomDataService.cs" />
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
     <Compile Include="Dataservices\DataService.cs" />

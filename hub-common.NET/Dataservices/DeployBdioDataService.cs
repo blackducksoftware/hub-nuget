@@ -3,7 +3,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using System.Net.Http;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Constants;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {

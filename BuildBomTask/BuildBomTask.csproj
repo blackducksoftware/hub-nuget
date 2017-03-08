@@ -159,6 +159,7 @@
     <Compile Include="BlackDuckIntegrationException.cs" />
     <Compile Include="BuildBOMTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceCopier.cs" />
     <Compile Include="SolutionBuildBOMTask.cs" />
   </ItemGroup>
   <ItemGroup>
