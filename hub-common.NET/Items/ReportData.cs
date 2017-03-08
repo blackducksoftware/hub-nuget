@@ -1,5 +1,6 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 
@@ -7,29 +8,66 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
 {
     public class ReportData
     {
+        [JsonProperty(PropertyName = "projectName")]
         public string ProjectName { get; set; }
+
+        [JsonProperty(PropertyName = "projectUrl")]
         public string ProjectURL { get; set; }
+
+        [JsonProperty(PropertyName = "projectVersion")]
         public string ProjectVersion { get; set; }
+
+        [JsonProperty(PropertyName = "projectVersionURL")]
         public string ProjectVersionURL { get; set; }
+
+        [JsonProperty(PropertyName = "phase")]
         public PhaseEnum Phase { get; set; }
+
+        [JsonProperty(PropertyName = "distrubution")]
         public DistributionEnum Distribution { get; set; }
 
+        [JsonProperty(PropertyName = "components")]
         public List<BomComponent> Components { get; private set; }
+
+        [JsonProperty(PropertyName = "totalComponents")]
         public int TotalComponents { get; private set; }
 
+        [JsonProperty(PropertyName = "vulnerabilityRiskHighCount")]
         public int VulnerabilityRiskHighCount { get; private set; }
+
+        [JsonProperty(PropertyName = "vulnerabilityRiskMediumCount")]
         public int VulnerabilityRiskMediumCount { get; private set; }
+
+        [JsonProperty(PropertyName = "vulnerabilityRiskLowCount")]
         public int VulnerabilityRiskLowCount { get; private set; }
+
+        [JsonProperty(PropertyName = "vulnerabilityRiskNoneCount")]
         public int VulnerabilityRiskNoneCount { get; private set; }
 
-        public int LicenseRiskHighCount { get; private set; }
-        public int LicenseRiskMediumCount { get; private set; }
-        public int LicenseRiskLowCount { get; private set; }
-        public int LicenseRiskNoneCount { get; private set; }
 
+        [JsonProperty(PropertyName = "licenseRiskHighCount")]
+        public int LicenseRiskHighCount { get; private set; }
+
+        [JsonProperty(PropertyName = "licenseRiskMediumCount")]
+        public int LicenseRiskMediumCount { get; private set; }
+
+        [JsonProperty(PropertyName = "licenseRiskLowCount")]
+        public int LicenseRiskLowCount { get; private set; }
+
+        [JsonProperty(PropertyName = "licenseRiskNoneCount")]
+        public int LicenseRiskNoneCount { get; private set; }
+        
+
+        [JsonProperty(PropertyName = "operationalRiskHighCount")]
         public int OperationalRiskHighCount { get; private set; }
+
+        [JsonProperty(PropertyName = "operationalRiskMediumCount")]
         public int OperationalRiskMediumCount { get; private set; }
+
+        [JsonProperty(PropertyName = "operationalRiskLowCount")]
         public int OperationalRiskLowCount { get; private set; }
+
+        [JsonProperty(PropertyName = "operationalRiskNoneCount")]
         public int OperationalRiskNoneCount { get; private set; }
 
         public void SetComponents(List<BomComponent> components)

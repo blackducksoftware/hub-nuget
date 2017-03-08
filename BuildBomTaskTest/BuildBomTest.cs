@@ -13,6 +13,8 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -132,6 +134,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             Assert.AreEqual(0, policyStatus.InViolationCount);
             Assert.AreEqual(0, policyStatus.InViolationOverriddenCount);
             Assert.AreEqual(25, policyStatus.NotInViolationCount);
+        }
+
+        [Test]
+        public void ReportDataTest()
+        {
+            Project project = task.ProjectDataService.GetMostRecentProjectItem(task.HubProjectName);
+            ReportData reportData = task.RiskReportDataService.GetReportData(project);
+            File.WriteAllText($"{task.OutputDirectory}/ReportData.json", JToken.FromObject(reportData).ToString());
         }
 
         private void WriteArrayToConsole(object[] objects)
