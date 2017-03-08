@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using Microsoft.Build.BuildEngine;
+using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using System.Linq;
 
@@ -21,8 +21,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 if(projectData.Count > 0)
                 {
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
-                    PackagesRepoPath = $"{solutionDirectory}{Path.DirectorySeparatorChar}packages";
-
                     bool useProjectOutputDir = false;
 
                     if (String.IsNullOrWhiteSpace(OutputDirectory))
@@ -33,6 +31,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     foreach (string key in projectData.Keys)
                     {
                         string projectRelativePath = projectData[key];
+
                         List<string> projectPathSegments = new List<string>();
                         projectPathSegments.Add(solutionDirectory);
                         projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
@@ -86,13 +85,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private Project CreateProjectObject(string solutionDirectory, string projectRelativePath)
         {
-            Engine buildEngine = Engine.GlobalEngine;
-            Project project = new Project(buildEngine);
+
             List<string> pathSegments = new List<string>();
             pathSegments.Add(solutionDirectory);
             pathSegments.Add(projectRelativePath);
-            project.Load(CreatePath(pathSegments));
-
+            string projectFullPath = CreatePath(pathSegments);
+            var projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => item.FullPath.Equals(projectFullPath));
+            Project project;
+            if (projectList.Count() > 0)
+            {
+                project = projectList.First();
+            }
+            else
+            {
+                project = new Project(projectFullPath);
+            }
             return project;
         }
 
@@ -165,12 +172,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private string CreateOutputDirectoryPath(string solutionDirectory, string projectRelativePath)
         {
-            Project project = CreateProjectObject(solutionDirectory, projectRelativePath);
+            Project project = CreateProjectObject(solutionDirectory, projectRelativePath);   
             if(project != null)
             {
-                BuildPropertyGroup propertyGroup = project.EvaluatedProperties;
-                string builddirectory = propertyGroup["OutputPath"].Value;
-
+                ICollection<ProjectProperty> propertyGroup = project.AllEvaluatedProperties;
+                var outputPathProperties = propertyGroup.Where(property => property.Name.Equals("OutputPath"));
+                string builddirectory = outputPathProperties.First().EvaluatedValue;
                 List<string> pathSegments = new List<string>();
                 pathSegments.Add(solutionDirectory);
                 pathSegments.Add(Path.GetDirectoryName(projectRelativePath));

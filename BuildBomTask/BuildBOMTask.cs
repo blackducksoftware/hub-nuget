@@ -229,6 +229,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             List<Lazy<INuGetResourceProvider>> providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
             providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
+            // we may need more code here around handling package sources.
             PackageSource packageSource = new PackageSource(PackagesRepoPath);
             SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
