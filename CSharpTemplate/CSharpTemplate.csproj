@@ -74,13 +74,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EmptyClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AssemblyInfo.cs" />
     <None Include="BlackDuck\Blackducksoftware.BuildBOM.targets" />
-    <None Include="ProjectTemplate.csproj" />
+    <None Include="packages.config" />
+    <None Include="ProjectTemplate.csproj">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="BlackDuck.ico" />
   </ItemGroup>
   <ItemGroup>
