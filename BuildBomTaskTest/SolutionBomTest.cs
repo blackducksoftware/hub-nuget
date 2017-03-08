@@ -4,12 +4,13 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
-using Microsoft.Build.BuildEngine;
+using Microsoft.Build.Evaluation;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -125,13 +126,22 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             foreach (string projectName in projectNameList)
             {
                 string outputPath = null;
-                Engine buildEngine = Engine.GlobalEngine;
-                Microsoft.Build.BuildEngine.Project project = new Microsoft.Build.BuildEngine.Project(buildEngine);
-                project.Load($"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj");
+                string projectFullPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj";
+                var projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => item.GetPropertyValue("ProjectName").Equals(projectName));
+                Project project;
+                if (projectList.Count() > 0)
+                {
+                    project = projectList.First();
+                }
+                else
+                {
+                    project = new Project(projectFullPath);
+                }
                 if (project != null)
                 {
-                    BuildPropertyGroup propertyGroup = project.EvaluatedProperties;
-                    string builddirectory = propertyGroup["OutputPath"].Value;
+                    ICollection<ProjectProperty> propertyGroup = project.AllEvaluatedProperties;
+                    var outputPathProperties = propertyGroup.Where(property => property.Name.Equals("OutputPath"));
+                    string builddirectory = outputPathProperties.First().EvaluatedValue;
                     outputPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}{Path.DirectorySeparatorChar}{builddirectory}";
                 }
                 string actualString = File.ReadAllText($"{outputPath}\\{projectName}.jsonld");
@@ -163,16 +173,32 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.DeployHubBdio = false;
             task.Execute();
 
+            var projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => {
+                foreach(ProjectProperty property in item.AllEvaluatedProperties)
+                {
+                    Console.WriteLine("Name: {0}, Value: {1}", property.Name, property.EvaluatedValue);
+                }
+                return true;
+            });
             foreach (string projectName in projectNameList)
             {
                 string outputPath = null;
-                Engine buildEngine = Engine.GlobalEngine;
-                Microsoft.Build.BuildEngine.Project project = new Microsoft.Build.BuildEngine.Project(buildEngine);
-                project.Load($"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj");
+                string projectFullPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj";
+                projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => item.GetPropertyValue("ProjectName").Equals(projectName));
+                Project project;
+                if (projectList.Count() > 0)
+                {
+                    project = projectList.First();
+                }
+                else
+                {
+                    project = new Project(projectFullPath);
+                }
                 if (project != null)
                 {
-                    BuildPropertyGroup propertyGroup = project.EvaluatedProperties;
-                    string builddirectory = propertyGroup["OutputPath"].Value;
+                    ICollection<ProjectProperty> propertyGroup = project.AllEvaluatedProperties;
+                    var outputPathProperties = propertyGroup.Where(property => property.Name.Equals("OutputPath"));
+                    string builddirectory = outputPathProperties.First().EvaluatedValue;
                     outputPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}{Path.DirectorySeparatorChar}{builddirectory}";
                 }
                 List <string> expectedFlatList = new List<string>(Resources.sample_flat.Split('\n'));
