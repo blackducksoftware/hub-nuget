@@ -21,8 +21,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 if(projectData.Count > 0)
                 {
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
-                    PackagesRepoPath = $"{solutionDirectory}{Path.DirectorySeparatorChar}packages";
-
                     bool useProjectOutputDir = false;
 
                     if (String.IsNullOrWhiteSpace(OutputDirectory))

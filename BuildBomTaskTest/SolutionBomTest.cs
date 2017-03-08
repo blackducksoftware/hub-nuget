@@ -34,6 +34,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.HubUrl = "https://www.google.com";
             task.HubUsername = "auser";
             task.HubPassword = "apassword";
+            task.PackagesRepoPath = $"https://api.nuget.org/v3/index.json";
             task.SolutionPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}/resources/sample_solution/sample_solution.sln";
             // Server setup
             HubCredentials credentials = new HubCredentials(task.HubUsername, task.HubPassword);
