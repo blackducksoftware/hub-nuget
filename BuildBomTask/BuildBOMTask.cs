@@ -77,8 +77,27 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public override bool Execute()
         {
-            // try
-            //{
+            if (HubIgnoreFailure)
+            {
+                try
+                {
+                    ExecuteTask();
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine($"{exception}");
+                }
+            }
+            else
+            {
+                ExecuteTask();
+            }
+
+            return true;
+        }
+
+        private void ExecuteTask()
+        {
             // Reset Connection Setup
             if (RestConnection == null)
             {
@@ -189,21 +208,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 ReportData reportData = RiskReportDataService.GetReportData(project);
                 File.WriteAllText($"{OutputDirectory}/ReportData.json", reportData.ToJson(Newtonsoft.Json.Formatting.Indented));
             }
-            /* }
-             catch (Exception exception)
-             {
-                 if (HubIgnoreFailure)
-                 {
-                     Console.WriteLine($"{exception}");
-                 }
-                 else
-                 {
-                     throw exception;
-                 }
-
-             //*/
-            //}
-            return true;
         }
 
         #region Make Flat List
