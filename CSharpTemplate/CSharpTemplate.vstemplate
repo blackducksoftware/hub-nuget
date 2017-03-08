@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Hub Nuget Template</Name>
+    <Description>C# project template to generate Black Duck I/O for Nuget packages</Description>
+    <Icon>BlackDuck.ico</Icon>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
+    <SortOrder>1000</SortOrder>
+    <TemplateID>9277727d-2343-4470-8587-13a763ce30ff</TemplateID>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>HubNugetProject</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ProjectTemplate.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true">EmptyClass.cs</ProjectItem>
+      <Folder Name="BlackDuck">
+        <ProjectItem OpenInEditor="true">Blackducksoftware.BuildBOM.targets</ProjectItem>  
+      </Folder>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

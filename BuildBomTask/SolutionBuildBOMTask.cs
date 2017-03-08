@@ -18,9 +18,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             try
             {
                 Dictionary<string,string> projectData = ParseSolutionFile(SolutionPath);
+                Console.WriteLine("Parsed Solution File");
                 if(projectData.Count > 0)
                 {
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
+
+                    Console.WriteLine("Solution directory: {0}",solutionDirectory);
                     bool useProjectOutputDir = false;
 
                     if (String.IsNullOrWhiteSpace(OutputDirectory))
@@ -30,6 +33,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
                     foreach (string key in projectData.Keys)
                     {
+                        Console.WriteLine("Processing Project: {0}", key);
                         string projectRelativePath = projectData[key];
 
                         List<string> projectPathSegments = new List<string>();

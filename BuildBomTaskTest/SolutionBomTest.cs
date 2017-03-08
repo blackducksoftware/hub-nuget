@@ -32,10 +32,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             projectNameList.Add(PROJECT_NAME_SAMPLE_2);
             projectNameList.Add(PROJECT_NAME_SAMPLE_SOLUTION);
 
-            task.HubUrl = "https://www.google.com";
+            task.HubUrl = "http://www.blackducksoftware.com";
             task.HubUsername = "auser";
             task.HubPassword = "apassword";
-            task.PackagesRepoPath = $"https://api.nuget.org/v3/index.json";
+            task.PackagesRepoUrl = $"https://api.nuget.org/v3/index.json";
             task.SolutionPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}/resources/sample_solution/sample_solution.sln";
             // Server setup
             HubCredentials credentials = new HubCredentials(task.HubUsername, task.HubPassword);
@@ -122,7 +122,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         {
             task.DeployHubBdio = false;
             task.Execute();
-            
+
+            var loadedProjects = ProjectCollection.GlobalProjectCollection.LoadedProjects;
             foreach (string projectName in projectNameList)
             {
                 string outputPath = null;
@@ -173,18 +174,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.DeployHubBdio = false;
             task.Execute();
 
-            var projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => {
-                foreach(ProjectProperty property in item.AllEvaluatedProperties)
-                {
-                    Console.WriteLine("Name: {0}, Value: {1}", property.Name, property.EvaluatedValue);
-                }
-                return true;
-            });
             foreach (string projectName in projectNameList)
             {
                 string outputPath = null;
                 string projectFullPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}\\{projectName}.csproj";
-                projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => item.GetPropertyValue("ProjectName").Equals(projectName));
+                var projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => item.GetPropertyValue("ProjectName").Equals(projectName));
                 Project project;
                 if (projectList.Count() > 0)
                 {

@@ -32,7 +32,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             task.HubVersionName = "0.0.1";
             task.OutputDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}/output";
             task.PackagesConfigPath = $"{task.OutputDirectory}/packages.config";
-            task.PackagesRepoPath = $"https://api.nuget.org/v3/index.json";
+            task.PackagesRepoUrl = $"https://api.nuget.org/v3/index.json";
             task.HubUrl = "http://int-hub01.dc1.lan:8080";
             task.HubUsername = "sysadmin";
             task.HubPassword = "blackduck";

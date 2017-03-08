@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<ProductVersion>8.0.30703</ProductVersion>
+		<SchemaVersion>2.0</SchemaVersion>
+		<ProjectGuid>$guid1$</ProjectGuid>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>$safeprojectname$</RootNamespace>
+		<AssemblyName>$safeprojectname$</AssemblyName>
+		<TargetFrameworkVersion>v$targetframeworkversion$</TargetFrameworkVersion>
+		<FileAlignment>512</FileAlignment>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>bin\Debug\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>pdbonly</DebugType>
+ 		<Optimize>true</Optimize>
+		<OutputPath>bin\Release\</OutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="System"/>
+		$if$ ($targetframeworkversion$ >= 3.5)
+		<Reference Include="System.Core"/>
+		<Reference Include="System.Xml.Linq"/>
+		<Reference Include="System.Data.DataSetExtensions"/>
+		$endif$
+		$if$ ($targetframeworkversion$ >= 4.0)
+		<Reference Include="Microsoft.CSharp"/>
+ 		$endif$
+		<Reference Include="System.Data"/>
+		<Reference Include="System.Xml"/>
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Include="Properties\AssemblyInfo.cs" />
+      <Compile Include="EmptyClass.cs"/>
+      <None Include="BlackDuck\Blackducksoftware.BuildBOM.targets" />
+	</ItemGroup>
+    <UsingTask TaskName="Com.Blackducksoftware.Integration.Hub.Nuget.SolutionBuildBOMTask" AssemblyFile="$(ProjectDir)\$(OutputPath)\BuildBomTask.dll" />
+    <Import Project="BlackDuck\Blackducksoftware.BuildBOM.targets" />
+	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target> -->
+    <Target Name="AfterBuild">
+      <SolutionBuildBOMTask HubUrl="$(hub_url)" HubUsername="$(hub_username)" HubPassword="$(hub_password)" PackagesRepoUrl="$(packages_repo_url)" HubTimeout="$(hub_timeout)" HubProxyHost="$(hub_proxy_host)" HubProxyPort="$(hub_proxy_port)" HubProxyUsername="$(hub_proxy_username)" HubProxyPassword="$(hub_proxy_password)" HubScanTimeout="$(hub_scan_timeout)" OutputDirectory="$(hub_output_directory)" ExcludedModules="$(excluded_modules)" HubIgnoreFailure="$(hub_ignore_failure)" CreateFlatDependencyList="$(hub_create_flat_list)" CreateHubBdio="$(hub_create_bdio)" DeployHubBdio="$(hub_deploy_bdio)" CreateHubReport="$(hub_create_report)" CheckPolicies="$(hub_check_policies)" SolutionPath="$(SolutionPath)" />
+    </Target>
+ </Project>
