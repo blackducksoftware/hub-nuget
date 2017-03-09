@@ -8,6 +8,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
 {
     public class HubRequest
     {
+        public static string Q_OFFSET = "offset";
         public static string Q_LIMIT = "limit";
         public static string Q_SORT = "sort";
         public static string Q_QUERY = "q";
@@ -63,8 +64,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             BuildUri();
             HttpResponseMessage response = RestConnection.CreateGetRequest(Uri);
             string responseMessage = response.Content.ReadAsStringAsync().Result;
-            HubResponse hubResponse = new HubResponse();
-            hubResponse.Json = responseMessage;
+            HubResponse hubResponse = new HubResponse
+            {
+                Json = responseMessage
+            };
             return hubResponse;
         }
 

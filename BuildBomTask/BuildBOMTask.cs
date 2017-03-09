@@ -200,7 +200,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
                 ReportData reportData = RiskReportDataService.GetReportData(project);
-                File.WriteAllText($"{OutputDirectory}/ReportData.json", reportData.ToJson(Newtonsoft.Json.Formatting.Indented));
+                RiskReportDataService.WriteToRiskReport(reportData, OutputDirectory);
+
+                //File.WriteAllText($"{OutputDirectory}/ReportData.json", reportData.ToJson(Newtonsoft.Json.Formatting.Indented));
             }
         }
 

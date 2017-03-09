@@ -21,10 +21,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
         public string ProjectVersionURL { get; set; }
 
         [JsonProperty(PropertyName = "phase")]
-        public PhaseEnum Phase { get; set; }
+        public string Phase { get; set; }
 
         [JsonProperty(PropertyName = "distrubution")]
-        public DistributionEnum Distribution { get; set; }
+        public string Distribution { get; set; }
 
         [JsonProperty(PropertyName = "components")]
         public List<BomComponent> Components { get; private set; }

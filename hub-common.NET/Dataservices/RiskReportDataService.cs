@@ -7,11 +7,21 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using System;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Resource;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using System.IO.Compression;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
     public class RiskReportDataService : DataService
     {
+
+        public const string HUB_REPORTING_VERSION = "1.0.1";
+        public const string RISK_REPORT_DIRECTORY = "RiskReport";
+        public const string RISK_REPORT_HTML_FILE = "riskreport.html";
+
         private AggregateBomDataService AggregateBomDataService;
 
         public RiskReportDataService(RestConnection restConnection) : base(restConnection)
@@ -23,14 +33,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             ProjectView projectView = project.ProjectView;
             ProjectVersionView versionView = project.ProjectVersionView;
-            ReportData reportData = new ReportData();
-            reportData.ProjectName = projectView.Name;
-            reportData.ProjectURL = GetReportProjectUrl(project.ProjectId);
-            reportData.ProjectVersion = versionView.VersionName;
-            reportData.ProjectVersionURL = GetReportVersionUrl(project.VersionId, false);
-            reportData.Phase = versionView.Phase;
-            reportData.Distribution = versionView.Distribution;
-
+            ReportData reportData = new ReportData()
+            {
+                ProjectName = projectView.Name,
+                ProjectURL = GetReportProjectUrl(projectView.Metadata.Href),
+                ProjectVersion = versionView.VersionName,
+                ProjectVersionURL = GetReportVersionUrl(versionView.Metadata.Href, false),
+                Phase = versionView.Phase.ToString(),
+                Distribution = versionView.Distribution.ToString(),
+            };
             List<BomComponent> components = new List<BomComponent>();
 
             List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(project);
@@ -41,13 +52,16 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
                 {
                     componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
-                } else
+                }
+                else
                 {
                     componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
                 }
 
-                HubRequest request = new HubRequest(RestConnection);
-                request.Uri = new Uri(componentPolicyStatusURL);
+                HubRequest request = new HubRequest(RestConnection)
+                {
+                    Uri = new Uri(componentPolicyStatusURL)
+                };
                 BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
                 component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
                 components.Add(component);
@@ -59,17 +73,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
 
 
-        private string GetReportProjectUrl(string projectId)
+        private string GetReportProjectUrl(string projectUrl)
         {
             string baseUrl = RestConnection.GetBaseUrl();
+            string projectId = new UrlHelper().GetFirstId(projectUrl);
             string url = $"{baseUrl}/#projects/id:{projectId}";
             return url;
         }
 
-        private string GetReportVersionUrl(string versionId, bool isComponent)
+        private string GetReportVersionUrl(string versionUrl, bool isComponent)
         {
             string baseUrl = RestConnection.GetBaseUrl();
-            string url = $"{baseUrl}/#version/id:{versionId}";
+            string versionId = new UrlHelper().GetLastId(versionUrl);
+            string url = $"{baseUrl}/#versions/id:{versionId}";
             if (!isComponent)
             {
                 url += "/view:bom";
@@ -86,11 +102,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         private BomComponent CreateBomComponentFromBomComponentView(VersionBomComponentView bomEntry)
         {
 
-            BomComponent component = new BomComponent();
-            component.ComponentName = bomEntry.ComponentName;
-            component.ComponentURL = GetReportProjectUrl(bomEntry.Component);
-            component.ComponentVersion = bomEntry.ComponentVersionName;
-            component.ComponentVersionURL = GetReportVersionUrl(bomEntry.ComponentVersion, true);
+            BomComponent component = new BomComponent()
+            {
+                ComponentName = bomEntry.ComponentName,
+                ComponentURL = GetReportProjectUrl(bomEntry.Component),
+                ComponentVersion = bomEntry.ComponentVersionName,
+                ComponentVersionURL = GetReportVersionUrl(bomEntry.ComponentVersion, true)
+            };
+
+            string displayLicense = "";
+            foreach (VersionBomLicenseView license in bomEntry.Licenses)
+            {
+                displayLicense = license.LicenseDisplay + " ";
+            }
+            component.License = displayLicense;
 
             if (bomEntry.SecurityRiskProfile != null && bomEntry.SecurityRiskProfile.Counts != null
                     && bomEntry.SecurityRiskProfile.Counts.Count != 0)
@@ -150,7 +175,50 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 }
             }
             return component;
+        }
 
+        private void CopyRiskReport(string outputPath, string version = HUB_REPORTING_VERSION)
+        {
+            string remoteFileName = $"hub-common-reporting-{version}.jar";
+            string filePath = $"{outputPath}/{remoteFileName}";
+            string extractionDirectory = $"{outputPath}/Temp_RiskReport";
+            string riskReportFiles = $"{extractionDirectory}/riskreport/web/";
+            string url = "http://oss.sonatype.org/content/repositories/releases/com/blackducksoftware/integration/hub-common-reporting";
+            url += $"/{version}/{remoteFileName}";
+
+            // Cleanup any old stuff
+            string riskReportDirectory = $"{outputPath}/{RISK_REPORT_DIRECTORY}";
+            if (Directory.Exists(riskReportDirectory))
+            {
+                Directory.Delete(riskReportDirectory, true);
+            }
+            if(Directory.Exists(extractionDirectory))
+            {
+                Directory.Delete(extractionDirectory, true);
+            }
+
+            // Fetch the file
+            ResourceCopier resourceCopier = new ResourceCopier();
+            resourceCopier.CopyFromWeb(url, filePath);
+
+            // Extract the resources   
+            ZipFile.ExtractToDirectory(filePath, extractionDirectory);
+            Directory.Move(riskReportFiles, riskReportDirectory);
+
+            // Cleanup mess
+            File.Delete(filePath);
+            Directory.Delete(extractionDirectory, true);
+        }
+
+        public void WriteToRiskReport(ReportData reportData, string outputDirectory)
+        {
+            CopyRiskReport(outputDirectory);
+            string htmlFilePath = $"{outputDirectory}/{RISK_REPORT_DIRECTORY}/{RISK_REPORT_HTML_FILE}";
+
+            string htmlFile = File.ReadAllText(htmlFilePath);
+            htmlFile =htmlFile.Replace("TOKEN_RISK_REPORT_JSON_TOKEN", JToken.FromObject(reportData).ToString());
+
+            File.WriteAllText(htmlFilePath, htmlFile);
         }
     }
 }

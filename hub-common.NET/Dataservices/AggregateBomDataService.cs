@@ -9,6 +9,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
     public class AggregateBomDataService : DataService
     {
+
+        private const int BUFFER_LIMIT = 5;
+
         public AggregateBomDataService(RestConnection restConnection) : base(restConnection)
         {
 
@@ -21,13 +24,26 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         public List<VersionBomComponentView> GetBomEntries(string projectId, string versionId)
         {
-            HubPagedResponse<VersionBomComponentView> response = GetPagedBomEntries(projectId, versionId);
-            return response.Items;
+            int totalComponents = GetPagedBomEntries(projectId, versionId, 0, 1).TotalCount;
+            HubPagedResponse<VersionBomComponentView> bomEntries = new HubPagedResponse<VersionBomComponentView>();
+
+            for (int i = 0; i < totalComponents;)
+            {
+                HubPagedResponse<VersionBomComponentView> response = GetPagedBomEntries(projectId, versionId, i, BUFFER_LIMIT);
+                int responseCount = response.Items.Count;
+                bomEntries.Items.AddRange(response.Items);
+                bomEntries.TotalCount += responseCount;
+                i += response.Items.Count;
+            }
+
+            return bomEntries.Items;
         }
 
-        public HubPagedResponse<VersionBomComponentView> GetPagedBomEntries(string projectId, string versionId)
+        public HubPagedResponse<VersionBomComponentView> GetPagedBomEntries(string projectId, string versionId, int offset, int limit)
         {
             HubRequest request = new HubRequest(RestConnection);
+            request.QueryParameters.Add(HubRequest.Q_OFFSET, offset.ToString());
+            request.QueryParameters.Add(HubRequest.Q_LIMIT, limit.ToString());
             request.Path = $"/api/{ApiLinks.PROJECTS_LINK}/{projectId}/{ApiLinks.VERSIONS_LINK}/{versionId}/{ApiLinks.COMPONENTS_LINK}";
             HubPagedResponse<VersionBomComponentView> response = request.ExecuteGetForResponsePaged<VersionBomComponentView>();
             return response;
