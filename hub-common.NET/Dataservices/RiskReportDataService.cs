@@ -8,11 +8,20 @@ using System;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Resource;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using System.IO.Compression;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
     public class RiskReportDataService : DataService
     {
+
+        public const string HUB_REPORTING_VERSION = "1.0.1";
+        public const string RISK_REPORT_DIRECTORY = "RiskReport";
+        public const string RISK_REPORT_HTML_FILE = "riskreport.html";
+
         private AggregateBomDataService AggregateBomDataService;
 
         public RiskReportDataService(RestConnection restConnection) : base(restConnection)
@@ -166,7 +175,50 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 }
             }
             return component;
+        }
 
+        private void CopyRiskReport(string outputPath, string version = HUB_REPORTING_VERSION)
+        {
+            string remoteFileName = $"hub-common-reporting-{version}.jar";
+            string filePath = $"{outputPath}/{remoteFileName}";
+            string extractionDirectory = $"{outputPath}/Temp_RiskReport";
+            string riskReportFiles = $"{extractionDirectory}/riskreport/web/";
+            string url = "http://oss.sonatype.org/content/repositories/releases/com/blackducksoftware/integration/hub-common-reporting";
+            url += $"/{version}/{remoteFileName}";
+
+            // Cleanup any old stuff
+            string riskReportDirectory = $"{outputPath}/{RISK_REPORT_DIRECTORY}";
+            if (Directory.Exists(riskReportDirectory))
+            {
+                Directory.Delete(riskReportDirectory, true);
+            }
+            if(Directory.Exists(extractionDirectory))
+            {
+                Directory.Delete(extractionDirectory, true);
+            }
+
+            // Fetch the file
+            ResourceCopier resourceCopier = new ResourceCopier();
+            resourceCopier.CopyFromWeb(url, filePath);
+
+            // Extract the resources   
+            ZipFile.ExtractToDirectory(filePath, extractionDirectory);
+            Directory.Move(riskReportFiles, riskReportDirectory);
+
+            // Cleanup mess
+            File.Delete(filePath);
+            Directory.Delete(extractionDirectory, true);
+        }
+
+        public void WriteToRiskReport(ReportData reportData, string outputDirectory)
+        {
+            CopyRiskReport(outputDirectory);
+            string htmlFilePath = $"{outputDirectory}/{RISK_REPORT_DIRECTORY}/{RISK_REPORT_HTML_FILE}";
+
+            string htmlFile = File.ReadAllText(htmlFilePath);
+            htmlFile =htmlFile.Replace("TOKEN_RISK_REPORT_JSON_TOKEN", JToken.FromObject(reportData).ToString());
+
+            File.WriteAllText(htmlFilePath, htmlFile);
         }
     }
 }
