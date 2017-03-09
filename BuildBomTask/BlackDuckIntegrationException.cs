@@ -3,6 +3,7 @@ using System.Net.Http;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
+    [Serializable]
     class BlackDuckIntegrationException : Exception
     {
 
