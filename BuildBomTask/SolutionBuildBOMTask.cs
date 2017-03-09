@@ -75,6 +75,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
                 else
                 {   result = false;
+                    Console.WriteLine("Exception occurred {0}", ex);
+                    Console.WriteLine("Stack trace: {0}",ex.StackTrace);
                     throw new BlackDuckIntegrationException(ex.Message);
                 }
             }
