@@ -7,6 +7,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using System;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -25,11 +26,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             ProjectVersionView versionView = project.ProjectVersionView;
             ReportData reportData = new ReportData();
             reportData.ProjectName = projectView.Name;
-            reportData.ProjectURL = GetReportProjectUrl(project.ProjectId);
+            reportData.ProjectURL = GetReportProjectUrl(projectView.Metadata.Href);
             reportData.ProjectVersion = versionView.VersionName;
-            reportData.ProjectVersionURL = GetReportVersionUrl(project.VersionId, false);
-            reportData.Phase = versionView.Phase;
-            reportData.Distribution = versionView.Distribution;
+            reportData.ProjectVersionURL = GetReportVersionUrl(versionView.Metadata.Href, false);
+            reportData.Phase = versionView.Phase.ToString();
+            reportData.Distribution = versionView.Distribution.ToString();
 
             List<BomComponent> components = new List<BomComponent>();
 
@@ -41,7 +42,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
                 {
                     componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
-                } else
+                }
+                else
                 {
                     componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
                 }
@@ -59,17 +61,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
 
 
-        private string GetReportProjectUrl(string projectId)
+        private string GetReportProjectUrl(string projectUrl)
         {
             string baseUrl = RestConnection.GetBaseUrl();
+            string projectId = new UrlHelper().GetFirstId(projectUrl); 
             string url = $"{baseUrl}/#projects/id:{projectId}";
             return url;
         }
 
-        private string GetReportVersionUrl(string versionId, bool isComponent)
+        private string GetReportVersionUrl(string versionUrl, bool isComponent)
         {
             string baseUrl = RestConnection.GetBaseUrl();
-            string url = $"{baseUrl}/#version/id:{versionId}";
+            string versionId = new UrlHelper().GetLastId(versionUrl);
+            string url = $"{baseUrl}/#versions/id:{versionId}";
             if (!isComponent)
             {
                 url += "/view:bom";
@@ -91,6 +95,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             component.ComponentURL = GetReportProjectUrl(bomEntry.Component);
             component.ComponentVersion = bomEntry.ComponentVersionName;
             component.ComponentVersionURL = GetReportVersionUrl(bomEntry.ComponentVersion, true);
+            string displayLicense = "";
+            foreach(VersionBomLicenseView license in bomEntry.Licenses)
+            {
+                displayLicense = license.LicenseDisplay + " ";
+            }
+            component.License = displayLicense;
 
             if (bomEntry.SecurityRiskProfile != null && bomEntry.SecurityRiskProfile.Counts != null
                     && bomEntry.SecurityRiskProfile.Counts.Count != 0)

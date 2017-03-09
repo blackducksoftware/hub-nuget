@@ -10,7 +10,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
         public int TotalCount { get; set; }
 
         [JsonProperty(PropertyName = "items")]
-        public List<T> Items { get; set; }
+        public List<T> Items { get; set; } = new List<T>();
 
         [JsonProperty(PropertyName = "_meta")]
         public Metadata Metadata { get; set; }

@@ -55,6 +55,7 @@
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
     <Compile Include="Global\ApiLinks.cs" />
+    <Compile Include="Global\UrlHelper.cs" />
     <Compile Include="Model\Enums\SourceEnum.cs" />
     <Compile Include="Model\Enums\PhaseEnum.cs" />
     <Compile Include="Model\Enums\DistributionPhaseEnum.cs" />
