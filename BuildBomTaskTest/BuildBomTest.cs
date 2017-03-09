@@ -13,7 +13,6 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
