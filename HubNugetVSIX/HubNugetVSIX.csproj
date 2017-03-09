@@ -49,6 +49,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <Link>ProjectTemplates\CSharpTemplate.zip</Link>
     </Content>
+    <None Include="app.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

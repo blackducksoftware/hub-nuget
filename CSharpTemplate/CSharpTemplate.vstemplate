@@ -15,6 +15,7 @@
   <TemplateContent>
     <Project File="ProjectTemplate.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="Properties\AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      <ProjectItem>app.config</ProjectItem>
       <ProjectItem>packages.config</ProjectItem>
       <Folder Name="BlackDuck">
         <ProjectItem OpenInEditor="true">Blackducksoftware.BuildBOM.targets</ProjectItem>  
