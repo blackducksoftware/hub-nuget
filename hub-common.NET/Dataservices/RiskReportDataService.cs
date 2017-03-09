@@ -24,14 +24,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             ProjectView projectView = project.ProjectView;
             ProjectVersionView versionView = project.ProjectVersionView;
-            ReportData reportData = new ReportData();
-            reportData.ProjectName = projectView.Name;
-            reportData.ProjectURL = GetReportProjectUrl(projectView.Metadata.Href);
-            reportData.ProjectVersion = versionView.VersionName;
-            reportData.ProjectVersionURL = GetReportVersionUrl(versionView.Metadata.Href, false);
-            reportData.Phase = versionView.Phase.ToString();
-            reportData.Distribution = versionView.Distribution.ToString();
-
+            ReportData reportData = new ReportData()
+            {
+                ProjectName = projectView.Name,
+                ProjectURL = GetReportProjectUrl(projectView.Metadata.Href),
+                ProjectVersion = versionView.VersionName,
+                ProjectVersionURL = GetReportVersionUrl(versionView.Metadata.Href, false),
+                Phase = versionView.Phase.ToString(),
+                Distribution = versionView.Distribution.ToString(),
+            };
             List<BomComponent> components = new List<BomComponent>();
 
             List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(project);
@@ -48,8 +49,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                     componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
                 }
 
-                HubRequest request = new HubRequest(RestConnection);
-                request.Uri = new Uri(componentPolicyStatusURL);
+                HubRequest request = new HubRequest(RestConnection)
+                {
+                    Uri = new Uri(componentPolicyStatusURL)
+                };
                 BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
                 component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
                 components.Add(component);
@@ -64,7 +67,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         private string GetReportProjectUrl(string projectUrl)
         {
             string baseUrl = RestConnection.GetBaseUrl();
-            string projectId = new UrlHelper().GetFirstId(projectUrl); 
+            string projectId = new UrlHelper().GetFirstId(projectUrl);
             string url = $"{baseUrl}/#projects/id:{projectId}";
             return url;
         }
@@ -90,13 +93,16 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         private BomComponent CreateBomComponentFromBomComponentView(VersionBomComponentView bomEntry)
         {
 
-            BomComponent component = new BomComponent();
-            component.ComponentName = bomEntry.ComponentName;
-            component.ComponentURL = GetReportProjectUrl(bomEntry.Component);
-            component.ComponentVersion = bomEntry.ComponentVersionName;
-            component.ComponentVersionURL = GetReportVersionUrl(bomEntry.ComponentVersion, true);
+            BomComponent component = new BomComponent()
+            {
+                ComponentName = bomEntry.ComponentName,
+                ComponentURL = GetReportProjectUrl(bomEntry.Component),
+                ComponentVersion = bomEntry.ComponentVersionName,
+                ComponentVersionURL = GetReportVersionUrl(bomEntry.ComponentVersion, true)
+            };
+
             string displayLicense = "";
-            foreach(VersionBomLicenseView license in bomEntry.Licenses)
+            foreach (VersionBomLicenseView license in bomEntry.Licenses)
             {
                 displayLicense = license.LicenseDisplay + " ";
             }

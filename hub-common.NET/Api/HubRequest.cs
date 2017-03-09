@@ -64,8 +64,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             BuildUri();
             HttpResponseMessage response = RestConnection.CreateGetRequest(Uri);
             string responseMessage = response.Content.ReadAsStringAsync().Result;
-            HubResponse hubResponse = new HubResponse();
-            hubResponse.Json = responseMessage;
+            HubResponse hubResponse = new HubResponse
+            {
+                Json = responseMessage
+            };
             return hubResponse;
         }
 
