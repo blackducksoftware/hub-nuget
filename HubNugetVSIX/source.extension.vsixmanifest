@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="HubNugetVSIX.BlackDuckSoftware.7ed28f86-4b88-4e6b-a534-9777fc7d190d" Version="1.0" Language="en-US" Publisher="Black Duck Software" />
+    <DisplayName>Hub Nuget Template Package</DisplayName>
+    <Description xml:space="preserve">Includes project templates for creating and deploying Black Duck I/0 for a solution.</Description>
+    <License>LICENSE.txt</License>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\CSharpTemplate.zip" />
+  </Assets>
+</PackageManifest>

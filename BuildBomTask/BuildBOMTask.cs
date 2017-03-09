@@ -28,28 +28,23 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     public class BuildBOMTask : Microsoft.Build.Utilities.Task
     {
-        #region Hub Properties
         [Required]
         public string HubUrl { get; set; }
-
         [Required]
         public string HubUsername { get; set; }
-
         [Required]
         public string HubPassword { get; set; }
+        [Required]
+        public string PackagesRepoUrl { get; set; }
 
         public int HubTimeout { get; set; } = 120;
         public string HubProjectName { get; set; }
         public string HubVersionName { get; set; }
-        #endregion
 
-        #region Proxy Properties
         public string HubProxyHost { get; set; }
         public string HubProxyPort { get; set; }
         public string HubProxyUsername { get; set; }
         public string HubProxyPassword { get; set; }
-
-        #endregion
 
         public int HubScanTimeout { get; set; } = 300;
         public string OutputDirectory { get; set; }
@@ -62,7 +57,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public bool CheckPolicies { get; set; } = false;
 
         public string PackagesConfigPath { get; set; }
-        public string PackagesRepoPath { get; set; }
 
         // Currently public for testing
         public CodeLocationDataService CodeLocationDataService;
@@ -234,7 +228,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
             providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
             // we may need more code here around handling package sources.
-            PackageSource packageSource = new PackageSource(PackagesRepoPath);
+            PackageSource packageSource = new PackageSource(PackagesRepoUrl);
             SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
 
