@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BdioTask")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("MSBuild tasks to generate Black Duck I/O output for a solution or project")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BdioTask")]

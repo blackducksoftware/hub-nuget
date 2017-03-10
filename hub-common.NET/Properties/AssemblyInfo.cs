@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("hub-common.NET")]
-[assembly: AssemblyDescription("Library for communicating with the Hub")]
+[assembly: AssemblyDescription("Common Hub communication library for .NET")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Black Duck Software")]
 [assembly: AssemblyProduct("hub-common.NET")]
