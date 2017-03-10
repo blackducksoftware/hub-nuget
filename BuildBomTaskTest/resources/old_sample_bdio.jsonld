@@ -18,33 +18,6 @@
     "relationship": []
   },
   {
-    "revision": "0.0.1",
-    "@id": "data:integration-bdio.NET/0.0.1",
-    "@type": "Component",
-    "name": "integration-bdio.NET",
-    "externalIdentifier": {
-      "externalSystemTypeId": "nuget",
-      "externalId": "integration-bdio.NET/0.0.1"
-    },
-    "relationship": []
-  },
-  {
-    "revision": "5.2.3",
-    "@id": "data:Microsoft.AspNet.WebApi.Client/5.2.3",
-    "@type": "Component",
-    "name": "Microsoft.AspNet.WebApi.Client",
-    "externalIdentifier": {
-      "externalSystemTypeId": "nuget",
-      "externalId": "Microsoft.AspNet.WebApi.Client/5.2.3"
-    },
-    "relationship": [
-      {
-        "related": "data:Newtonsoft.Json/6.0.8",
-        "relationshipType": "DYNAMIC_LINK"
-      }
-    ]
-  },
-  {
     "revision": "2.1.1",
     "@id": "data:Microsoft.Web.Xdt/2.1.1",
     "@type": "Component",
@@ -56,13 +29,13 @@
     "relationship": []
   },
   {
-    "revision": "6.0.8",
-    "@id": "data:Newtonsoft.Json/6.0.8",
+    "revision": "9.0.1",
+    "@id": "data:Newtonsoft.Json/9.0.1",
     "@type": "Component",
     "name": "Newtonsoft.Json",
     "externalIdentifier": {
       "externalSystemTypeId": "nuget",
-      "externalId": "Newtonsoft.Json/6.0.8"
+      "externalId": "Newtonsoft.Json/9.0.1"
     },
     "relationship": []
   },
@@ -385,7 +358,7 @@
     },
     "relationship": [
       {
-        "related": "data:Newtonsoft.Json/6.0.8",
+        "related": "data:Newtonsoft.Json/9.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -457,7 +430,7 @@
     },
     "relationship": [
       {
-        "related": "data:Newtonsoft.Json/6.0.8",
+        "related": "data:Newtonsoft.Json/9.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -525,7 +498,7 @@
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "data:Newtonsoft.Json/6.0.8",
+        "related": "data:Newtonsoft.Json/9.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {

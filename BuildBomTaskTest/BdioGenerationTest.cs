@@ -17,7 +17,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void Setup()
         {
             HubNugetTestConfig.ConfigureTask(Task);
-            Task.Setup();
 
             BdioFilePath = $"{Task.OutputDirectory}/{Task.HubProjectName}.jsonld";
 

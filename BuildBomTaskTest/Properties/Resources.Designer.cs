@@ -61,6 +61,64 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [
+        ///  {
+        ///    &quot;specVersion&quot;: &quot;1.1.0&quot;,
+        ///    &quot;@id&quot;: &quot;uuid:4f12abf6-f105-4546-b9c8-83c98a8611c5&quot;,
+        ///    &quot;@type&quot;: &quot;BillOfMaterials&quot;,
+        ///    &quot;name&quot;: &quot;BuildBomTask Black Duck I/O Export&quot;,
+        ///    &quot;relationship&quot;: []
+        ///  },
+        ///  {
+        ///    &quot;revision&quot;: &quot;0.0.1&quot;,
+        ///    &quot;@id&quot;: &quot;data:BuildBomTask/0.0.1&quot;,
+        ///    &quot;@type&quot;: &quot;Project&quot;,
+        ///    &quot;name&quot;: &quot;BuildBomTask&quot;,
+        ///    &quot;externalIdentifier&quot;: {
+        ///      &quot;externalSystemTypeId&quot;: &quot;nuget&quot;,
+        ///      &quot;externalId&quot;: &quot;BuildBomTask/0.0.1&quot;
+        ///    },
+        ///    &quot;relationship&quot;: []
+        ///  },
+        ///  {
+        ///    &quot;revision&quot;: &quot;2.1.1&quot;,
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string old_sample_bdio {
+            get {
+                return ResourceManager.GetString("old_sample_bdio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft.Web.Xdt/2.1.1
+        ///Newtonsoft.Json/6.0.8
+        ///NuGet.Client/3.5.0
+        ///NuGet.Commands/3.5.0
+        ///NuGet.Common/3.5.0
+        ///NuGet.Configuration/3.5.0
+        ///NuGet.ContentModel/3.5.0
+        ///NuGet.Core/2.14.0
+        ///NuGet.DependencyResolver/3.5.0
+        ///NuGet.DependencyResolver.Core/3.5.0
+        ///NuGet.Frameworks/3.5.0
+        ///NuGet.LibraryModel/3.5.0
+        ///NuGet.PackageManagement/3.5.0
+        ///NuGet.Packaging/3.5.0
+        ///NuGet.Packaging.Core/3.5.0
+        ///NuGet.Packaging.Core.Types/3.5.0
+        ///NuGet.ProjectManagement/3.5.0
+        ///NuGet.ProjectModel/3.5.0
+        ///NuGet.Protocol.Core.Types/3.5.0
+        ///NuGet [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string old_sample_flat {
+            get {
+                return ResourceManager.GetString("old_sample_flat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         ///&lt;packages&gt;
         ///  &lt;package id=&quot;Microsoft.Web.Xdt&quot; version=&quot;2.1.1&quot; targetFramework=&quot;net452&quot; /&gt;
@@ -97,7 +155,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.Properties {
         ///    &quot;relationship&quot;: []
         ///  },
         ///  {
-        ///    &quot;revision&quot;: &quot;2.1.1&quot;,
+        ///    &quot;revision&quot;: &quot;0.0.1&quot;,
         /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string sample_bdio {
@@ -107,8 +165,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Microsoft.Web.Xdt/2.1.1
-        ///Newtonsoft.Json/9.0.1
+        ///   Looks up a localized string similar to integration-bdio.NET/0.0.1
+        ///Microsoft.AspNet.WebApi.Client/5.2.3
+        ///Microsoft.Web.Xdt/2.1.1
+        ///Newtonsoft.Json/6.0.8
         ///NuGet.Client/3.5.0
         ///NuGet.Commands/3.5.0
         ///NuGet.Common/3.5.0
@@ -123,10 +183,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.Properties {
         ///NuGet.Packaging/3.5.0
         ///NuGet.Packaging.Core/3.5.0
         ///NuGet.Packaging.Core.Types/3.5.0
-        ///NuGet.ProjectManagement/3.5.0
-        ///NuGet.ProjectModel/3.5.0
-        ///NuGet.Protocol.Core.Types/3.5.0
-        ///NuGet [rest of string was truncated]&quot;;.
+        ///NuGet.ProjectManagement/3.5.0 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string sample_flat {
             get {

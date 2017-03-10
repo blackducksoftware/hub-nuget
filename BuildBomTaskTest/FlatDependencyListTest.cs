@@ -18,7 +18,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void Setup()
         {
             HubNugetTestConfig.ConfigureTask(Task);
-            Task.Setup();
 
             FlatListFilePath = $"{Task.OutputDirectory}/{Task.HubProjectName}_flat.txt";
 

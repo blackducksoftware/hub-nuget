@@ -1,14 +1,12 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using NUnit.Framework;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     [TestFixture]
-    class DeployTest
+    class CheckPoliciesTest
     {
         private BuildBOMTask Task = new BuildBOMTask();
 
@@ -19,7 +17,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         private ScanSummariesDataService ScanSummariesDataService;
 
         private string BdioId;
-        private int PreScanCount = 0;
 
         [OneTimeSetUp]
         public void Setup()
@@ -30,7 +27,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             Task.CreateFlatDependencyList = false;
             Task.CreateHubBdio = true;
             Task.DeployHubBdio = true;
-            Task.CheckPolicies = false;
+            Task.CheckPolicies = true;
             Task.CreateHubReport = false;
 
             Task.WaitForDeployment = true;
@@ -43,28 +40,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             CodeLocationDataService = new CodeLocationDataService(RestConnection);
             ScanSummariesDataService = new ScanSummariesDataService(RestConnection);
 
-            // Determine preconditions
-            PreScanCount = GetScanCount();
-
-            Task.Execute();
+            //Task.Execute();
         }
 
         [Test]
-        public void Deploy_SuccessTest()
+        public void CheckPolicy_CountTest()
         {
-            Assert.Greater(GetScanCount(), PreScanCount);
+
         }
 
-        private int GetScanCount()
+        [Test]
+        public void CheckPolicy_ContentTest()
         {
-            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
-            BdioId = bdioPropertyHelper.CreateBdioId(Task.HubProjectName, Task.HubVersionName);
-            CodeLocationView codeLocationView = CodeLocationDataService.GetCodeLocationView(BdioId);
-            if (codeLocationView != null)
-            {
-                return ScanSummariesDataService.GetScanSummaries(codeLocationView).TotalCount;
-            }
-            return 0;
+
         }
     }
 }

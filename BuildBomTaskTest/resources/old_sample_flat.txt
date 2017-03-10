@@ -1,7 +1,5 @@
-integration-bdio.NET/0.0.1
-Microsoft.AspNet.WebApi.Client/5.2.3
 Microsoft.Web.Xdt/2.1.1
-Newtonsoft.Json/6.0.8
+Newtonsoft.Json/9.0.1
 NuGet.Client/3.5.0
 NuGet.Commands/3.5.0
 NuGet.Common/3.5.0

@@ -56,13 +56,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             // Deploy resources
             Directory.CreateDirectory(task.OutputDirectory);
-            File.WriteAllLines($"{task.OutputDirectory}/packages.config", Resources.packages.Split('\n'));
             task.Execute();
 
             foreach (string projectName in projectNameList)
             {
                 string actualString = File.ReadAllText($"{task.OutputDirectory}/{projectName}.jsonld");
-                BdioContent expected = BdioContent.Parse(Resources.sample_bdio);
+                BdioContent expected = BdioContent.Parse(Resources.old_sample_bdio);
                 BdioContent actual = BdioContent.Parse(actualString);
 
                 Assert.AreEqual(expected.Count, actual.Count);
@@ -87,6 +86,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void Solution_BuildBOMInProjectDirectoryTest()
         {
             task.DeployHubBdio = false;
+            task.OutputDirectory = null;
             task.Execute();
 
             var loadedProjects = ProjectCollection.GlobalProjectCollection.LoadedProjects;
@@ -112,7 +112,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     outputPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}{Path.DirectorySeparatorChar}{builddirectory}";
                 }
                 string actualString = File.ReadAllText($"{outputPath}\\{projectName}.jsonld");
-                BdioContent expected = BdioContent.Parse(Resources.sample_bdio);
+                BdioContent expected = BdioContent.Parse(Resources.old_sample_bdio);
                 BdioContent actual = BdioContent.Parse(actualString);
 
                 Assert.AreEqual(expected.Count, actual.Count);
@@ -138,6 +138,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         {
             task.CreateFlatDependencyList = true;
             task.DeployHubBdio = false;
+            task.OutputDirectory = null;
             task.Execute();
 
             foreach (string projectName in projectNameList)
@@ -161,7 +162,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     string builddirectory = outputPathProperties.First().EvaluatedValue;
                     outputPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}{Path.DirectorySeparatorChar}{builddirectory}";
                 }
-                List <string> expectedFlatList = new List<string>(Resources.sample_flat.Split('\n'));
+                List <string> expectedFlatList = new List<string>(Resources.old_sample_flat.Split('\n'));
                 List<string> actualFlatList = new List<string>(File.ReadAllLines($"{outputPath}\\{projectName}_flat.txt", Encoding.UTF8));
                 Assert.AreEqual(expectedFlatList.Count, actualFlatList.Count);
                 foreach (string actual in actualFlatList)
@@ -175,10 +176,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                             break;
                         }
                     }
-                    Assert.IsTrue(found, $"\n{actual} \nNOT FOUND IN\n{Resources.sample_flat}");
+                    Assert.IsTrue(found, $"\n{actual} \nNOT FOUND IN\n{Resources.old_sample_flat}");
                 }
                 Console.WriteLine("\nEXPECTED");
-                Console.WriteLine(Resources.sample_flat);
+                Console.WriteLine(Resources.old_sample_flat);
                 Console.WriteLine("\nACTUAL");
                 Console.WriteLine(File.ReadAllText($"{outputPath}\\{projectName}_flat.txt", Encoding.UTF8));
             }

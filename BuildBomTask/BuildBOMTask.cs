@@ -72,7 +72,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         // Helper properties
         private string BdioId;
 
-        public void Setup()
+        private void Setup()
         {
             // Estabilish authenticated connection
             HubServerConfig hubServerConfig = BuildHubServerConfig();
