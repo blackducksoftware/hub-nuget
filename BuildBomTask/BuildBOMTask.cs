@@ -58,19 +58,43 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public string PackagesConfigPath { get; set; }
 
-        // Currently public for testing
-        public CodeLocationDataService CodeLocationDataService;
-        public ScanSummariesDataService ScanSummariesDataService;
-        public DeployBdioDataService DeployBdioDataService;
-        public ProjectDataService ProjectDataService;
-        public PolicyDataService PolicyDataService;
-        public RiskReportDataService RiskReportDataService;
+        public bool WaitForDeployment = false;
+        private RestConnection RestConnection;
 
-        public RestConnection RestConnection;
-        public string BdioId;
+        // Dataservices
+        private CodeLocationDataService CodeLocationDataService;
+        private ScanSummariesDataService ScanSummariesDataService;
+        private DeployBdioDataService DeployBdioDataService;
+        private ProjectDataService ProjectDataService;
+        private PolicyDataService PolicyDataService;
+        private RiskReportDataService RiskReportDataService;
+
+        // Helper properties
+        private string BdioId;
+
+        public void Setup()
+        {
+            // Estabilish authenticated connection
+            HubServerConfig hubServerConfig = BuildHubServerConfig();
+            RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
+            RestConnection = restConnection;
+
+            // Create required dataservices
+            CodeLocationDataService = new CodeLocationDataService(RestConnection);
+            ScanSummariesDataService = new ScanSummariesDataService(RestConnection);
+            DeployBdioDataService = new DeployBdioDataService(RestConnection);
+            ProjectDataService = new ProjectDataService(RestConnection);
+            PolicyDataService = new PolicyDataService(RestConnection);
+            RiskReportDataService = new RiskReportDataService(RestConnection);
+
+            // Set helper properties
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+            BdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
+        }
 
         public override bool Execute()
         {
+            Setup();
             if (HubIgnoreFailure)
             {
                 try
@@ -86,114 +110,52 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 ExecuteTask();
             }
-
             return true;
         }
 
         private void ExecuteTask()
         {
-            // Reset Connection Setup
-            if (RestConnection == null)
-            {
-                HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
-                HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
-                HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
-                HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
-                RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
-                RestConnection = restConnection;
-            }
-
-            // Setup DataServices
-            if (CodeLocationDataService == null)
-            {
-                CodeLocationDataService = new CodeLocationDataService(RestConnection);
-            }
-            if (ScanSummariesDataService == null)
-            {
-                ScanSummariesDataService = new ScanSummariesDataService(RestConnection);
-            }
-            if (DeployBdioDataService == null)
-            {
-                DeployBdioDataService = new DeployBdioDataService(RestConnection);
-            }
-            if (ProjectDataService == null)
-            {
-                ProjectDataService = new ProjectDataService(RestConnection);
-            }
-            if (PolicyDataService == null)
-            {
-                PolicyDataService = new PolicyDataService(RestConnection);
-            }
-            if (RiskReportDataService == null)
-            {
-                RiskReportDataService = new RiskReportDataService(RestConnection);
-            }
-
-            // Set helper properties
-            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
-            BdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
-
             // Creates output directory if it doesn't already exist
             Directory.CreateDirectory(OutputDirectory);
-            string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
 
+            // Define output files
+            string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
+            string flatListFilePath = $"{OutputDirectory}/{HubProjectName}_flat.txt";
+
+            // Execute task functionality
             if (CreateFlatDependencyList)
             {
-                List<NuGet.PackageReference> packages = GenerateFlatList();
-                using (StreamWriter file = new StreamWriter($"{OutputDirectory}/{HubProjectName}_flat.txt", false, Encoding.UTF8))
-                {
-                    foreach (NuGet.PackageReference packageReference in packages)
-                    {
-                        string externalId = bdioPropertyHelper.CreateNugetExternalId(packageReference.Id, packageReference.Version.ToString());
-                        file.WriteLine(externalId);
-                    }
-                }
+                string[] externalIds = CreateFlatList().ToArray();
+                File.WriteAllLines(flatListFilePath, externalIds, Encoding.UTF8);
             }
 
             if (CreateHubBdio)
             {
-                Console.WriteLine($"Buidling BDIO");
                 BdioContent bdioContent = BuildBOM();
                 File.WriteAllText(bdioFilePath, bdioContent.ToString());
-                Console.WriteLine($"Created Bdio @ {bdioFilePath}");
             }
 
             if (DeployHubBdio)
             {
-                Console.WriteLine($"Deploying BDIO to hub @ {HubUrl}");
-
                 string bdio = File.ReadAllText(bdioFilePath);
                 BdioContent bdioContent = BdioContent.Parse(bdio);
+                DeployBdioDataService.Deploy(bdioContent);
+            }
 
+            // Only wait for scan if we have to
+            if(DeployHubBdio && (CheckPolicies || CreateHubBdio || WaitForDeployment))
+            {
+                string bdio = File.ReadAllText(bdioFilePath);
+                BdioContent bdioContent = BdioContent.Parse(bdio);
                 CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(bdioContent.Project.Id);
                 int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
-
-                HttpResponseMessage response = DeployBdioDataService.Deploy(bdioContent);
-
                 WaitForScanComplete(RestConnection, currentSummaries);
-                Console.WriteLine("Finished deployment");
             }
 
             if (CheckPolicies)
-            {
-                Console.WriteLine($"Checking policies of {HubProjectName}");
-
+            { 
                 PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
-
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append("The Hub found: ");
-                stringBuilder.Append(policyStatus.InViolationCount);
-                stringBuilder.Append(" components in violation, ");
-                stringBuilder.Append(policyStatus.InViolationCount);
-                stringBuilder.Append(" components in violation, but overridden, and ");
-                stringBuilder.Append(policyStatus.NotInViolationCount);
-                stringBuilder.Append(" components not in violation.");
-
-                if (policyStatus.OverallStatus == PolicyStatusEnum.IN_VIOLATION)
-                {
-                    string error = $"The Hub found: {policyStatus.InViolationCount} components in violation\n";
-                    throw new BlackDuckIntegrationException(error);
-                }
+                LogPolicyViolations(policyStatus);
             }
 
             if (CreateHubReport)
@@ -201,18 +163,34 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
                 ReportData reportData = RiskReportDataService.GetReportData(project);
                 RiskReportDataService.WriteToRiskReport(reportData, OutputDirectory);
-
-                //File.WriteAllText($"{OutputDirectory}/ReportData.json", reportData.ToJson(Newtonsoft.Json.Formatting.Indented));
             }
         }
 
-        #region Make Flat List
+        public HubServerConfig BuildHubServerConfig()
+        {
+            HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
+            HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
+            HubProxyInfo proxyInfo = new HubProxyInfo(HubProxyHost, HubProxyPort, proxyCredentials);
+            HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
+            return hubServerConfig;
+        }
 
-        public List<NuGet.PackageReference> GenerateFlatList()
+        #region Make Flat Dependency List
+
+        public List<string> CreateFlatList()
         {
             // Load the packages.config file into a list of Packages
             NuGet.PackageReferenceFile configFile = new NuGet.PackageReferenceFile(PackagesConfigPath);
-            return new List<NuGet.PackageReference>(configFile.GetPackageReferences());
+            List<NuGet.PackageReference> packages = new List<NuGet.PackageReference>(configFile.GetPackageReferences());
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+
+            List<string> externalIds = new List<string>();
+            foreach (NuGet.PackageReference packageReference in packages)
+            {
+                string externalId = bdioPropertyHelper.CreateNugetExternalId(packageReference.Id, packageReference.Version.ToString());
+                externalIds.Add(externalId);
+            }
+            return externalIds;
         }
 
         #endregion
@@ -408,7 +386,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
         }
 
-        #endregion        
+        #endregion
+
+        #region Create Policies
 
         public VersionBomPolicyStatusView GetPolicies()
         {
@@ -416,8 +396,28 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             VersionBomPolicyStatusView policyStatus = PolicyDataService.GetVersionBomPolicyStatusView(project.ProjectId, project.VersionId);
             return policyStatus;
         }
+
+        public void LogPolicyViolations(PolicyStatus policyStatus)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("The Hub found: ");
+            stringBuilder.Append(policyStatus.InViolationCount);
+            stringBuilder.Append(" components in violation, ");
+            stringBuilder.Append(policyStatus.InViolationCount);
+            stringBuilder.Append(" components in violation, but overridden, and ");
+            stringBuilder.Append(policyStatus.NotInViolationCount);
+            stringBuilder.Append(" components not in violation.");
+
+            if (policyStatus.OverallStatus == PolicyStatusEnum.IN_VIOLATION)
+            {
+                string error = $"The Hub found: {policyStatus.InViolationCount} components in violation\n";
+                throw new BlackDuckIntegrationException(error);
+            }
+        }
+#endregion
     }
 
+    // For the NuGet API
     public class Logger : NuGet.Common.ILogger
     {
         public void LogDebug(string data) => Trace.WriteLine($"DEBUG: {data}");
@@ -430,12 +430,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public void LogInformationSummary(string data)
         {
-            throw new NotImplementedException();
+            Trace.WriteLine($"INFORMATION SUMMARY: {data}");
         }
 
         public void LogErrorSummary(string data)
         {
-            throw new NotImplementedException();
+            Trace.WriteLine($"ERROR SUMMARY: {data}");
         }
     }
 }

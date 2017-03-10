@@ -43,13 +43,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             HubProxyInfo proxyInfo = new HubProxyInfo(task.HubProxyHost, task.HubProxyPort, proxyCredentials);
             HubServerConfig = new HubServerConfig(task.HubUrl, task.HubTimeout, credentials, proxyInfo);
 
-            task.RestConnection = new CredentialsResetConnection(HubServerConfig);
-            task.CodeLocationDataService = new CodeLocationDataService(task.RestConnection);
-            task.ScanSummariesDataService = new ScanSummariesDataService(task.RestConnection);
+            //task.RestConnection = new CredentialsResetConnection(HubServerConfig);
+            //task.CodeLocationDataService = new CodeLocationDataService(task.RestConnection);
+            //task.ScanSummariesDataService = new ScanSummariesDataService(task.RestConnection);
         }
 
         [Test]
-        public void SolutionBuildBOMTest()
+        public void Solution_BuildBOMTest()
         {
             task.OutputDirectory = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}/output";
             task.DeployHubBdio = false;
@@ -83,42 +83,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             }
         }
 
-       
         [Test]
-        public void FlatListTest()
-        {
-            task.OutputDirectory = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}/output";
-            task.CreateFlatDependencyList = true;
-            task.DeployHubBdio = false;
-            task.Execute();
-
-            foreach (string projectName in projectNameList)
-            {
-                List<string> expectedFlatList = new List<string>(Resources.sample_flat.Split('\n'));
-                List<string> actualFlatList = new List<string>(File.ReadAllLines($"{task.OutputDirectory}/{projectName}_flat.txt", Encoding.UTF8));
-                Assert.AreEqual(expectedFlatList.Count, actualFlatList.Count);
-                foreach (string actual in actualFlatList)
-                {
-                    bool found = false;
-                    foreach (string expected in expectedFlatList)
-                    {
-                        if (expected.Trim().Equals(actual.Trim()))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    Assert.IsTrue(found, $"\n{actual} \nNOT FOUND IN\n{Resources.sample_flat}");
-                }
-                Console.WriteLine("\nEXPECTED");
-                Console.WriteLine(Resources.sample_flat);
-                Console.WriteLine("\nACTUAL");
-                WriteArrayToConsole(actualFlatList.ToArray());
-            }
-        }
-
-        [Test]
-        public void SolutionBuildBOMInProjectDirectoryTest()
+        public void Solution_BuildBOMInProjectDirectoryTest()
         {
             task.DeployHubBdio = false;
             task.Execute();
@@ -168,7 +134,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         }
 
         [Test]
-        public void FlatListProjectDirectoryTest()
+        public void Solution_FlatListProjectDirectoryTest()
         {
             task.CreateFlatDependencyList = true;
             task.DeployHubBdio = false;
@@ -214,16 +180,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 Console.WriteLine("\nEXPECTED");
                 Console.WriteLine(Resources.sample_flat);
                 Console.WriteLine("\nACTUAL");
-                WriteArrayToConsole(actualFlatList.ToArray());
-            }
-        }
-
-
-        private void WriteArrayToConsole(object[] objects)
-        {
-            foreach (object item in objects)
-            {
-                Console.WriteLine(item);
+                Console.WriteLine(File.ReadAllText($"{outputPath}\\{projectName}_flat.txt", Encoding.UTF8));
             }
         }
     }

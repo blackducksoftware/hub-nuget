@@ -44,7 +44,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             return scanSummary;
         }
 
-        public string GetCodeLocationId(CodeLocationView codeLocation)
+        private string GetCodeLocationId(CodeLocationView codeLocation)
         {
             if (codeLocation == null)
             {
