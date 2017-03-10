@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("hub-common.NET")]
-[assembly: AssemblyDescription("Library for communicating with the Hub")]
+[assembly: AssemblyDescription("Common Hub communication library for .NET")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Black Duck Software")]
 [assembly: AssemblyProduct("hub-common.NET")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.1.0")]
-[assembly: AssemblyFileVersion("0.0.1.0")]
+[assembly: AssemblyVersion("0.0.2.0")]
+[assembly: AssemblyFileVersion("0.0.2.0")]
