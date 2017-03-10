@@ -12,7 +12,7 @@
     <hub_proxy_password></hub_proxy_password>
     <hub_scan_timeout>300</hub_scan_timeout>
     <hub_output_directory></hub_output_directory>
-    <excluded_modules></excluded_modules>
+    <excluded_modules>$safeprojectname$</excluded_modules>
     <hub_ignore_failure>false</hub_ignore_failure>
     <hub_create_flat_list>false</hub_create_flat_list>
     <hub_create_bdio>true</hub_create_bdio>

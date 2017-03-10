@@ -115,55 +115,74 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         private void ExecuteTask()
         {
-            // Creates output directory if it doesn't already exist
-            Directory.CreateDirectory(OutputDirectory);
-
-            // Define output files
-            string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
-            string flatListFilePath = $"{OutputDirectory}/{HubProjectName}_flat.txt";
-
-            // Execute task functionality
-            if (CreateFlatDependencyList)
+            if (IsExcluded())
             {
-                string[] externalIds = CreateFlatList().ToArray();
-                File.WriteAllLines(flatListFilePath, externalIds, Encoding.UTF8);
+                Console.WriteLine("Project {0} excluded from task", HubProjectName);
             }
-
-            if (CreateHubBdio)
-            {
-                BdioContent bdioContent = BuildBOM();
-                File.WriteAllText(bdioFilePath, bdioContent.ToString());
-            }
-
-            if (DeployHubBdio)
-            {
-                string bdio = File.ReadAllText(bdioFilePath);
-                BdioContent bdioContent = BdioContent.Parse(bdio);
-                DeployBdioDataService.Deploy(bdioContent);
-            }
-
-            // Only wait for scan if we have to
-            if(DeployHubBdio && (CheckPolicies || CreateHubBdio || WaitForDeployment))
-            {
-                string bdio = File.ReadAllText(bdioFilePath);
-                BdioContent bdioContent = BdioContent.Parse(bdio);
-                CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(bdioContent.Project.Id);
-                int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
-                WaitForScanComplete(RestConnection, currentSummaries);
-            }
-
-            if (CheckPolicies)
+            else
             { 
-                PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
-                LogPolicyViolations(policyStatus);
+                // Creates output directory if it doesn't already exist
+                Directory.CreateDirectory(OutputDirectory);
+
+                // Define output files
+                string bdioFilePath = $"{OutputDirectory}/{HubProjectName}.jsonld";
+                string flatListFilePath = $"{OutputDirectory}/{HubProjectName}_flat.txt";
+
+                // Execute task functionality
+                if (CreateFlatDependencyList)
+                {
+                    string[] externalIds = CreateFlatList().ToArray();
+                    File.WriteAllLines(flatListFilePath, externalIds, Encoding.UTF8);
+                }
+
+                if (CreateHubBdio)
+                {
+                    BdioContent bdioContent = BuildBOM();
+                    File.WriteAllText(bdioFilePath, bdioContent.ToString());
+                }
+
+                if (DeployHubBdio)
+                {
+                    string bdio = File.ReadAllText(bdioFilePath);
+                    BdioContent bdioContent = BdioContent.Parse(bdio);
+                    DeployBdioDataService.Deploy(bdioContent);
+                }
+
+                // Only wait for scan if we have to
+                if (DeployHubBdio && (CheckPolicies || CreateHubBdio || WaitForDeployment))
+                {
+                    string bdio = File.ReadAllText(bdioFilePath);
+                    BdioContent bdioContent = BdioContent.Parse(bdio);
+                    CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(bdioContent.Project.Id);
+                    int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
+                    WaitForScanComplete(RestConnection, currentSummaries);
+                }
+
+                if (CheckPolicies)
+                {
+                    PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
+                    LogPolicyViolations(policyStatus);
+                }
+
+                if (CreateHubReport)
+                {
+                    Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
+                    ReportData reportData = RiskReportDataService.GetReportData(project);
+                    RiskReportDataService.WriteToRiskReport(reportData, OutputDirectory);
+                }
+            }
+        }
+
+        public bool IsExcluded()
+        {
+            ISet<string> excludedSet = new HashSet<string>();
+            string[] projectNameArray = this.ExcludedModules.Split(new char[] { ',' });
+            foreach(string projectName in projectNameArray)
+            {
+                excludedSet.Add(projectName.Trim());
             }
 
-            if (CreateHubReport)
-            {
-                Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
-                ReportData reportData = RiskReportDataService.GetReportData(project);
-                RiskReportDataService.WriteToRiskReport(reportData, OutputDirectory);
-            }
+            return excludedSet.Contains(HubProjectName.Trim());
         }
 
         public HubServerConfig BuildHubServerConfig()

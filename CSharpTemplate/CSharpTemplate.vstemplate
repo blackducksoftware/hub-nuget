@@ -18,7 +18,7 @@
       <ProjectItem>app.config</ProjectItem>
       <ProjectItem>packages.config</ProjectItem>
       <Folder Name="BlackDuck">
-        <ProjectItem OpenInEditor="true">Blackducksoftware.BuildBOM.targets</ProjectItem>  
+        <ProjectItem ReplaceParameters="true" OpenInEditor="true">Blackducksoftware.BuildBOM.targets</ProjectItem>  
       </Folder>
     </Project>
   </TemplateContent>
