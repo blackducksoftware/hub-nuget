@@ -35,7 +35,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             Task.Execute();
         }
 
-        [Test]
+        [Test, Order(2)]
         public void FlatList_ExistanceTest()
         {
             DirectoryAssert.Exists(Task.OutputDirectory);

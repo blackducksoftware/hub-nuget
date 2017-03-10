@@ -1,8 +1,6 @@
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
 using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
 using Microsoft.Build.Evaluation;
 using NUnit.Framework;
@@ -162,7 +160,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     string builddirectory = outputPathProperties.First().EvaluatedValue;
                     outputPath = $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\\resources\\sample_solution\\{projectName}{Path.DirectorySeparatorChar}{builddirectory}";
                 }
-                List <string> expectedFlatList = new List<string>(Resources.old_sample_flat.Split('\n'));
+                List<string> expectedFlatList = new List<string>(Resources.old_sample_flat.Split('\n'));
                 List<string> actualFlatList = new List<string>(File.ReadAllLines($"{outputPath}\\{projectName}_flat.txt", Encoding.UTF8));
                 Assert.AreEqual(expectedFlatList.Count, actualFlatList.Count);
                 foreach (string actual in actualFlatList)

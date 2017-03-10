@@ -67,6 +67,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ReportTest.cs" />
     <Compile Include="CheckPoliciesTest.cs" />
     <Compile Include="DeployTest.cs" />
     <Compile Include="BdioGenerationTest.cs" />

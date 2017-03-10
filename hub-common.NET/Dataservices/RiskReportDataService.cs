@@ -21,6 +21,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         public const string HUB_REPORTING_VERSION = "1.0.1";
         public const string RISK_REPORT_DIRECTORY = "RiskReport";
         public const string RISK_REPORT_HTML_FILE = "riskreport.html";
+        public const string REPLACEMENT_TOKEN = "TOKEN_RISK_REPORT_JSON_TOKEN";
 
         private AggregateBomDataService AggregateBomDataService;
 
@@ -216,7 +217,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             string htmlFilePath = $"{outputDirectory}/{RISK_REPORT_DIRECTORY}/{RISK_REPORT_HTML_FILE}";
 
             string htmlFile = File.ReadAllText(htmlFilePath);
-            htmlFile =htmlFile.Replace("TOKEN_RISK_REPORT_JSON_TOKEN", JToken.FromObject(reportData).ToString());
+            htmlFile =htmlFile.Replace(REPLACEMENT_TOKEN, JToken.FromObject(reportData).ToString());
 
             File.WriteAllText(htmlFilePath, htmlFile);
         }
