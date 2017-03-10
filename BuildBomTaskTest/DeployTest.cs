@@ -45,7 +45,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             // Determine preconditions
             PreScanCount = GetScanCount();
+        }
 
+        [Test, Order(1)]
+        public void Deploy_Execute()
+        {
             Task.Execute();
         }
 

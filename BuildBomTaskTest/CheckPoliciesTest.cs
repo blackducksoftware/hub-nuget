@@ -41,7 +41,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             // Intialize data Services
             ProjectDataService = new ProjectDataService(RestConnection);
             PolicyDataService = new PolicyDataService(RestConnection);
+        }
 
+        [Test, Order(1)]
+        public void CheckPolicy_Execute()
+        {
             Task.Execute();
         }
 

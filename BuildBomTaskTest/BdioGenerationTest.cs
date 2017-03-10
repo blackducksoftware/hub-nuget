@@ -26,11 +26,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             Task.DeployHubBdio = false;
             Task.CheckPolicies = false;
             Task.CreateHubReport = false;
-
-            Task.Execute();
         }
 
         [Test, Order(1)]
+        public void Bdio_Execute()
+        {
+            Task.Execute();
+        }
+
+        [Test]
         public void Bdio_ExistanceTest()
         {
             DirectoryAssert.Exists(Task.OutputDirectory);
