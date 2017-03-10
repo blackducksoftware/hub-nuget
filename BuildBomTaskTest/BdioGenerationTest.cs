@@ -1,4 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Nuget.Properties;
 using NUnit.Framework;
 using System;
@@ -17,6 +18,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void Setup()
         {
             HubNugetTestConfig.ConfigureTask(Task);
+            
+            // Setup a mocked rest connection
+            RestConnection restConnection = new MockRestConnection(Task.BuildHubServerConfig());
+            Task.Setup(restConnection);
 
             BdioFilePath = $"{Task.OutputDirectory}/{Task.HubProjectName}.jsonld";
 
@@ -31,7 +36,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         [Test, Order(1)]
         public void Bdio_Execute()
         {
-            Task.Execute();
+            Task.ExecuteTask();
         }
 
         [Test, Order(2)]

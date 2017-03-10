@@ -101,6 +101,7 @@
     <Compile Include="Items\ReportData.cs" />
     <Compile Include="Resources\ResourceCopier.cs" />
     <Compile Include="Rest\CredentialsResetConnection.cs" />
+    <Compile Include="Rest\MockRestConnection.cs" />
     <Compile Include="Rest\RestConnection.cs" />
     <Compile Include="Model\CodeLocation\CodeLocationView.cs" />
     <Compile Include="Api\HubResponse.cs" />

@@ -77,6 +77,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             // Estabilish authenticated connection
             HubServerConfig hubServerConfig = BuildHubServerConfig();
             RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
+            Setup(restConnection); 
+        }
+
+        public void Setup(RestConnection restConnection)
+        {
             RestConnection = restConnection;
 
             // Create required dataservices
@@ -113,7 +118,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             return true;
         }
 
-        private void ExecuteTask()
+        public void ExecuteTask()
         {
             if (IsExcluded())
             {

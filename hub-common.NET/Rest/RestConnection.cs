@@ -10,7 +10,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
 {
     public class RestConnection : HttpClient
     {
-        private HubServerConfig HubServerConfig;
+        internal HubServerConfig HubServerConfig;
 
         public RestConnection(HubServerConfig hubServerConfig)
         {
@@ -43,12 +43,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
         }
         #endregion
 
-        public HttpResponseMessage CreateGetRequest(Uri uri)
+        public virtual HttpResponseMessage CreateGetRequest(Uri uri)
         {
             return GetAsync(uri).Result;
         }
 
-        public HttpResponseMessage CreatePostRequest(Uri uri, HttpContent content)
+        public virtual HttpResponseMessage CreatePostRequest(Uri uri, HttpContent content)
         {
             HttpResponseMessage response = PostAsync(uri, content).Result;
             return response;
