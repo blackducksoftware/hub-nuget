@@ -28,7 +28,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Items
             List<ViolationCountView> counts = policyView.ComponentVersionStatusCounts;
             foreach (ViolationCountView pair in counts)
             {
-                PolicyStatusEnum status = new PolicyStatusEnum(pair.Name);
+                PolicyStatusEnum status = pair.Name;
                 if (status.Equals(PolicyStatusEnum.IN_VIOLATION))
                 {
                     InViolationCount = pair.Count;

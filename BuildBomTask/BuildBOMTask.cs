@@ -409,7 +409,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         #region Create Policies
 
-        public VersionBomPolicyStatusView GetPolicies()
+        private VersionBomPolicyStatusView GetPolicies()
         {
             Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
             VersionBomPolicyStatusView policyStatus = PolicyDataService.GetVersionBomPolicyStatusView(project.ProjectId, project.VersionId);

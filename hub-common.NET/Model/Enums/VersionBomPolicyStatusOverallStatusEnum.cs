@@ -1,7 +1,7 @@
 ﻿
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums
 {
-    class VersionBomPolicyStatusOverallStatusEnum : HubEnum
+    public class VersionBomPolicyStatusOverallStatusEnum : HubEnum
     {
         public static readonly VersionBomPolicyStatusOverallStatusEnum IN_VIOLATION = new VersionBomPolicyStatusOverallStatusEnum("IN_VIOLATION");
         public static readonly VersionBomPolicyStatusOverallStatusEnum IN_VIOLATION_OVERRIDDEN = new VersionBomPolicyStatusOverallStatusEnum("IN_VIOLATION_OVERRIDDEN");
