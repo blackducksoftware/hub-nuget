@@ -36,8 +36,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="integration-bdio.NET, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\integration-bdio.NET\integration-bdio.NET\bin\Debug\integration-bdio.NET.dll</HintPath>
+      <HintPath>..\packages\integration-bdio.NET.0.0.1\lib\net452\integration-bdio.NET.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
@@ -109,7 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <EmbeddedResource Include="resources\sample_solution\sample_project_2\packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -119,6 +118,7 @@
     <EmbeddedResource Include="resources\sample_solution\sample_solution\packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <Resource Include="resources\packages.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

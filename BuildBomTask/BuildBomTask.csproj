@@ -31,8 +31,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="integration-bdio.NET, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\integration-bdio.NET\integration-bdio.NET\bin\Debug\integration-bdio.NET.dll</HintPath>
+      <HintPath>..\packages\integration-bdio.NET.0.0.1\lib\net452\integration-bdio.NET.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Engine" />
@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="BuildBomTask.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
