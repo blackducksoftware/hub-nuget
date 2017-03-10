@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BdioTask")]
+[assembly: AssemblyTitle("BuildBomTask")]
 [assembly: AssemblyDescription("MSBuild tasks to generate Black Duck I/O output for a solution or project")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BdioTask")]
+[assembly: AssemblyCompany("Black Duck Software")]
+[assembly: AssemblyProduct("BuildBomTask")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
