@@ -48,24 +48,32 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(project);
             foreach (VersionBomComponentView bomEntry in bomEntries)
             {
-                BomComponent component = CreateBomComponentFromBomComponentView(bomEntry);
-                string componentPolicyStatusURL = null;
-                if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
+                try
                 {
-                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
-                }
-                else
-                {
-                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
-                }
+                    BomComponent component = CreateBomComponentFromBomComponentView(bomEntry);
+                    components.Add(component);
+                    string componentPolicyStatusURL = null;
+                    if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
+                    {
+                        componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
+                    }
+                    else
+                    {
+                        componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
+                    }
 
-                HubRequest request = new HubRequest(RestConnection)
+                    HubRequest request = new HubRequest(RestConnection)
+                    {
+                        Uri = new Uri(componentPolicyStatusURL)
+                    };
+                    BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
+                    component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
+                    
+                }
+                catch(BlackDuckIntegrationException)
                 {
-                    Uri = new Uri(componentPolicyStatusURL)
-                };
-                BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
-                component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
-                components.Add(component);
+                    
+                }
             }
 
             reportData.SetComponents(components);
