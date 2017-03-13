@@ -5,6 +5,7 @@
     <DisplayName>Hub Nuget Template Package</DisplayName>
     <Description xml:space="preserve">Includes project templates for creating and deploying Black Duck I/0 for a solution.</Description>
     <License>LICENSE.txt</License>
+    <Tags>BlackDuck hub bdio open source security</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />

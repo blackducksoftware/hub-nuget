@@ -99,21 +99,22 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public override bool Execute()
         {
-            Setup();
-            if (HubIgnoreFailure)
+            try
             {
-                try
-                {
-                    ExecuteTask();
-                }
-                catch (Exception exception)
-                {
-                    Log.LogErrorFromException(exception);
-                }
-            }
-            else
-            {
+                Setup();
                 ExecuteTask();
+            }
+            catch (Exception ex)
+            {
+                if (HubIgnoreFailure)
+                {
+                    Log.LogMessage(MessageImportance.High,"Error executing Build BOM task. Cause: {0}", ex);
+                    return true;
+                }
+                else
+                {
+                    throw new BlackDuckIntegrationException("Error executing Build BOM task.",ex);
+                }
             }
             return true;
         }

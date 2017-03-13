@@ -71,12 +71,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 if(HubIgnoreFailure)
                 {
                     result = true;
-                    Log.LogMessage("Error occurred building Black Duck I/O file for solution: {0}",ex);
+                    Log.LogMessage(MessageImportance.High, "Error executing Build BOM task. Cause: {0}",ex);
                 }
                 else
-                {   result = false;
-                    Log.LogErrorFromException(ex);
-                    throw new BlackDuckIntegrationException(ex.Message);
+                {
+                    throw ex;
                 }
             }
 
