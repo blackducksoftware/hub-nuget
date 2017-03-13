@@ -20,7 +20,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             request.QueryParameters.Add(HubRequest.Q_LIMIT, limit.ToString());
             request.QueryParameters.Add(HubRequest.Q_QUERY, q);
             request.Path = $"api/{ApiLinks.CODE_LOCATION_LINK}";
-            Console.WriteLine(request.BuildUri().ToString());
             HubPagedResponse<CodeLocationView> response = request.ExecuteGetForResponsePaged<CodeLocationView>();
             List<CodeLocationView> codeLocations = response.Items;
             return codeLocations;

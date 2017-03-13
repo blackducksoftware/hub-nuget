@@ -18,12 +18,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             try
             {
                 Dictionary<string,string> projectData = ParseSolutionFile(SolutionPath);
-                Console.WriteLine("Parsed Solution File");
+                Log.LogMessage("Parsed Solution File");
                 if(projectData.Count > 0)
                 {
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
 
-                    Console.WriteLine("Solution directory: {0}",solutionDirectory);
+                    Log.LogMessage("Solution directory: {0}",solutionDirectory);
                     bool useProjectOutputDir = false;
 
                     if (String.IsNullOrWhiteSpace(OutputDirectory))
@@ -33,7 +33,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
                     foreach (string key in projectData.Keys)
                     {
-                        Console.WriteLine("Processing Project: {0}", key);
+                        Log.LogMessage("Processing Project: {0}", key);
                         string projectRelativePath = projectData[key];
 
                         List<string> projectPathSegments = new List<string>();
@@ -52,18 +52,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                         bool projectResult = base.Execute();
                         if(projectResult)
                         {
-                            Console.WriteLine("Generated Bdio file for project {0}",projectData[key]);
+                            Log.LogMessage("Generated Bdio file for project {0}",projectData[key]);
                         }
                         else
                         {
-                            Console.WriteLine("Could not generate Bdio file for project {0}",projectData[key]);
+                            Log.LogMessage("Could not generate Bdio file for project {0}",projectData[key]);
                         }
                         result = result && projectResult;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("No project data found for solution {0}",SolutionPath);
+                    Log.LogMessage("No project data found for solution {0}",SolutionPath);
                 }
             }
             catch(Exception ex)
@@ -71,12 +71,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 if(HubIgnoreFailure)
                 {
                     result = true;
-                    Console.WriteLine("Error occurred building Black Duck I/O file for solution: {0}",ex);
+                    Log.LogMessage("Error occurred building Black Duck I/O file for solution: {0}",ex);
                 }
                 else
                 {   result = false;
-                    Console.WriteLine("Exception occurred {0}", ex);
-                    Console.WriteLine("Stack trace: {0}",ex.StackTrace);
+                    Log.LogErrorFromException(ex);
                     throw new BlackDuckIntegrationException(ex.Message);
                 }
             }
@@ -133,7 +132,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                         }
                     }
                 }
-                Console.WriteLine("Found {0} Projects elements, processed {1} project elements for data",projectLines.Count(), projectDataMap.Count());
+                Log.LogMessage("Black Duck I/O Generation Found {0} Project elements, processed {1} project elements for data",projectLines.Count(), projectDataMap.Count());
             }
             else
             {
