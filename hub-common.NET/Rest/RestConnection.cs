@@ -1,4 +1,5 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
+using Com.Blackducksoftware.Integration.Hub.Nuget;
 using Mono.Web;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
             return HubServerConfig.Url;
         }
 
-        public Uri CreateURI(string baseUrl,string path, Dictionary<string, string> queryParameters)
+        public Uri CreateURI(string baseUrl, string path, Dictionary<string, string> queryParameters)
         {
             UriBuilder uriBuilder = new UriBuilder(baseUrl);
             uriBuilder.Path = path;
@@ -45,12 +46,22 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
 
         public virtual HttpResponseMessage CreateGetRequest(Uri uri)
         {
-            return GetAsync(uri).Result;
+            HttpResponseMessage response = GetAsync(uri).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return response;
+            }
+            throw new BlackDuckIntegrationException($"The hub returned status code: {response.StatusCode} @ {uri.AbsolutePath}");
         }
 
         public virtual HttpResponseMessage CreatePostRequest(Uri uri, HttpContent content)
         {
             HttpResponseMessage response = PostAsync(uri, content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return response;
+            }
+            throw new BlackDuckIntegrationException($"The hub returned status code: {response.StatusCode} @ {uri.AbsolutePath}");
             return response;
         }
 
