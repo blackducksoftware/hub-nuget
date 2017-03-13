@@ -19,7 +19,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             HubRequest request = new HubRequest(RestConnection);
             request.Path = $"api/{ApiLinks.BOM_IMPORTS_LINK}";
-            Console.WriteLine(request.BuildUri().ToString());
             HttpResponseMessage response = request.ExecuteJsonLDPost(bdioContent.ToString());
             return response;
         }

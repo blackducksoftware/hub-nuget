@@ -108,7 +108,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine($"{exception}");
+                    Log.LogErrorFromException(exception);
                 }
             }
             else
@@ -122,7 +122,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         {
             if (IsExcluded())
             {
-                Console.WriteLine("Project {0} excluded from task", HubProjectName);
+                Log.LogMessage("Project {0} excluded from task", HubProjectName);
             }
             else
             { 
@@ -359,7 +359,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
-                Console.WriteLine("Checking scan summary status");
+                Log.LogMessage("Checking scan summary status");
                 codeLocation = CodeLocationDataService.GetCodeLocationView(BdioId);
                 if (codeLocation != null)
                 {
@@ -367,7 +367,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
                 else
                 {
-                    Console.WriteLine("No code locations found. Trying again...");
+                    Log.LogMessage("No code locations found. Trying again...");
                     Thread.Sleep(500);
                 }
             }
@@ -393,7 +393,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     if (!scanStatus.Equals(currentStatus))
                     {
                         currentStatus = scanStatus;
-                        Console.WriteLine($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
+                        Log.LogMessage($"\tScan Status = {currentStatus} @ {stopwatch.ElapsedMilliseconds / 1000.0}");
                     }
                     if (currentStatus.Equals(ScanStatusEnum.COMPLETE))
                     {

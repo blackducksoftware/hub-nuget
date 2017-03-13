@@ -23,7 +23,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters.Add(HubRequest.Q_SORT, "updated asc");
             request.Path = $"api/{ApiLinks.CODE_LOCATION_LINK}/{codeLocationId}/{ApiLinks.SCAN_SUMMARIES_LINK}";
-            Console.WriteLine(request.BuildUri().ToString());
             HubPagedResponse<ScanSummaryView> response = request.ExecuteGetForResponsePaged<ScanSummaryView>();
             return response;
         }
