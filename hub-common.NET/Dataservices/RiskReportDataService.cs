@@ -48,39 +48,51 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(project);
             foreach (VersionBomComponentView bomEntry in bomEntries)
             {
+                BomComponent component;
                 try
                 {
-                    BomComponent component = CreateBomComponentFromBomComponentView(bomEntry);
+                    component = CreateBomComponentFromBomComponentView(bomEntry);
                     components.Add(component);
-                    string componentPolicyStatusURL = null;
-                    if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
-                    {
-                        componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
-                    }
-                    else
-                    {
-                        componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
-                    }
-
-                    HubRequest request = new HubRequest(RestConnection)
-                    {
-                        Uri = new Uri(componentPolicyStatusURL)
-                    };
-                    BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
-                    component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
-                    
                 }
-                catch(BlackDuckIntegrationException)
+                catch(Exception ex)
                 {
-                    
+                    throw new BlackDuckIntegrationException("Error getting BOM Component.", ex);
                 }
+
+                string componentPolicyStatusURL = null;
+                if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
+                {
+                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
+                }
+                else
+                {
+                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
+                }
+
+                CheckPolicyStatusForComponent(componentPolicyStatusURL, component);
             }
 
             reportData.SetComponents(components);
             return reportData;
         }
 
+        private void CheckPolicyStatusForComponent(string componentPolicyStatusURL, BomComponent component)
+        {
+            try 
+            {
+                HubRequest request = new HubRequest(RestConnection)
+                {
+                    Uri = new Uri(componentPolicyStatusURL)
+                };
+                BomComponentPolicyStatusView bomPolicyStatus = request.ExecuteGetForResponse<BomComponentPolicyStatusView>();
+                component.PolicyStatus = bomPolicyStatus.ApprovalStatus.ToString();
 
+            }
+            catch (BlackDuckIntegrationException)
+            {
+
+            }
+        }
 
         private string GetReportProjectUrl(string projectUrl)
         {
