@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net
 {
     [Serializable]
-    class BlackDuckIntegrationException : Exception
+    public class BlackDuckIntegrationException : Exception
     {
         public BlackDuckIntegrationException() : base()
         {
