@@ -16,7 +16,7 @@
     <tags>BlackDuck hub bdio open source security</tags>
     <dependencies>
       <dependency id="integration-bdio.NET" version="0.0.2" />
-      <dependency id="HubCommon.NET" version="0.0.3" />
+      <dependency id="HubCommon.NET" version="0.0.5" />
       <dependency id="NuGet.Client" version="3.5.0" />
       <dependency id="NuGet.Protocol.Core.V2" version="3.5.0" />
     </dependencies>

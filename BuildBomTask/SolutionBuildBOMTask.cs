@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Build.Evaluation;
