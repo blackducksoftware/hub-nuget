@@ -1,5 +1,4 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
-using Com.Blackducksoftware.Integration.Hub.Nuget;
 using Mono.Web;
 using System;
 using System.Collections.Generic;
@@ -62,7 +61,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
                 return response;
             }
             throw new BlackDuckIntegrationException($"The hub returned status code: {response.StatusCode} @ {uri.AbsolutePath}");
-            return response;
         }
 
         #region HttpContent
