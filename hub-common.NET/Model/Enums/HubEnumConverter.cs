@@ -13,17 +13,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            JValue obj = (JValue) JToken.Load(reader);
+            JValue obj = (JValue)JToken.Load(reader);
             string[] args = { (string)obj };
             T hubEnum = (T)Activator.CreateInstance(typeof(T), args);
             return hubEnum;
         }
 
-        public override bool CanWrite => false;
+        public override bool CanWrite => true;
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            HubEnum hubEnum = value as HubEnum;
+            string enumValue = hubEnum.ToString();
+            serializer.Serialize(writer, enumValue, typeof(string));
         }
     }
 }
