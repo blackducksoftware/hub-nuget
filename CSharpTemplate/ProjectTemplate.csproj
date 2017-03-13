@@ -31,6 +31,18 @@
 		<WarningLevel>4</WarningLevel>
 	</PropertyGroup>
 	<ItemGroup>
+        <Reference Include="BuildBOMTask, Version=0.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\BuildBOMTask.0.0.2\lib\net452\BuildBOMTask.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="HubCommon.NET, Version=0.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\HubCommon.NET.0.0.2\lib\net452\HubCommon.NET.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="integration-bdio.NET, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\integration-bdio.NET.0.0.1\lib\net452\integration-bdio.NET.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
         <Reference Include="Microsoft.Build" />
         <Reference Include="Microsoft.Build.Framework" />
         <Reference Include="Microsoft.Build.Utilities.v4.0" />

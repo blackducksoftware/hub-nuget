@@ -14,5 +14,10 @@
     <releaseNotes>Initial Release</releaseNotes>
     <copyright>Copyright © 2017 Black Duck Software</copyright>
     <tags>BlackDuck hub bdio open source security</tags>
+    <dependencies>
+      <dependency id="integration-bdio.NET" version="0.0.1"/>
+      <dependency id="HubCommon.NET" version="0.0.2"/>
+      <dependency id="NuGet.Client" version="3.5.0" />
+    </dependencies>
   </metadata>
 </package>
