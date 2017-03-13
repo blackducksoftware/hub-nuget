@@ -78,7 +78,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             // Estabilish authenticated connection
             HubServerConfig hubServerConfig = BuildHubServerConfig();
             RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
-            Setup(restConnection); 
+            Setup(restConnection);
         }
 
         public void Setup(RestConnection restConnection)
@@ -109,12 +109,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 if (HubIgnoreFailure)
                 {
-                    Log.LogMessage(MessageImportance.High,"Error executing Build BOM task. Cause: {0}", ex);
+                    Log.LogMessage(MessageImportance.High, "Error executing Build BOM task. Cause: {0}", ex);
                     return true;
                 }
                 else
                 {
-                    throw new BlackDuckIntegrationException("Error executing Build BOM task.",ex);
+                    throw new BlackDuckIntegrationException("Error executing Build BOM task.", ex);
                 }
             }
             return true;
@@ -127,7 +127,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 Log.LogMessage("Project {0} excluded from task", HubProjectName);
             }
             else
-            { 
+            {
                 // Creates output directory if it doesn't already exist
                 Directory.CreateDirectory(OutputDirectory);
 
@@ -184,7 +184,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         {
             ISet<string> excludedSet = new HashSet<string>();
             string[] projectNameArray = this.ExcludedModules.Split(new char[] { ',' });
-            foreach(string projectName in projectNameArray)
+            foreach (string projectName in projectNameArray)
             {
                 excludedSet.Add(projectName.Trim());
             }
@@ -440,7 +440,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 throw new BlackDuckIntegrationException(error);
             }
         }
-#endregion
+        #endregion
     }
 
     // For the NuGet API

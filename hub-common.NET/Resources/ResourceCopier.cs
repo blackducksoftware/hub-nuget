@@ -16,6 +16,4 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Resource
             webClient.DownloadFile(url, filePath);
         }
     }
-
-
 }
