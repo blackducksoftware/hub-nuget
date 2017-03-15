@@ -111,7 +111,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 {
                     Log.LogMessage(MessageImportance.High, "Error executing Build BOM task. Cause: {0}", ex);
                     return true;
-                }
+                } 
                 else
                 {
                     throw new BlackDuckIntegrationException("Error executing Build BOM task.", ex);
@@ -161,7 +161,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     string bdio = File.ReadAllText(bdioFilePath);
                     BdioContent bdioContent = BdioContent.Parse(bdio);
                     CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(bdioContent.Project.Id);
-                    int currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation).TotalCount;
+                    HubPagedResponse<ScanSummaryView> currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation);
                     WaitForScanComplete(RestConnection, currentSummaries);
                 }
 
@@ -354,8 +354,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         #region Deploy
 
-        public void WaitForScanComplete(HttpClient client, int currentSummaries)
+        public void WaitForScanComplete(HttpClient client, HubPagedResponse<ScanSummaryView> currentPagedSummaries)
         {
+            int currentSummaries = 0;
+            if(currentPagedSummaries != null)
+            {
+                currentSummaries = currentPagedSummaries.TotalCount;
+            }
+
             Stopwatch stopwatch = Stopwatch.StartNew();
             CodeLocationView codeLocation = null;
 
@@ -379,14 +385,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 throw new BlackDuckIntegrationException($"Failed to get the codelocation for {HubProjectName} ");
             }
 
-            string codeLocationId = CodeLocationDataService.GetCodeLocationId(codeLocation);
             ScanStatusEnum currentStatus = ScanStatusEnum.UNSTARTED;
             while (stopwatch.ElapsedMilliseconds / 1000 < HubScanTimeout)
             {
                 HubPagedResponse<ScanSummaryView> scanSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation);
                 if (scanSummaries == null || scanSummaries.Items == null)
                 {
-                    throw new BlackDuckIntegrationException($"There are no scan summaries for id: {codeLocationId}");
+                    throw new BlackDuckIntegrationException($"There are no scan summaries @: {codeLocation.Metadata.Href}");
                 }
                 else if (scanSummaries.TotalCount > currentSummaries)
                 {
@@ -408,7 +413,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
             if (stopwatch.ElapsedMilliseconds / 1000 > HubScanTimeout)
             {
-                throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocationId} execeded the {HubScanTimeout} second timeout");
+                throw new BlackDuckIntegrationException($"Scanning of the codelocation: {codeLocation.Metadata.Href} execeded the {HubScanTimeout} second timeout");
             }
         }
 

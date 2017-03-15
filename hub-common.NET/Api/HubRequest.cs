@@ -17,7 +17,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
         public Uri Uri;
         public string Path = "";
         public Dictionary<string, string> QueryParameters = new Dictionary<string, string>();
-        public string Q;
 
         public HubRequest(RestConnection restConnection)
         {
@@ -92,13 +91,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
 
         public Uri BuildUri()
         {
-            if (!string.IsNullOrWhiteSpace(Q))
-            {
-                QueryParameters.Add("q", Q);
-            }
             if (Uri == null)
             {
                 Uri = RestConnection.CreateURI(RestConnection.GetBaseUrl(), Path, QueryParameters);
+            } else
+            {
+                Uri = RestConnection.CreateURI(Uri, QueryParameters);
             }
             return Uri;
         }

@@ -8,48 +8,37 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
     public class ScanSummariesDataService : DataService
-    { 
+    {
+        MetadataDataService MetadataDataService;
+
         public ScanSummariesDataService(RestConnection restConnection) : base(restConnection)
         {
+            MetadataDataService = new MetadataDataService(RestConnection);
         }
 
         public HubPagedResponse<ScanSummaryView> GetScanSummaries(CodeLocationView codeLocationView)
-        {
-            return GetScanSummaries(GetCodeLocationId(codeLocationView));
-        }
-
-        public HubPagedResponse<ScanSummaryView> GetScanSummaries(string codeLocationId)
-        {
+        {    
+            if(codeLocationView == null)
+            {
+                return null;
+            }
+            string codeLocation = MetadataDataService.GetLink(codeLocationView, ApiLinks.SCANS_LINK);
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters.Add(HubRequest.Q_SORT, "updated asc");
-            request.Path = $"api/{ApiLinks.CODE_LOCATION_LINK}/{codeLocationId}/{ApiLinks.SCAN_SUMMARIES_LINK}";
+            request.Uri = new Uri(codeLocation, UriKind.Absolute);
             HubPagedResponse<ScanSummaryView> response = request.ExecuteGetForResponsePaged<ScanSummaryView>();
             return response;
         }
 
         public ScanSummaryView GetMostRecentScanSummary(CodeLocationView codeLocationView)
         {
-            return GetMostRecentScanSummary(GetCodeLocationId(codeLocationView));
-        }
-
-        public ScanSummaryView GetMostRecentScanSummary(string codeLocationId)
-        {
-            HubPagedResponse<ScanSummaryView> response = GetScanSummaries(codeLocationId);
+            HubPagedResponse<ScanSummaryView> response = GetScanSummaries(codeLocationView);
             ScanSummaryView scanSummary = null;
-            if (response.Items != null)
+            if (response != null && response.Items != null)
             {
                 scanSummary = response.Items[0];
             }
             return scanSummary;
-        }
-
-        private string GetCodeLocationId(CodeLocationView codeLocation)
-        {
-            if (codeLocation == null)
-            {
-                return null;
-            }
-            return codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
         }
     }
 }

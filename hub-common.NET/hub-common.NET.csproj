@@ -57,6 +57,7 @@
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
+    <Compile Include="Dataservices\MetadataDataService.cs" />
     <Compile Include="Global\ApiLinks.cs" />
     <Compile Include="Global\UrlHelper.cs" />
     <Compile Include="Model\Enums\SourceEnum.cs" />

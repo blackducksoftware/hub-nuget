@@ -24,10 +24,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
             return HubServerConfig.Url;
         }
 
-        public Uri CreateURI(string baseUrl, string path, Dictionary<string, string> queryParameters)
+        public Uri CreateURI(Uri uri, Dictionary<string, string> queryParameters)
         {
-            UriBuilder uriBuilder = new UriBuilder(baseUrl);
-            uriBuilder.Path = path;
+            UriBuilder uriBuilder = new UriBuilder(uri);
             if (queryParameters != null)
             {
                 NameValueCollection parameters = HttpUtility.ParseQueryString(string.Empty);
@@ -41,6 +40,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
             }
             return uriBuilder.Uri;
         }
+
+        public Uri CreateURI(string baseUrl, string path, Dictionary<string, string> queryParameters)
+        {
+            Uri uri = new Uri($"{baseUrl}/{path}", UriKind.Absolute);
+            return CreateURI(uri, queryParameters);
+        }
         #endregion
 
         public virtual HttpResponseMessage CreateGetRequest(Uri uri)
@@ -50,7 +55,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
             {
                 return response;
             }
-            throw new BlackDuckIntegrationException($"The hub returned status code: {response.StatusCode} @ {uri.AbsolutePath}");
+            throw new BlackDuckIntegrationException($"The hub returned status code: {response.StatusCode} @ {uri.AbsoluteUri}");
         }
 
         public virtual HttpResponseMessage CreatePostRequest(Uri uri, HttpContent content)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
@@ -37,11 +36,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             {
                 return null;
             }
-        }
-
-        public string GetCodeLocationId(CodeLocationView codeLocation)
-        {
-            return codeLocation.Metadata.GetFirstId(codeLocation.Metadata.Href);
         }
     }
 }
