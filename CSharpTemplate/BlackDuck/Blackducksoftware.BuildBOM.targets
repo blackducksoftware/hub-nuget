@@ -5,7 +5,7 @@
     <hub_url></hub_url>
     <hub_username></hub_username>
     <hub_password></hub_password>
-    <packages_repo_url></packages_repo_url>
+    <packages_repo_url>https://api.nuget.org/v3/index.json</packages_repo_url>
     <!-- Proxy Settings-->
     <hub_proxy_host></hub_proxy_host>
     <hub_proxy_port></hub_proxy_port>

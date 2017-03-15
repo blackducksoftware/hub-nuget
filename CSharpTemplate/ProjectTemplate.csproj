@@ -35,8 +35,8 @@
           <HintPath>..\packages\BuildBOMTask.0.0.5\lib\net452\BuildBOMTask.dll</HintPath>
           <Private>True</Private>
         </Reference>
-        <Reference Include="HubCommon.NET, Version=0.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\HubCommon.NET.0.0.5\lib\net452\HubCommon.NET.dll</HintPath>
+        <Reference Include="HubCommon.NET, Version=0.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\HubCommon.NET.0.0.6\lib\net452\HubCommon.NET.dll</HintPath>
           <Private>True</Private>
         </Reference>
         <Reference Include="integration-bdio.NET, Version=0.0.2.0, Culture=neutral, processorArchitecture=MSIL">

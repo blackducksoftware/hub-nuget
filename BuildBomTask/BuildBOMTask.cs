@@ -170,18 +170,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     WaitForScanComplete(RestConnection, currentSummaries);
                 }
 
-                if (CheckPolicies)
-                {
-                    PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
-                    LogPolicyViolations(policyStatus);
-                }
-
                 if (CreateHubReport)
                 {
                     ProjectView projectView = ProjectDataService.GetProjectView(HubProjectName);
                     ProjectVersionView projectVersionView = ProjectDataService.GetMostRecentVersion(projectView);
                     ReportData reportData = RiskReportDataService.GetReportData(projectView, projectVersionView);
                     RiskReportDataService.WriteToRiskReport(reportData, OutputDirectory);
+                }
+
+                if (CheckPolicies)
+                {
+                    PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
+                    LogPolicyViolations(policyStatus);
                 }
             }
         }
