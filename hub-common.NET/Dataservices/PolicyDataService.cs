@@ -18,7 +18,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             string policyStatusUrl = MetadataDataService.GetLink(projectVersionView, ApiLinks.POLICY_STATUS_LINK);
             HubRequest request = new HubRequest(RestConnection);
-            request.Uri = new Uri(policyStatusUrl, UriKind.Absolute);
+            request.SetUriFromString(policyStatusUrl);
             VersionBomPolicyStatusView response = request.ExecuteGetForResponse<VersionBomPolicyStatusView>();
             return response;
         }

@@ -20,10 +20,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             {
                 return null;
             }
-            string codeLocation = MetadataDataService.GetLink(codeLocationView, ApiLinks.SCANS_LINK);
+            string codeLocationUrl = MetadataDataService.GetLink(codeLocationView, ApiLinks.SCANS_LINK);
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters.Add(HubRequest.Q_SORT, "updated asc");
-            request.Uri = new Uri(codeLocation, UriKind.Absolute);
+            request.SetUriFromString(codeLocationUrl);
             HubPagedResponse<ScanSummaryView> response = request.ExecuteGetForResponsePaged<ScanSummaryView>();
             return response;
         }

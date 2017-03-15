@@ -112,11 +112,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 {
                     Log.LogMessage(MessageImportance.High, "Error executing Build BOM task. Cause: {0}", ex);
                     return true;
-                } 
+                }
                 else
                 {
                     throw new BlackDuckIntegrationException("Error executing Build BOM task.", ex);
                 }
+            }
+            finally
+            {
+                RestConnection.Dispose();
             }
             return true;
         }
@@ -359,7 +363,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public void WaitForScanComplete(HttpClient client, HubPagedResponse<ScanSummaryView> currentPagedSummaries)
         {
             int currentSummaries = 0;
-            if(currentPagedSummaries != null)
+            if (currentPagedSummaries != null)
             {
                 currentSummaries = currentPagedSummaries.TotalCount;
             }
@@ -442,7 +446,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             stringBuilder.Append(policyStatus.NotInViolationCount);
             stringBuilder.Append(" components not in violation.");
 
-            if (policyStatus.OverallStatus == PolicyStatusEnum.IN_VIOLATION)
+            if (PolicyStatusEnum.IN_VIOLATION.Equals(policyStatus.OverallStatus))
             {
                 string error = $"The Hub found: {policyStatus.InViolationCount} components in violation\n";
                 throw new BlackDuckIntegrationException(error);
