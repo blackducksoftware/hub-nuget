@@ -30,16 +30,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             AggregateBomDataService = new AggregateBomDataService(restConnection);
         }
 
-        public ReportData GetReportData(Project project)
-        {
-            return GetReportData(project.ProjectView, project.ProjectVersionView);
-        }
-
         public ReportData GetReportData(ProjectView projectView, ProjectVersionView projectVersionView)
         {
             ReportData reportData = new ReportData()
-            {
-                
+            {           
                 ProjectName = projectView.Name,
                 ProjectURL = GetReportProjectUrl(projectView.Metadata.Href),
                 ProjectVersion = projectVersionView.VersionName,

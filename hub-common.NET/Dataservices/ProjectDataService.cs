@@ -55,15 +55,5 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             }
             return recent;
         }
-
-        public Project GetMostRecentProjectItem(string projectName)
-        {
-            Project projectItem = new Project();
-            ProjectView projectView = GetProjectView(projectName);
-            projectItem.ProjectView = projectView; // Sets the project Id
-            ProjectVersionView versionView = GetMostRecentVersion(projectView);
-            projectItem.ProjectVersionView = versionView; // Sets the version Id
-            return projectItem;
-        }
     }
 }

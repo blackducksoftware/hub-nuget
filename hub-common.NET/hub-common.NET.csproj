@@ -84,7 +84,6 @@
     <Compile Include="Global\HubProxyInfo.cs" />
     <Compile Include="Items\BomComponent.cs" />
     <Compile Include="Items\PolicyStatus.cs" />
-    <Compile Include="Items\Project.cs" />
     <Compile Include="Model\ComplexLicense\ComplexLicenseView.cs" />
     <Compile Include="Model\Report\ActivityDataView.cs" />
     <Compile Include="Model\Report\BomComponentPolicyStatusView.cs" />
@@ -114,9 +113,6 @@
     <None Include="app.config" />
     <None Include="hub-common.NET.nuspec" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
