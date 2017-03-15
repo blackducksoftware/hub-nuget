@@ -11,12 +11,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         }
 
-        public string GetLink(HubView hubView, string rel)
+        public static string GetLink(HubView hubView, string rel)
         {
             return GetLink(hubView.Metadata, rel);
         }
 
-        public string GetLink(Metadata metadata, string rel)
+        public static string GetLink(Metadata metadata, string rel)
         {
             foreach(Link link in metadata.Links)
             {

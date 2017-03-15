@@ -9,11 +9,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
     public class ScanSummariesDataService : DataService
     {
-        MetadataDataService MetadataDataService;
 
         public ScanSummariesDataService(RestConnection restConnection) : base(restConnection)
         {
-            MetadataDataService = new MetadataDataService(RestConnection);
         }
 
         public HubPagedResponse<ScanSummaryView> GetScanSummaries(CodeLocationView codeLocationView)

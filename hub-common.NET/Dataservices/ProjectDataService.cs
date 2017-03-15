@@ -4,6 +4,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
+using System;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -11,7 +12,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
     {
         public ProjectDataService(RestConnection restConnection) : base(restConnection)
         {
-
         }
 
         public HubPagedResponse<ProjectView> GetPagedProjectView(string projectName)
@@ -23,11 +23,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             return response;
         }
 
-        public HubPagedResponse<ProjectVersionView> GetPagedProjectVersionView(string projectId)
+        public HubPagedResponse<ProjectVersionView> GetPagedProjectVersionView(ProjectView projectView)
         {
+            string projectVersionsUrl = MetadataDataService.GetLink(projectView, ApiLinks.VERSIONS_LINK);
             HubRequest hubRequest = new HubRequest(RestConnection);
             hubRequest.QueryParameters.Add(HubRequest.Q_SORT, "updatedAt asc"); // Sort it by most recent
-            hubRequest.Path = $"api/{ApiLinks.PROJECTS_LINK}/{projectId}/{ApiLinks.VERSIONS_LINK}";
+            hubRequest.Uri = new Uri(projectVersionsUrl, UriKind.Absolute);
             HubPagedResponse<ProjectVersionView> response = hubRequest.ExecuteGetForResponsePaged<ProjectVersionView>();
             return response;
         }
@@ -44,9 +45,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         }
 
 
-        public ProjectVersionView GetMostRecentVersion(string projectId)
+        public ProjectVersionView GetMostRecentVersion(ProjectView projectView)
         {
-            List<ProjectVersionView> versions = GetPagedProjectVersionView(projectId).Items;
+            List<ProjectVersionView> versions = GetPagedProjectVersionView(projectView).Items;
             ProjectVersionView recent = null;
             if (versions != null && versions.Count > 0)
             {
@@ -60,7 +61,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             Project projectItem = new Project();
             ProjectView projectView = GetProjectView(projectName);
             projectItem.ProjectView = projectView; // Sets the project Id
-            ProjectVersionView versionView = GetMostRecentVersion(projectItem.ProjectId);
+            ProjectVersionView versionView = GetMostRecentVersion(projectView);
             projectItem.ProjectVersionView = versionView; // Sets the version Id
             return projectItem;
         }
