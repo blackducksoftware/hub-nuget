@@ -24,6 +24,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -421,10 +422,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         #region Create Policies
 
-        private VersionBomPolicyStatusView GetPolicies()
+        public VersionBomPolicyStatusView GetPolicies()
         {
-            Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
-            VersionBomPolicyStatusView policyStatus = PolicyDataService.GetVersionBomPolicyStatusView(project.ProjectId, project.VersionId);
+            ProjectView project = ProjectDataService.GetProjectView(HubProjectName);
+            ProjectVersionView projectVersion = ProjectDataService.GetMostRecentVersion(project);
+            VersionBomPolicyStatusView policyStatus = PolicyDataService.GetVersionBomPolicyStatusView(projectVersion);
             return policyStatus;
         }
 

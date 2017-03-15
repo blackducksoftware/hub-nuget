@@ -3,6 +3,8 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
+using System;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 {
@@ -12,17 +14,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
         }
 
-        public VersionBomPolicyStatusView GetVersionBomPolicyStatusView(string projectId, string versionId)
+        public VersionBomPolicyStatusView GetVersionBomPolicyStatusView(ProjectVersionView projectVersionView)
         {
+            string policyStatusUrl = MetadataDataService.GetLink(projectVersionView, ApiLinks.POLICY_STATUS_LINK);
             HubRequest request = new HubRequest(RestConnection);
-            request.Path = $"api/{ApiLinks.PROJECTS_LINK}/{projectId}/{ApiLinks.VERSIONS_LINK}/{versionId}/{ApiLinks.POLICY_STATUS_LINK}";
+            request.Uri = new Uri(policyStatusUrl, UriKind.Absolute);
             VersionBomPolicyStatusView response = request.ExecuteGetForResponse<VersionBomPolicyStatusView>();
             return response;
         }
 
-        public PolicyStatus GetPolicyStatus(string projectId, string versionId)
+        public PolicyStatus GetPolicyStatus(ProjectVersionView projectVersionView)
         {
-            VersionBomPolicyStatusView policyView = GetVersionBomPolicyStatusView(projectId, versionId);
+            VersionBomPolicyStatusView policyView = GetVersionBomPolicyStatusView(projectVersionView);
             PolicyStatus policyStatus = new PolicyStatus(policyView);
             return policyStatus;
         }
