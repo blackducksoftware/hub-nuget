@@ -14,7 +14,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
         public static string Q_QUERY = "q";
 
         private RestConnection RestConnection;
-        public Uri Uri;
+
+        public Uri Uri { get; set; }
+
         public string Path = "";
         public Dictionary<string, string> QueryParameters = new Dictionary<string, string>();
 
@@ -87,6 +89,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
             BuildUri();
             HttpResponseMessage response = RestConnection.CreatePostRequest(Uri, httpContent);
             return response;
+        }
+
+        public void SetUriFromString(string absoluteUri)
+        {
+            Uri = new Uri(absoluteUri, UriKind.Absolute);
         }
 
         public Uri BuildUri()

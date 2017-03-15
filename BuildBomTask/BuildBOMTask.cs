@@ -174,8 +174,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
                 if (CreateHubReport)
                 {
-                    Project project = ProjectDataService.GetMostRecentProjectItem(HubProjectName);
-                    ReportData reportData = RiskReportDataService.GetReportData(project);
+                    ProjectView projectView = ProjectDataService.GetProjectView(HubProjectName);
+                    ProjectVersionView projectVersionView = ProjectDataService.GetMostRecentVersion(projectView);
+                    ReportData reportData = RiskReportDataService.GetReportData(projectView, projectVersionView);
                     RiskReportDataService.WriteToRiskReport(reportData, OutputDirectory);
                 }
             }

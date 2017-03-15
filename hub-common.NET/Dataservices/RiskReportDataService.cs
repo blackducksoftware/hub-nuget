@@ -32,20 +32,24 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         public ReportData GetReportData(Project project)
         {
-            ProjectView projectView = project.ProjectView;
-            ProjectVersionView versionView = project.ProjectVersionView;
+            return GetReportData(project.ProjectView, project.ProjectVersionView);
+        }
+
+        public ReportData GetReportData(ProjectView projectView, ProjectVersionView projectVersionView)
+        {
             ReportData reportData = new ReportData()
             {
+                
                 ProjectName = projectView.Name,
                 ProjectURL = GetReportProjectUrl(projectView.Metadata.Href),
-                ProjectVersion = versionView.VersionName,
-                ProjectVersionURL = GetReportVersionUrl(versionView.Metadata.Href, false),
-                Phase = versionView.Phase.ToString(),
-                Distribution = versionView.Distribution.ToString(),
+                ProjectVersion = projectVersionView.VersionName,
+                ProjectVersionURL = GetReportVersionUrl(projectVersionView.Metadata.Href, false),
+                Phase = projectVersionView.Phase.ToString(),
+                Distribution = projectVersionView.Distribution.ToString(),
             };
             List<BomComponent> components = new List<BomComponent>();
 
-            List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(project);
+            List<VersionBomComponentView> bomEntries = AggregateBomDataService.GetBomEntries(projectVersionView);
             foreach (VersionBomComponentView bomEntry in bomEntries)
             {
                 BomComponent component;
@@ -62,11 +66,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 string componentPolicyStatusURL = null;
                 if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
                 {
-                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.ComponentVersion);
+                    componentPolicyStatusURL = GetComponentPolicyUrl(projectVersionView.Metadata.Href, bomEntry.ComponentVersion);
                 }
                 else
                 {
-                    componentPolicyStatusURL = GetComponentPolicyUrl(versionView.Metadata.Href, bomEntry.Component);
+                    componentPolicyStatusURL = GetComponentPolicyUrl(projectVersionView.Metadata.Href, bomEntry.Component);
                 }
 
                 CheckPolicyStatusForComponent(componentPolicyStatusURL, component);
