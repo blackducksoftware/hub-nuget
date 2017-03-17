@@ -188,14 +188,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         public bool IsExcluded()
         {
-            ISet<string> excludedSet = new HashSet<string>();
-            string[] projectNameArray = this.ExcludedModules.Split(new char[] { ',' });
-            foreach (string projectName in projectNameArray)
+            
+            if (String.IsNullOrWhiteSpace(ExcludedModules))
             {
-                excludedSet.Add(projectName.Trim());
+                return false;
             }
-
-            return excludedSet.Contains(HubProjectName.Trim());
+            else
+            {
+                ISet<string> excludedSet = new HashSet<string>();
+                string[] projectNameArray = this.ExcludedModules.Split(new char[] { ',' });
+                foreach (string projectName in projectNameArray)
+                {
+                    excludedSet.Add(projectName.Trim());
+                }
+                return excludedSet.Contains(HubProjectName.Trim());
+            }
         }
 
         public HubServerConfig BuildHubServerConfig()
