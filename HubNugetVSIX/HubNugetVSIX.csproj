@@ -13,8 +13,8 @@
     <ProjectGuid>{01CC11BF-F061-4EF3-BEEE-79ACAB16AC9B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HubNugetVSIX</RootNamespace>
-    <AssemblyName>HubNugetVSIX</AssemblyName>
+    <RootNamespace>Com.Blackducksoftware.Integration.Hub.Nuget</RootNamespace>
+    <AssemblyName>hub-nuget</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
