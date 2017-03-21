@@ -58,7 +58,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                 }
 
                 string componentPolicyStatusURL = null;
-                if (string.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
+                if (!String.IsNullOrWhiteSpace(bomEntry.ComponentVersion))
                 {
                     componentPolicyStatusURL = GetComponentPolicyUrl(projectVersionView.Metadata.Href, bomEntry.ComponentVersion);
                 }
@@ -141,15 +141,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             {
                 foreach (RiskCountView count in bomEntry.SecurityRiskProfile.Counts)
                 {
-                    if (count.CountType == RiskCountEnum.HIGH && count.Count > 0)
+                    if (count.CountType.Equals(RiskCountEnum.HIGH) && count.Count > 0)
                     {
                         component.SecurityRiskHighCount = count.Count;
                     }
-                    else if (count.CountType == RiskCountEnum.MEDIUM && count.Count > 0)
+                    else if (count.CountType.Equals(RiskCountEnum.MEDIUM) && count.Count > 0)
                     {
                         component.SecurityRiskMediumCount = count.Count;
                     }
-                    else if (count.CountType == RiskCountEnum.LOW && count.Count > 0)
+                    else if (count.CountType.Equals(RiskCountEnum.LOW) && count.Count > 0)
                     {
                         component.SecurityRiskLowCount = count.Count;
                     }
@@ -160,15 +160,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             {
                 foreach (RiskCountView count in bomEntry.LicenseRiskProfile.Counts)
                 {
-                    if (count.CountType == RiskCountEnum.HIGH && count.Count > 0)
+                    if (count.CountType.Equals(RiskCountEnum.HIGH) && count.Count > 0)
                     {
                         component.LicenseRiskHighCount = count.Count;
                     }
-                    else if (count.CountType == RiskCountEnum.MEDIUM && count.Count > 0)
+                    else if (count.CountType.Equals(RiskCountEnum.MEDIUM) && count.Count > 0)
                     {
                         component.LicenseRiskMediumCount = count.Count;
                     }
-                    else if (count.CountType == RiskCountEnum.LOW && count.Count > 0)
+                    else if (count.CountType.Equals(RiskCountEnum.LOW) && count.Count > 0)
                     {
                         component.LicenseRiskLowCount = count.Count;
                     }
@@ -179,15 +179,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             {
                 foreach (RiskCountView count in bomEntry.OperationalRiskProfile.Counts)
                 {
-                    if (count.CountType == RiskCountEnum.HIGH && count.Count > 0)
+                    if (count.CountType.Equals(RiskCountEnum.HIGH) && count.Count > 0)
                     {
                         component.OperationalRiskHighCount = count.Count;
                     }
-                    else if (count.CountType == RiskCountEnum.MEDIUM && count.Count > 0)
+                    else if (count.CountType.Equals(RiskCountEnum.MEDIUM) && count.Count > 0)
                     {
                         component.OperationalRiskMediumCount = count.Count;
                     }
-                    else if (count.CountType == RiskCountEnum.LOW && count.Count > 0)
+                    else if (count.CountType.Equals(RiskCountEnum.LOW) && count.Count > 0)
                     {
                         component.OperationalRiskLowCount = count.Count;
                     }

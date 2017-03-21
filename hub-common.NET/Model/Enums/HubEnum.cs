@@ -19,7 +19,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums
             var other = obj as HubEnum;
             if (other == null)
                 return false;
-            return Value == other.Value;
+            return Value.Equals(other.Value);
         }
 
         public override int GetHashCode()

@@ -25,6 +25,9 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
+using System.Reflection;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -73,13 +76,58 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 
         // Helper properties
         private string BdioId;
+        private bool initAssemblies = true;
 
         private void Setup()
         {
+            LoadPackagesXML();
             // Estabilish authenticated connection
             HubServerConfig hubServerConfig = BuildHubServerConfig();
             RestConnection restConnection = new CredentialsResetConnection(hubServerConfig);
             Setup(restConnection);
+        }
+
+        public void LoadPackagesXML()
+        {
+            if (initAssemblies)
+            {
+                Dictionary<string, string> assemblyBindingMap = new Dictionary<string, string>(30);
+                // need to provide the same functionality as the assembly binding refereence in app.config programatically for a task.  
+                // Use the assembly resolve handler to achieve this. 
+                assemblyBindingMap["Newtonsoft.Json"] = "10.0.0.0";
+                assemblyBindingMap["NuGet.Protocol.Core.Types"] = "4.0.0.0";
+                assemblyBindingMap["NuGet.Configuration"] = "4.0.0.0";
+                
+                foreach(string assemblyName in assemblyBindingMap.Keys)
+                {
+                    LoadLocalAssembly(assemblyName, assemblyBindingMap[assemblyName]);
+                }
+
+                initAssemblies = false;
+            }
+        }
+
+        public void LoadLocalAssembly(string shortName, string version)
+        {
+            ResolveEventHandler handler = null;
+
+            handler = (object sender, ResolveEventArgs args) =>
+            {                
+                AssemblyName requestedAssembly = new AssemblyName(args.Name);
+
+                if(requestedAssembly.Name != shortName)
+                {
+                    return null;
+                }
+
+                requestedAssembly.Version = new Version(version);
+                AppDomain.CurrentDomain.AssemblyResolve -= handler;
+
+                Log.LogMessage(MessageImportance.High,"Loading assembly Name: {0}, Resolving Assembly {1}", args.Name, requestedAssembly);
+
+                return Assembly.Load(requestedAssembly);
+            };
+            AppDomain.CurrentDomain.AssemblyResolve += handler;
         }
 
         public void Setup(RestConnection restConnection)
