@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="integration-bdio.NET, Version=0.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\integration-bdio.NET.0.0.2\lib\net452\integration-bdio.NET.dll</HintPath>
+    <Reference Include="integration-bdio.NET, Version=0.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\integration-bdio.NET.0.0.3\lib\net452\integration-bdio.NET.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build" />
