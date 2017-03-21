@@ -15,7 +15,7 @@
     <copyright>Copyright © 2017 Black Duck Software</copyright>
     <tags>BlackDuck hub bdio open source security</tags>
     <dependencies>
-      <dependency id="integration-bdio.NET" version="0.0.2"/>
+      <dependency id="integration-bdio.NET" version="0.0.3"/>
       <dependency id="Mono.HttpUtility" version="1.0.0.1"/>
     </dependencies>
   </metadata>
