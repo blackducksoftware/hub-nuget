@@ -164,6 +164,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 else
                 {
                     Log.LogError("Error executing Build BOM task on project {0}, cause: {1}", HubProjectName, ex);
+                    return false;
                 }
             }
             finally
