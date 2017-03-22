@@ -76,7 +76,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 }
                 else
                 {
-                    throw ex;
+                    Log.LogError("Error executing Build BOM task. Cause: {0}",ex);
                 }
             }
 

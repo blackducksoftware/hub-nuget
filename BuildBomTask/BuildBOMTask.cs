@@ -158,12 +158,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             {
                 if (HubIgnoreFailure)
                 {
-                    Log.LogMessage(MessageImportance.High, "Error executing Build BOM task. Cause: {0}", ex);
+                    Log.LogMessage(MessageImportance.High, "Error executing Build BOM task on project {0}, cause: {1}", HubProjectName ,ex);
                     return true;
                 }
                 else
                 {
-                    throw new BlackDuckIntegrationException("Error executing Build BOM task.", ex);
+                    Log.LogError("Error executing Build BOM task on project {0}, cause: {1}", HubProjectName, ex);
                 }
             }
             finally
