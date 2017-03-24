@@ -22,5 +22,6 @@
     <hub_deploy_bdio>true</hub_deploy_bdio>
     <hub_create_report>false</hub_create_report>
     <hub_check_policies>false</hub_check_policies>
+    <hub_code_location_name></hub_code_location_name>
   </PropertyGroup>
 </Project>

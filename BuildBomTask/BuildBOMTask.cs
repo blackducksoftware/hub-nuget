@@ -60,6 +60,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public bool DeployHubBdio { get; set; } = true;
         public bool CreateHubReport { get; set; } = false;
         public bool CheckPolicies { get; set; } = false;
+        public string HubCodeLocationName { get; set; } = "";
 
         public string PackagesConfigPath { get; set; }
 
@@ -312,7 +313,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             BdioContent bdio = new BdioContent();
 
             // Create bdio bill of materials node
-            BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubProjectName);
+            BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubCodeLocationName,HubProjectName, HubVersionName);
 
             // Create bdio project node
             string projectBdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
