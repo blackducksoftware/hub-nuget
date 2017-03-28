@@ -57,6 +57,7 @@
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
+    <Compile Include="Dataservices\DataService.cs" />
     <Compile Include="Dataservices\MetadataDataService.cs" />
     <Compile Include="Dataservices\ProjectVersionDataService.cs" />
     <Compile Include="Dataservices\ScanStatusDataService.cs" />
@@ -77,7 +78,6 @@
     <Compile Include="Model\Enums\ScanStatusEnum.cs" />
     <Compile Include="Dataservices\AggregateBomDataService.cs" />
     <Compile Include="Dataservices\CodeLocationDataService.cs" />
-    <Compile Include="Dataservices\DataService.cs" />
     <Compile Include="Dataservices\DeployBdioDataService.cs" />
     <Compile Include="Dataservices\PolicyDataService.cs" />
     <Compile Include="Dataservices\ProjectDataService.cs" />
