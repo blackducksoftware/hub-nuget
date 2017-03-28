@@ -39,8 +39,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             string componentsUrl = MetadataDataService.GetLink(projectVersionView, ApiLinks.COMPONENTS_LINK);
             HubRequest request = new HubRequest(RestConnection);
-            request.QueryParameters.Add(HubRequest.Q_OFFSET, offset.ToString());
-            request.QueryParameters.Add(HubRequest.Q_LIMIT, limit.ToString());
+            request.QueryParameters[HubRequest.Q_OFFSET] = offset.ToString();
+            request.QueryParameters[HubRequest.Q_LIMIT] = limit.ToString();
             request.SetUriFromString(componentsUrl);
             HubPagedResponse<VersionBomComponentView> response = request.ExecuteGetForResponsePaged<VersionBomComponentView>();
             return response;

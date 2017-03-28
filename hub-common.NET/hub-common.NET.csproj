@@ -58,8 +58,11 @@
     <Compile Include="Api\HubRequest.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
     <Compile Include="Dataservices\MetadataDataService.cs" />
+    <Compile Include="Dataservices\ProjectVersionDataService.cs" />
+    <Compile Include="Dataservices\ScanStatusDataService.cs" />
     <Compile Include="Global\ApiLinks.cs" />
     <Compile Include="Global\UrlHelper.cs" />
+    <Compile Include="Api\HubPagedRequest.cs" />
     <Compile Include="Model\Enums\SourceEnum.cs" />
     <Compile Include="Model\Enums\PhaseEnum.cs" />
     <Compile Include="Model\Enums\DistributionPhaseEnum.cs" />
@@ -113,6 +116,9 @@
     <None Include="app.config" />
     <None Include="hub-common.NET.nuspec" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Requestservices\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

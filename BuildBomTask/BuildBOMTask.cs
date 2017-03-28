@@ -74,6 +74,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         private ProjectDataService ProjectDataService;
         private PolicyDataService PolicyDataService;
         private RiskReportDataService RiskReportDataService;
+        private ScanStatusDataService ScanStatusDataService;
 
         // Helper properties
         private string BdioId;
@@ -142,6 +143,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             ProjectDataService = new ProjectDataService(RestConnection);
             PolicyDataService = new PolicyDataService(RestConnection);
             RiskReportDataService = new RiskReportDataService(RestConnection);
+            ScanStatusDataService = new ScanStatusDataService(RestConnection, Convert.ToInt64(TimeSpan.FromSeconds(Convert.ToDouble(HubScanTimeout)).TotalMilliseconds));
 
             // Set helper properties
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
@@ -213,11 +215,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 // Only wait for scan if we have to
                 if (DeployHubBdio && (CheckPolicies || CreateHubBdio || WaitForDeployment))
                 {
-                    string bdio = File.ReadAllText(bdioFilePath);
-                    BdioContent bdioContent = BdioContent.Parse(bdio);
-                    CodeLocationView codeLocation = CodeLocationDataService.GetCodeLocationView(bdioContent.Project.Id);
-                    HubPagedResponse<ScanSummaryView> currentSummaries = ScanSummariesDataService.GetScanSummaries(codeLocation);
-                    WaitForScanComplete(RestConnection, currentSummaries);
+                    WaitForHub();
                 }
 
                 if (CreateHubReport)
@@ -416,6 +414,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         #endregion
 
         #region Deploy
+
+        public void WaitForHub()
+        {
+            ScanStatusDataService.AssertBomImportScanStartedThenFinished(HubProjectName, HubVersionName);
+        }
 
         public void WaitForScanComplete(HttpClient client, HubPagedResponse<ScanSummaryView> currentPagedSummaries)
         {

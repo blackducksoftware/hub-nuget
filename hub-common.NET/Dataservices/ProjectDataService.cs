@@ -16,7 +16,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             HubRequest hubRequest = new HubRequest(RestConnection);
             hubRequest.Path = $"api/{ApiLinks.PROJECTS_LINK}";
-            hubRequest.QueryParameters.Add(HubRequest.Q_QUERY, $"name:{projectName}");
+            hubRequest.QueryParameters[HubRequest.Q_QUERY] = $"name:{projectName}";
             HubPagedResponse<ProjectView> response = hubRequest.ExecuteGetForResponsePaged<ProjectView>();
             return response;
         }
@@ -25,7 +25,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         {
             string projectVersionsUrl = MetadataDataService.GetLink(projectView, ApiLinks.VERSIONS_LINK);
             HubRequest hubRequest = new HubRequest(RestConnection);
-            hubRequest.QueryParameters.Add(HubRequest.Q_SORT, "updatedAt asc"); // Sort it by most recent
+            hubRequest.QueryParameters[HubRequest.Q_SORT] = "updatedAt asc"; // Sort it by most recent
             hubRequest.SetUriFromString(projectVersionsUrl);
             HubPagedResponse<ProjectVersionView> response = hubRequest.ExecuteGetForResponsePaged<ProjectVersionView>();
             return response;

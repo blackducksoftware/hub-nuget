@@ -8,10 +8,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api
 {
     public class HubRequest
     {
-        public static string Q_OFFSET = "offset";
-        public static string Q_LIMIT = "limit";
-        public static string Q_SORT = "sort";
-        public static string Q_QUERY = "q";
+        public const string Q_OFFSET = "offset";
+        public const string Q_LIMIT = "limit";
+        public const string Q_SORT = "sort";
+        public const string Q_QUERY = "q";
+        public const string Q_CODE_LOCATION_TYPE = "codeLocationType";
 
         private RestConnection RestConnection;
 
