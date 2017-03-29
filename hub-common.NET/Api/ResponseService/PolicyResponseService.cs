@@ -6,17 +6,17 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using System;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class PolicyDataService : DataService
+    public class PolicyResponseService : HubResponseService
     {
-        public PolicyDataService(RestConnection restConnection) : base(restConnection)
+        public PolicyResponseService(RestConnection restConnection) : base(restConnection)
         {
         }
 
         public VersionBomPolicyStatusView GetVersionBomPolicyStatusView(ProjectVersionView projectVersionView)
         {
-            string policyStatusUrl = MetadataDataService.GetLink(projectVersionView, ApiLinks.POLICY_STATUS_LINK);
+            string policyStatusUrl = MetadataResponseService.GetLink(projectVersionView, ApiLinks.POLICY_STATUS_LINK);
             HubRequest request = new HubRequest(RestConnection);
             request.SetUriFromString(policyStatusUrl);
             VersionBomPolicyStatusView response = request.ExecuteGetForResponse<VersionBomPolicyStatusView>();

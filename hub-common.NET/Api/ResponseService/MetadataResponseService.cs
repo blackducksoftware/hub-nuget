@@ -2,11 +2,11 @@
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    class MetadataDataService : DataService
+    class MetadataResponseService : HubResponseService
     {
-        public MetadataDataService(RestConnection restConnection) : base(restConnection)
+        public MetadataResponseService(RestConnection restConnection) : base(restConnection)
         {
 
         }

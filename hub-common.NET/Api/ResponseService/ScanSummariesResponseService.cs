@@ -6,12 +6,12 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using System.Collections.Generic;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class ScanSummariesDataService : DataService
+    public class ScanSummariesResponseService : HubResponseService
     {
 
-        public ScanSummariesDataService(RestConnection restConnection) : base(restConnection)
+        public ScanSummariesResponseService(RestConnection restConnection) : base(restConnection)
         {
         }
 
@@ -21,7 +21,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
             {
                 return null;
             }
-            string codeLocationUrl = MetadataDataService.GetLink(codeLocationView, ApiLinks.SCANS_LINK);
+            string codeLocationUrl = MetadataResponseService.GetLink(codeLocationView, ApiLinks.SCANS_LINK);
             HubRequest request = new HubRequest(RestConnection);
             request.QueryParameters[HubRequest.Q_SORT] = "updated asc";
             request.SetUriFromString(codeLocationUrl);

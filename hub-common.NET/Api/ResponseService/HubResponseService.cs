@@ -3,13 +3,13 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using System;
 using System.Collections.Generic;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class DataService
+    public class HubResponseService
     {
         internal RestConnection RestConnection { get; set; }
 
-        public DataService(RestConnection restConnection)
+        public HubResponseService(RestConnection restConnection)
         {
             RestConnection = restConnection;
         }

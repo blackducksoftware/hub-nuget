@@ -12,10 +12,11 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Resource;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.IO.Compression;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.DataService
 {
-    public class RiskReportDataService : DataService
+    public class RiskReportResponseService : HubResponseService
     {
 
         public const string HUB_REPORTING_VERSION = "1.0.1";
@@ -23,11 +24,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
         public const string RISK_REPORT_HTML_FILE = "riskreport.html";
         public const string REPLACEMENT_TOKEN = "TOKEN_RISK_REPORT_JSON_TOKEN";
 
-        private AggregateBomDataService AggregateBomDataService;
+        private AggregateBomResponseService AggregateBomDataService;
 
-        public RiskReportDataService(RestConnection restConnection) : base(restConnection)
+        public RiskReportResponseService(RestConnection restConnection) : base(restConnection)
         {
-            AggregateBomDataService = new AggregateBomDataService(restConnection);
+            AggregateBomDataService = new AggregateBomResponseService(restConnection);
         }
 
         public ReportData GetReportData(ProjectView projectView, ProjectVersionView projectVersionView)

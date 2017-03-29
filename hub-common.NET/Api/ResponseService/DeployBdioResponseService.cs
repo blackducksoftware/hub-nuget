@@ -5,12 +5,12 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using System.Net.Http;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class DeployBdioDataService : DataService
+    public class DeployBdioResponseService : HubResponseService
     {
 
-        public DeployBdioDataService(RestConnection restConnection) : base(restConnection)
+        public DeployBdioResponseService(RestConnection restConnection) : base(restConnection)
         {
             RestConnection = restConnection;
         }

@@ -56,11 +56,17 @@
   <ItemGroup>
     <Compile Include="Api\HubPagedResponse.cs" />
     <Compile Include="Api\HubRequest.cs" />
+    <Compile Include="Api\ResponseService\AggregateBomResponseService.cs" />
+    <Compile Include="Api\ResponseService\CodeLocationResponseService.cs" />
+    <Compile Include="Api\ResponseService\DeployBdioResponseService.cs" />
+    <Compile Include="Api\ResponseService\HubResponseService.cs" />
+    <Compile Include="Api\ResponseService\MetadataResponseService.cs" />
+    <Compile Include="Api\ResponseService\PolicyResponseService.cs" />
+    <Compile Include="Api\ResponseService\ProjectResponseService.cs" />
+    <Compile Include="Api\ResponseService\ProjectVersionResponseService.cs" />
+    <Compile Include="Api\ResponseService\ScanSummariesResponseService.cs" />
     <Compile Include="BlackDuckIntegrationException.cs" />
-    <Compile Include="Dataservices\DataService.cs" />
-    <Compile Include="Dataservices\MetadataDataService.cs" />
-    <Compile Include="Dataservices\ProjectVersionDataService.cs" />
-    <Compile Include="Dataservices\ScanStatusDataService.cs" />
+    <Compile Include="DataService\ScanStatusDataService.cs" />
     <Compile Include="Global\ApiLinks.cs" />
     <Compile Include="Global\UrlHelper.cs" />
     <Compile Include="Api\HubPagedRequest.cs" />
@@ -76,17 +82,11 @@
     <Compile Include="Model\Enums\PolicyStatusEnum.cs" />
     <Compile Include="Model\Enums\RiskCountEnum.cs" />
     <Compile Include="Model\Enums\ScanStatusEnum.cs" />
-    <Compile Include="Dataservices\AggregateBomDataService.cs" />
-    <Compile Include="Dataservices\CodeLocationDataService.cs" />
-    <Compile Include="Dataservices\DeployBdioDataService.cs" />
-    <Compile Include="Dataservices\PolicyDataService.cs" />
-    <Compile Include="Dataservices\ProjectDataService.cs" />
-    <Compile Include="Dataservices\RiskReportDataService.cs" />
-    <Compile Include="Dataservices\ScanSummariesDataService.cs" />
+    <Compile Include="DataService\RiskReportDataService.cs" />
     <Compile Include="Global\HubCredentials.cs" />
     <Compile Include="Global\HubProxyInfo.cs" />
-    <Compile Include="Items\BomComponent.cs" />
-    <Compile Include="Items\PolicyStatus.cs" />
+    <Compile Include="Item\BomComponent.cs" />
+    <Compile Include="Item\PolicyStatus.cs" />
     <Compile Include="Model\ComplexLicense\ComplexLicenseView.cs" />
     <Compile Include="Model\Report\ActivityDataView.cs" />
     <Compile Include="Model\Report\BomComponentPolicyStatusView.cs" />
@@ -98,7 +98,7 @@
     <Compile Include="Model\Project\ProjectVersionView.cs" />
     <Compile Include="Model\Project\ProjectView.cs" />
     <Compile Include="Model\PolicyStatus\VersionBomPolicyStatusView.cs" />
-    <Compile Include="Items\ReportData.cs" />
+    <Compile Include="Item\ReportData.cs" />
     <Compile Include="Resources\ResourceCopier.cs" />
     <Compile Include="Rest\CredentialsResetConnection.cs" />
     <Compile Include="Rest\MockRestConnection.cs" />
@@ -117,9 +117,7 @@
     <None Include="hub-common.NET.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Requestservices\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

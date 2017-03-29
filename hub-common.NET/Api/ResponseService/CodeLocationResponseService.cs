@@ -5,11 +5,11 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class CodeLocationDataService : DataService
+    public class CodeLocationResponseService : HubResponseService
     {
-        public CodeLocationDataService(RestConnection restConnection) : base(restConnection)
+        public CodeLocationResponseService(RestConnection restConnection) : base(restConnection)
         {
 
         }

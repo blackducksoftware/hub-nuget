@@ -17,7 +17,6 @@ using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
@@ -26,8 +25,8 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Linq;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.DataService;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
@@ -68,12 +67,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         private RestConnection RestConnection;
 
         // Dataservices
-        private CodeLocationDataService CodeLocationDataService;
-        private ScanSummariesDataService ScanSummariesDataService;
-        private DeployBdioDataService DeployBdioDataService;
-        private ProjectDataService ProjectDataService;
-        private PolicyDataService PolicyDataService;
-        private RiskReportDataService RiskReportDataService;
+        private CodeLocationResponseService CodeLocationDataService;
+        private ScanSummariesResponseService ScanSummariesDataService;
+        private DeployBdioResponseService DeployBdioDataService;
+        private ProjectResponseService ProjectDataService;
+        private PolicyResponseService PolicyDataService;
+        private RiskReportResponseService RiskReportDataService;
         private ScanStatusDataService ScanStatusDataService;
 
         // Helper properties
@@ -137,12 +136,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
             RestConnection = restConnection;
 
             // Create required dataservices
-            CodeLocationDataService = new CodeLocationDataService(RestConnection);
-            ScanSummariesDataService = new ScanSummariesDataService(RestConnection);
-            DeployBdioDataService = new DeployBdioDataService(RestConnection);
-            ProjectDataService = new ProjectDataService(RestConnection);
-            PolicyDataService = new PolicyDataService(RestConnection);
-            RiskReportDataService = new RiskReportDataService(RestConnection);
+            CodeLocationDataService = new CodeLocationResponseService(RestConnection);
+            ScanSummariesDataService = new ScanSummariesResponseService(RestConnection);
+            DeployBdioDataService = new DeployBdioResponseService(RestConnection);
+            ProjectDataService = new ProjectResponseService(RestConnection);
+            PolicyDataService = new PolicyResponseService(RestConnection);
+            RiskReportDataService = new RiskReportResponseService(RestConnection);
             ScanStatusDataService = new ScanStatusDataService(RestConnection, Convert.ToInt64(TimeSpan.FromSeconds(Convert.ToDouble(HubScanTimeout)).TotalMilliseconds));
 
             // Set helper properties

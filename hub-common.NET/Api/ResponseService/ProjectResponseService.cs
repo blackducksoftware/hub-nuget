@@ -4,11 +4,11 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class ProjectDataService : DataService
+    public class ProjectResponseService : HubResponseService
     {
-        public ProjectDataService(RestConnection restConnection) : base(restConnection)
+        public ProjectResponseService(RestConnection restConnection) : base(restConnection)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         public HubPagedResponse<ProjectVersionView> GetPagedProjectVersionView(ProjectView projectView)
         {
-            string projectVersionsUrl = MetadataDataService.GetLink(projectView, ApiLinks.VERSIONS_LINK);
+            string projectVersionsUrl = MetadataResponseService.GetLink(projectView, ApiLinks.VERSIONS_LINK);
             HubRequest hubRequest = new HubRequest(RestConnection);
             hubRequest.QueryParameters[HubRequest.Q_SORT] = "updatedAt asc"; // Sort it by most recent
             hubRequest.SetUriFromString(projectVersionsUrl);

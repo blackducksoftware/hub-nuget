@@ -8,17 +8,17 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {
-    public class ProjectVersionDataService : DataService
+    public class ProjectVersionResponseService : HubResponseService
     {
-        public ProjectVersionDataService(RestConnection restConnection) : base(restConnection)
+        public ProjectVersionResponseService(RestConnection restConnection) : base(restConnection)
         {
         }
 
         public ProjectVersionView GetProjectVersion(ProjectView project, string projectVersionName)
         {
-            string versionsUrl = MetadataDataService.GetLink(project, ApiLinks.VERSIONS_LINK);
+            string versionsUrl = MetadataResponseService.GetLink(project, ApiLinks.VERSIONS_LINK);
             HubPagedRequest request = new HubPagedRequest(RestConnection);
             request.QueryParameters[HubRequest.Q_QUERY] = String.Format("versionName:{0}", projectVersionName);
             request.SetUriFromString(versionsUrl);

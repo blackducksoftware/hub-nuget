@@ -1,4 +1,5 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.CodeLocation;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
@@ -6,14 +7,11 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
+namespace Com.Blackducksoftware.Integration.Hub.Common.Net.DataService
 {
-    public class ScanStatusDataService : DataService
+    public class ScanStatusDataService : HubResponseService
     {
         private static int FIVE_SECONDS = 5 * 1000;
         private static long DEFAULT_TIMEOUT = 300000;
@@ -31,17 +29,17 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
 
         private long timeoutInMilliseconds;
 
-        private ProjectDataService projectDataService;
-        private ProjectVersionDataService projectVersionDataService;
-        private CodeLocationDataService codeLocationDataService;
-        private ScanSummariesDataService scanSummaryDataService;
+        private ProjectResponseService projectDataService;
+        private ProjectVersionResponseService projectVersionDataService;
+        private CodeLocationResponseService codeLocationDataService;
+        private ScanSummariesResponseService scanSummaryDataService;
 
         public ScanStatusDataService(RestConnection restConnection, long timeoutInMilliseconds) : base(restConnection)
         {
-            projectDataService = new ProjectDataService(restConnection);
-            projectVersionDataService = new ProjectVersionDataService(restConnection);
-            codeLocationDataService = new CodeLocationDataService(restConnection);
-            scanSummaryDataService = new ScanSummariesDataService(restConnection);
+            projectDataService = new ProjectResponseService(restConnection);
+            projectVersionDataService = new ProjectVersionResponseService(restConnection);
+            codeLocationDataService = new CodeLocationResponseService(restConnection);
+            scanSummaryDataService = new ScanSummariesResponseService(restConnection);
 
             long timeout = timeoutInMilliseconds;
             if (timeoutInMilliseconds <= 0)
@@ -160,7 +158,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Dataservices
                     string mappedProjectVersionUrl = codeLocationItem.MappedProjectVersion;
                     if (projectVersionUrl.Equals(mappedProjectVersionUrl))
                     {
-                        string scanSummariesLink = MetadataDataService.GetLink(codeLocationItem, ApiLinks.SCANS_LINK);
+                        string scanSummariesLink = MetadataResponseService.GetLink(codeLocationItem, ApiLinks.SCANS_LINK);
                         allScanSummariesLinks.Add(scanSummariesLink);
                     }
                 }
