@@ -1,6 +1,4 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
 

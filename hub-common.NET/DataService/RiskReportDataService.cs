@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Report;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Enums;
-using System;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Resource;
-using System.IO;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.DataService
 {

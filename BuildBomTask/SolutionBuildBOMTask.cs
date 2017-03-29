@@ -1,9 +1,9 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net;
-using System;
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget

@@ -1,5 +1,4 @@
 ﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 using System;
 using System.Net.Http;
 

@@ -1,10 +1,8 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Items;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
-using System;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {

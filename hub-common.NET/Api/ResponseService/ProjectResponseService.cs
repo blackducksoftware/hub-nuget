@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Global;
+using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+using System.Collections.Generic;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
 {

@@ -1,5 +1,4 @@
-﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Api;
-using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
+﻿using Com.Blackducksoftware.Integration.Hub.Common.Net.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Api.ResponseService
