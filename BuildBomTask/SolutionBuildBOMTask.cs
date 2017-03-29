@@ -32,8 +32,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                         useProjectOutputDir = true;
                     }
 
+                    string originalOutputDirectory = OutputDirectory;
+
                     foreach (string key in projectData.Keys)
                     {
+                        OutputDirectory = originalOutputDirectory;
                         Log.LogMessage("Processing Project: {0}", key);
                         string projectRelativePath = projectData[key];
 
@@ -48,6 +51,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                         if (useProjectOutputDir) // create 
                         {
                             OutputDirectory = CreateOutputDirectoryPath(solutionDirectory, projectRelativePath);
+                        } 
+                        else
+                        {
+                            OutputDirectory = originalOutputDirectory + Path.DirectorySeparatorChar + key;
                         }
 
                         bool projectResult = base.Execute();
