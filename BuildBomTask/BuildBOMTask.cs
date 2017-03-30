@@ -124,7 +124,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 requestedAssembly.Version = new Version(version);
                 AppDomain.CurrentDomain.AssemblyResolve -= handler;
 
-                Log.LogMessage(MessageImportance.High,"Loading assembly Name: {0}, Resolving Assembly {1}", args.Name, requestedAssembly);
+                Log.LogMessage("Loading assembly Name: {0}, Resolving Assembly {1}", args.Name, requestedAssembly);
 
                 return Assembly.Load(requestedAssembly);
             };

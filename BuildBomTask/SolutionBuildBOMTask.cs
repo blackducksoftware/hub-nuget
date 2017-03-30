@@ -16,6 +16,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
         public override bool Execute()
         {
             bool result = true;
+            string originalOutputDirectory = OutputDirectory;
             try
             {
                 Dictionary<string,string> projectData = ParseSolutionFile(SolutionPath);
@@ -31,9 +32,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                     {
                         useProjectOutputDir = true;
                     }
-
-                    string originalOutputDirectory = OutputDirectory;
-
+                    
                     foreach (string key in projectData.Keys)
                     {
                         OutputDirectory = originalOutputDirectory;
@@ -85,6 +84,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
                 {
                     Log.LogError("Error executing Build BOM task. Cause: {0}",ex);
                 }
+            }
+            finally
+            {
+                OutputDirectory = originalOutputDirectory; // reset the output directory to original path
             }
 
             return result;
