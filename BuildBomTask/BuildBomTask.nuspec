@@ -21,4 +21,7 @@
       <dependency id="NuGet.Protocol.Core.V2" version="3.5.0" />
     </dependencies>
   </metadata>
+  <!--<files>
+    <file src="build\**" target="build"/>
+  </files>-->
 </package>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- Required Properties-->
+    <hub_url></hub_url>
+    <hub_username></hub_username>
+    <hub_password></hub_password>
+    <packages_repo_url>https://api.nuget.org/v3/index.json</packages_repo_url>
+    <!-- Proxy Settings-->
+    <hub_proxy_host></hub_proxy_host>
+    <hub_proxy_port></hub_proxy_port>
+    <hub_proxy_username></hub_proxy_username>
+    <hub_proxy_password></hub_proxy_password>
+    <!-- Optional Parameters-->
+    <hub_timeout>120</hub_timeout>
+    <hub_scan_timeout>300</hub_scan_timeout>
+    <hub_output_directory></hub_output_directory>
+    <excluded_modules></excluded_modules>
+    <hub_ignore_failure>false</hub_ignore_failure>
+    <hub_create_flat_list>false</hub_create_flat_list>
+    <hub_create_bdio>true</hub_create_bdio>
+    <hub_deploy_bdio>true</hub_deploy_bdio>
+    <hub_create_report>false</hub_create_report>
+    <hub_check_policies>false</hub_check_policies>
+    <hub_code_location_name></hub_code_location_name>
+  </PropertyGroup>
+</Project>
