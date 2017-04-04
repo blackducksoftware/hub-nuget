@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubNugetVSIX", "HubNugetVSI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpTemplate", "CSharpTemplate\CSharpTemplate.csproj", "{9A3E2890-A7AB-498F-98F1-CDFDD246B675}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildBom", "BuildBom\BuildBom.csproj", "{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,14 @@ Global
 		{9A3E2890-A7AB-498F-98F1-CDFDD246B675}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9A3E2890-A7AB-498F-98F1-CDFDD246B675}.Release|x86.ActiveCfg = Release|Any CPU
 		{9A3E2890-A7AB-498F-98F1-CDFDD246B675}.Release|x86.Build.0 = Release|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Debug|x86.Build.0 = Debug|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Release|x86.ActiveCfg = Release|Any CPU
+		{13CF904A-AE65-425D-91D9-0CEE2C86F5BB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$-alpha</version>
+    <title>$title$</title>
+    <authors>Black Duck Software</authors>
+    <owners>Black Duck Software</owners>
+    <licenseUrl>https://raw.githubusercontent.com/blackducksoftware/hub-nuget/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/blackducksoftware/hub-nuget</projectUrl>
+    <iconUrl>https://avatars2.githubusercontent.com/u/431461?v=3&amp;s=64</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial Release</releaseNotes>
+    <copyright>Copyright © 2017 Black Duck Software</copyright>
+    <tags>BlackDuck hub bdio open source security</tags>
+    <dependencies>
+      <dependency id="integration-bdio.NET" version="0.0.5" />
+      <dependency id="HubCommon.NET" version="0.1.1" />
+      <dependency id="NuGet.Client" version="4.0.0" />
+      <dependency id="NuGet.Protocol.Core.V2" version="3.5.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\$id$.exe" target="tools"/>
+    <file src="bin\$configuration$\$id$.exe.config" target="tools"/>
+  </files>
+</package>
