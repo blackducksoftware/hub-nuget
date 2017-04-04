@@ -32,13 +32,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget
 {
     public class BuildBOMTask : Microsoft.Build.Utilities.Task
     {
-        [Required]
         public string HubUrl { get; set; }
-        [Required]
         public string HubUsername { get; set; }
-        [Required]
         public string HubPassword { get; set; }
-        [Required]
         public string PackagesRepoUrl { get; set; }
 
         public int HubTimeout { get; set; } = 120;

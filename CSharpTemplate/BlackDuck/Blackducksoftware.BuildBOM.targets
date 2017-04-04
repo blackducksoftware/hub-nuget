@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <!-- Required Properties-->
     <hub_url></hub_url>
     <hub_username></hub_username>
     <hub_password></hub_password>
@@ -12,6 +11,8 @@
     <hub_proxy_username></hub_proxy_username>
     <hub_proxy_password></hub_proxy_password>
     <!-- Optional Parameters-->
+    <hub_project_name></hub_project_name>
+    <hub_version_name></hub_version_name>
     <hub_timeout>120</hub_timeout>
     <hub_scan_timeout>300</hub_scan_timeout>
     <hub_output_directory></hub_output_directory>

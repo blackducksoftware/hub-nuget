@@ -1,5 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <hub_project_name Condition=" '$(hub_project_name)' == '' ">$(AssemblyName)</hub_project_name>
+    <hub_version_name></hub_version_name>
+    <hub_output_directory Condition="'$(hub_output_directory)' == '' ">$(TargetDir)</hub_output_directory>
+  </PropertyGroup>
   <UsingTask TaskName="Com.Blackducksoftware.Integration.Hub.Nuget.BuildBOMTask" AssemblyFile="$(ProjectDir)\$(OutputPath)\BuildBomTask.dll" />
   <Target Name="AfterBuild">
     <BuildBOMTask HubUrl="$(hub_url)" HubUsername="$(hub_username)" HubPassword="$(hub_password)" PackagesRepoUrl="$(packages_repo_url)" HubTimeout="$(hub_timeout)" HubProjectName="$(hub_project_name)" HubVersionName="$(hub_version_name)" HubProxyHost="$(hub_proxy_host)" HubProxyPort="$(hub_proxy_port)" HubProxyUsername="$(hub_proxy_username)" HubProxyPassword="$(hub_proxy_password)" HubScanTimeout="$(hub_scan_timeout)" OutputDirectory="$(hub_output_directory)" ExcludedModules="$(excluded_modules)" HubIgnoreFailure="$(hub_ignore_failure)" CreateFlatDependencyList="$(hub_create_flat_list)" CreateHubBdio="$(hub_create_bdio)" DeployHubBdio="$(hub_deploy_bdio)" CreateHubReport="$(hub_create_report)" CheckPolicies="$(hub_check_policies)" HubCodeLocationName="$(hub_code_location_name)" PackagesConfigPath="$(ProjectDir)\packages.config" />
