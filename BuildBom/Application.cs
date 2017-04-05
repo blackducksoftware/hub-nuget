@@ -110,7 +110,15 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 Console.WriteLine("Configuration Properties: ");
                 foreach (string key in PropertyMap.Keys)
                 {
-                    Console.WriteLine("Property {0} = {1}", key, PropertyMap[key]);
+                    string property_value = PropertyMap[key];
+                    if (key.Contains("password"))
+                    {
+                        Console.WriteLine("Property {0} = **********", key);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Property {0} = {1}", key, PropertyMap[key]);
+                    }
                 }
             }
 
