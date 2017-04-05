@@ -104,7 +104,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             PopulateParameterMap();
             OptionSet commandOptions = CreateOptionSet();
             ParseCommandLine(commandOptions);
-            ConfigureGenerator();
             
             if (Verbose)
             {
@@ -119,6 +118,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             {
                 ShowHelpMessage("Usage is BuildBom.exe --solution_path=[path to solution]", commandOptions);
             }
+
+            ConfigureGenerator();
         }
 
         private void PopulateParameterMap()
