@@ -152,7 +152,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
         }
 
-        private void Setup()
+        public void Setup()
         {
             if (!String.IsNullOrWhiteSpace(HubUrl.Trim()))
             {
@@ -167,7 +167,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             BdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
         }
 
-        private void Setup(RestConnection restConnection)
+        public void Setup(RestConnection restConnection)
         {
             RestConnection = restConnection;
 
@@ -181,7 +181,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             ScanStatusDataService = new ScanStatusDataService(RestConnection, Convert.ToInt64(TimeSpan.FromSeconds(Convert.ToDouble(HubScanTimeout)).TotalMilliseconds)); 
         }
 
-        private void ExecuteTask()
+        public void ExecuteTask()
         {
             if (IsExcluded())
             {
@@ -257,7 +257,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
         }
 
-        private HubServerConfig BuildHubServerConfig()
+        public HubServerConfig BuildHubServerConfig()
         {
             HubCredentials credentials = new HubCredentials(HubUsername, HubPassword);
             HubCredentials proxyCredentials = new HubCredentials(HubProxyUsername, HubProxyPassword);
