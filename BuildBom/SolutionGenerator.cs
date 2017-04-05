@@ -15,6 +15,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         {
             bool result = true;
             string originalOutputDirectory = OutputDirectory;
+            string originalHubProjectName = HubProjectName;
+            string originalHubVersionName = HubVersionName;
             try
             {
                 Dictionary<string, string> projectData = ParseSolutionFile(SolutionPath);
@@ -41,12 +43,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                         projectPathSegments.Add(solutionDirectory);
                         projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
 
-                        if (String.IsNullOrWhiteSpace(HubProjectName))
+                        if (String.IsNullOrWhiteSpace(originalHubProjectName))
                         {
                             HubProjectName = key;
                         }
 
-                        if(String.IsNullOrWhiteSpace(HubVersionName))
+                        if(String.IsNullOrWhiteSpace(originalHubVersionName))
                         {
                             HubVersionName = GetProjectAssemblyVersion(projectPathSegments);
                         }
