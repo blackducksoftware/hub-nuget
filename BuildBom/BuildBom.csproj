@@ -172,7 +172,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="BuildBom.nuspec" />
+    <None Include="BuildBom-Release.nuspec" />
+    <None Include="BuildBom-Debug.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

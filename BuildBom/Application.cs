@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.IO;
 
 namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 {
@@ -33,7 +34,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         public const string PARAM_KEY_HUB_CHECK_POLICIES = "hub_check_policies";
         public const string PARAM_KEY_HUB_CODE_LOCATION_NAME = "hub_code_location_name";
 
-        private SolutionGenerator SolutionGenerator;
+        private ProjectGenerator ProjectGenerator;
         private string[] Args;
         private Dictionary<string, string> PropertyMap;
 
@@ -44,7 +45,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         {
             this.Args = args;
             PropertyMap = new Dictionary<string, string>();
-            SolutionGenerator = CreateGenerator();
         }
 
         public static void Main(string[] args)
@@ -60,9 +60,21 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
         }
 
-        private SolutionGenerator CreateGenerator()
+        private ProjectGenerator CreateGenerator()
         {
-            return new SolutionGenerator();
+            string solutionPath = GetPropertyValue(PARAM_KEY_SOLUTION);
+            if (solutionPath.Contains(".sln"))
+            {                
+                SolutionGenerator solutionGenerator = new SolutionGenerator();
+                solutionGenerator.SolutionPath = solutionPath;
+                return solutionGenerator;
+            }
+            else
+            {
+                ProjectGenerator projectGenerator =  new ProjectGenerator();
+                projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", Path.GetDirectoryName(solutionPath), Path.DirectorySeparatorChar);
+                return projectGenerator;
+            }
         }
 
         public bool Execute()
@@ -70,7 +82,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             try
             {
                 Configure();
-                return SolutionGenerator.Execute();
+                if (!ShowHelp)
+                {
+                    return ProjectGenerator.Execute();
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -170,32 +189,33 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                throw new BlackDuckIntegrationException(String.Format("Missing required parameter {0}", PARAM_KEY_SOLUTION));
             }
 
-            SolutionGenerator.Verbose = Verbose;
-            SolutionGenerator.SolutionPath = GetPropertyValue(PARAM_KEY_SOLUTION);
-            SolutionGenerator.HubUrl = GetPropertyValue(PARAM_KEY_HUB_URL);
-            SolutionGenerator.HubUsername = GetPropertyValue(PARAM_KEY_HUB_USERNAME);
-            SolutionGenerator.HubPassword = GetPropertyValue(PARAM_KEY_HUB_PASSWORD);
-            SolutionGenerator.PackagesRepoUrl = GetPropertyValue(PARAM_KEY_PACKAGE_REPO_URL);
+            ProjectGenerator = CreateGenerator();
 
-            SolutionGenerator.HubTimeout = Convert.ToInt32(GetPropertyValue(PARAM_KEY_HUB_TIMEOUT,"120"));
-            SolutionGenerator.HubProjectName = GetPropertyValue(PARAM_KEY_HUB_PROJECT_NAME);
-            SolutionGenerator.HubVersionName = GetPropertyValue(PARAM_KEY_HUB_VERSION_NAME);
-           
-            SolutionGenerator.HubProxyHost = GetPropertyValue(PARAM_KEY_HUB_PROXY_HOST);
-            SolutionGenerator.HubProxyPort = GetPropertyValue(PARAM_KEY_HUB_PROXY_PORT);
-            SolutionGenerator.HubProxyUsername = GetPropertyValue(PARAM_KEY_HUB_PROXY_USERNAME);
-            SolutionGenerator.HubProxyPassword = GetPropertyValue(PARAM_KEY_HUB_PROXY_PASSWORD);
+            ProjectGenerator.Verbose = Verbose;
+            ProjectGenerator.HubUrl = GetPropertyValue(PARAM_KEY_HUB_URL);
+            ProjectGenerator.HubUsername = GetPropertyValue(PARAM_KEY_HUB_USERNAME);
+            ProjectGenerator.HubPassword = GetPropertyValue(PARAM_KEY_HUB_PASSWORD);
+            ProjectGenerator.PackagesRepoUrl = GetPropertyValue(PARAM_KEY_PACKAGE_REPO_URL);
 
-            SolutionGenerator.HubScanTimeout = Convert.ToInt32(GetPropertyValue(PARAM_KEY_HUB_SCAN_TIMEOUT,"300"));
-            SolutionGenerator.OutputDirectory = GetPropertyValue(PARAM_KEY_HUB_OUTPUT_DIRECTORY);
-            SolutionGenerator.ExcludedModules = GetPropertyValue(PARAM_KEY_EXCLUDED_MODULES);
-            SolutionGenerator.HubIgnoreFailure = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_IGNORE_FAILURE,"false"));
-            SolutionGenerator.CreateFlatDependencyList = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_FLAT_LIST,"false"));
-            SolutionGenerator.CreateHubBdio = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_BDIO,"true"));
-            SolutionGenerator.DeployHubBdio = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_DEPLOY_BDIO,"true"));
-            SolutionGenerator.CreateHubReport = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_REPORT,"false"));
-            SolutionGenerator.CheckPolicies = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CHECK_POLICIES, "false"));
-            SolutionGenerator.HubCodeLocationName = GetPropertyValue(PARAM_KEY_HUB_CODE_LOCATION_NAME);
+            ProjectGenerator.HubTimeout = Convert.ToInt32(GetPropertyValue(PARAM_KEY_HUB_TIMEOUT,"120"));
+            ProjectGenerator.HubProjectName = GetPropertyValue(PARAM_KEY_HUB_PROJECT_NAME);
+            ProjectGenerator.HubVersionName = GetPropertyValue(PARAM_KEY_HUB_VERSION_NAME);
+
+            ProjectGenerator.HubProxyHost = GetPropertyValue(PARAM_KEY_HUB_PROXY_HOST);
+            ProjectGenerator.HubProxyPort = GetPropertyValue(PARAM_KEY_HUB_PROXY_PORT);
+            ProjectGenerator.HubProxyUsername = GetPropertyValue(PARAM_KEY_HUB_PROXY_USERNAME);
+            ProjectGenerator.HubProxyPassword = GetPropertyValue(PARAM_KEY_HUB_PROXY_PASSWORD);
+
+            ProjectGenerator.HubScanTimeout = Convert.ToInt32(GetPropertyValue(PARAM_KEY_HUB_SCAN_TIMEOUT,"300"));
+            ProjectGenerator.OutputDirectory = GetPropertyValue(PARAM_KEY_HUB_OUTPUT_DIRECTORY);
+            ProjectGenerator.ExcludedModules = GetPropertyValue(PARAM_KEY_EXCLUDED_MODULES);
+            ProjectGenerator.HubIgnoreFailure = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_IGNORE_FAILURE,"false"));
+            ProjectGenerator.CreateFlatDependencyList = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_FLAT_LIST,"false"));
+            ProjectGenerator.CreateHubBdio = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_BDIO,"true"));
+            ProjectGenerator.DeployHubBdio = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_DEPLOY_BDIO,"true"));
+            ProjectGenerator.CreateHubReport = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_REPORT,"false"));
+            ProjectGenerator.CheckPolicies = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CHECK_POLICIES, "false"));
+            ProjectGenerator.HubCodeLocationName = GetPropertyValue(PARAM_KEY_HUB_CODE_LOCATION_NAME);
         }
 
         private string GetPropertyValue(string key, string defaultValue = "")

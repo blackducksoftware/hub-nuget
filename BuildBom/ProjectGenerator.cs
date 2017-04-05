@@ -30,6 +30,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 {
     public class ProjectGenerator
     {
+        public bool Verbose { get; set; } = false;
         public string HubUrl { get; set; }
         public string HubUsername { get; set; }
         public string HubPassword { get; set; }
@@ -154,6 +155,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
         public void Setup()
         {
+            if(String.IsNullOrWhiteSpace(PackagesConfigPath))
+            {
+                string currentDirectory = Directory.GetCurrentDirectory();
+                PackagesConfigPath = String.Format("{0}{1}packages.config",currentDirectory, Path.DirectorySeparatorChar);
+            }
+
             if (!String.IsNullOrWhiteSpace(HubUrl.Trim()))
             {
                 // Estabilish authenticated connection

@@ -11,7 +11,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
     {
         public string SolutionPath { get; set; }
 
-        public bool Verbose { get; set; } = false;
         public override bool Execute()
         {
             bool result = true;
@@ -42,8 +41,16 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                         projectPathSegments.Add(solutionDirectory);
                         projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
 
-                        HubProjectName = key;
-                        HubVersionName = GetProjectAssemblyVersion(projectPathSegments);
+                        if (String.IsNullOrWhiteSpace(HubProjectName))
+                        {
+                            HubProjectName = key;
+                        }
+
+                        if(String.IsNullOrWhiteSpace(HubVersionName))
+                        {
+                            HubVersionName = GetProjectAssemblyVersion(projectPathSegments);
+                        }
+                        
                         PackagesConfigPath = CreateProjectPackageConfigPath(projectPathSegments);
 
                         if (useProjectOutputDir) // create 
