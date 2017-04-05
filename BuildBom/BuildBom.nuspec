@@ -18,9 +18,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Debug\buildBom.exe" target="lib\net452"/>
-    <file src="bin\Debug\buildBom.exe" target="tools"/>
-    <file src="bin\Debug\buildBom.exe.config" target="tools"/>
-    <file src="bin\Debug\*.dll" target="tools"/>
+    <file src="bin\$configuration$\buildBom.exe" target="lib\net452"/>
+    <file src="bin\$configuration$\buildBom.exe" target="tools"/>
+    <file src="bin\$configuration$\buildBom.exe.config" target="tools"/>
+    <file src="bin\$configuration$\*.dll" target="tools"/>
   </files>
 </package>
