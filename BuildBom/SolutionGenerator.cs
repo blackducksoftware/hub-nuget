@@ -19,10 +19,17 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             string originalHubVersionName = HubVersionName;
             try
             {
+                if (!File.Exists(SolutionPath))
+                {
+                    string currentDirectory = Directory.GetCurrentDirectory();
+                    SolutionPath = Path.GetDirectoryName(string.Format("{0}{1}{2}", currentDirectory, Path.DirectorySeparatorChar, SolutionPath));
+                }
+
                 Dictionary<string, string> projectData = ParseSolutionFile(SolutionPath);
                 Console.WriteLine("Parsed Solution File");
                 if (projectData.Count > 0)
                 {
+
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
 
                     Console.WriteLine("Solution directory: {0}", solutionDirectory);
