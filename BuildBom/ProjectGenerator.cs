@@ -185,7 +185,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             ProjectDataService = new ProjectResponseService(RestConnection);
             PolicyDataService = new PolicyResponseService(RestConnection);
             RiskReportDataService = new RiskReportResponseService(RestConnection);
-            ScanStatusDataService = new ScanStatusDataService(RestConnection, Convert.ToInt64(TimeSpan.FromSeconds(Convert.ToDouble(HubScanTimeout)).TotalMilliseconds)); 
+            ScanStatusDataService = new ScanStatusDataService(RestConnection, Convert.ToInt64(TimeSpan.FromSeconds(Convert.ToDouble(HubScanTimeout)).TotalMilliseconds));
         }
 
         public void ExecuteTask()
@@ -309,9 +309,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             PackageSource packageSource = new PackageSource(PackagesRepoUrl);
             SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
             PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
+            List<PackageMetadataResource> metadataResourceList = new List<PackageMetadataResource>();
+            metadataResourceList.Add(packageMetadataResource);
 
-            // Create BDIO 
-            BdioContent bdioContent = BuildBOMFromMetadata(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), packageMetadataResource);
+            // Create BDIO
+            BdioContent bdioContent = BuildBOMFromMetadata(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), metadataResourceList);
             return bdioContent;
         }
 
@@ -335,7 +337,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             return list;
         }
 
-        public BdioContent BuildBOMFromMetadata(List<NuGet.PackageReference> packages, PackageMetadataResource metadataResource)
+        public BdioContent BuildBOMFromMetadata(List<NuGet.PackageReference> packages, List<PackageMetadataResource> metadataResourceList)
         {
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
@@ -361,7 +363,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 BdioComponent component = bdioNodeFactory.CreateComponent(componentName, componentVersion, componentBdioId, componentExternalIdentifier);
 
                 // Add references
-                List<PackageDependency> packageDependencies = GetPackageDependencies(packageRef, metadataResource);
+                List<PackageDependency> packageDependencies = GetPackageDependencies(packageRef, metadataResourceList);
                 foreach (PackageDependency packageDependency in packageDependencies)
                 {
                     // Create node from dependency info
@@ -408,28 +410,30 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             return version;
         }
 
-        public List<PackageDependency> GetPackageDependencies(NuGet.PackageReference packageDependency, PackageMetadataResource metadataResource)
+        public List<PackageDependency> GetPackageDependencies(NuGet.PackageReference packageDependency, List<PackageMetadataResource> metadataResourceList)
         {
             List<PackageDependency> dependencies = new List<PackageDependency>();
-
-            //Gets all versions of package in package repository
-            List<IPackageSearchMetadata> matchingPackages = new List<IPackageSearchMetadata>(metadataResource.GetMetadataAsync(packageDependency.Id, true, true, new Logger(), CancellationToken.None).Result);
-            foreach (IPackageSearchMetadata matchingPackage in matchingPackages)
+            foreach(PackageMetadataResource metadataResource in metadataResourceList)
             {
-                // Check if the matching package is the same as the version defined
-                if (matchingPackage.Identity.Version.ToString() == packageDependency.Version.ToString())
+                //Gets all versions of package in package repository
+                List<IPackageSearchMetadata> matchingPackages = new List<IPackageSearchMetadata>(metadataResource.GetMetadataAsync(packageDependency.Id, true, true, new Logger(), CancellationToken.None).Result);
+                foreach (IPackageSearchMetadata matchingPackage in matchingPackages)
                 {
-                    // Gets every dependency set in the package
-                    foreach (PackageDependencyGroup dependencySet in matchingPackage.DependencySets)
+                    // Check if the matching package is the same as the version defined
+                    if (matchingPackage.Identity.Version.ToString() == packageDependency.Version.ToString())
                     {
-                        // Grab the dependency set for the target framework. We only care about majors and minors in the version
-                        if (FrameworksMatch(dependencySet, packageDependency))
+                        // Gets every dependency set in the package
+                        foreach (PackageDependencyGroup dependencySet in matchingPackage.DependencySets)
                         {
-                            dependencies.AddRange(dependencySet.Packages);
-                            break;
+                            // Grab the dependency set for the target framework. We only care about majors and minors in the version
+                            if (FrameworksMatch(dependencySet, packageDependency))
+                            {
+                                dependencies.AddRange(dependencySet.Packages);
+                                break;
+                            }
                         }
+                        break;
                     }
-                    break;
                 }
             }
             return dependencies;
