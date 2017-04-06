@@ -305,12 +305,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             List<Lazy<INuGetResourceProvider>> providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
             providers.AddRange(Repository.Provider.GetCoreV2());  // Add v2 API support
-            // we may need more code here around handling package sources.
-            PackageSource packageSource = new PackageSource(PackagesRepoUrl);
-            SourceRepository sourceRepository = new SourceRepository(packageSource, providers);
-            PackageMetadataResource packageMetadataResource = sourceRepository.GetResource<PackageMetadataResource>();
-            List<PackageMetadataResource> metadataResourceList = new List<PackageMetadataResource>();
-            metadataResourceList.Add(packageMetadataResource);
+            List<PackageMetadataResource> metadataResourceList = CreateMetaDataResourceList(providers);
 
             // Create BDIO
             BdioContent bdioContent = BuildBOMFromMetadata(new List<NuGet.PackageReference>(configFile.GetPackageReferences()), metadataResourceList);
@@ -411,8 +406,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         }
 
         public List<PackageDependency> GetPackageDependencies(NuGet.PackageReference packageDependency, List<PackageMetadataResource> metadataResourceList)
-        {
-            List<PackageDependency> dependencies = new List<PackageDependency>();
+        {            
+            HashSet<PackageDependency> dependencySet = new HashSet<PackageDependency>();
             foreach(PackageMetadataResource metadataResource in metadataResourceList)
             {
                 //Gets all versions of package in package repository
@@ -423,12 +418,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                     if (matchingPackage.Identity.Version.ToString() == packageDependency.Version.ToString())
                     {
                         // Gets every dependency set in the package
-                        foreach (PackageDependencyGroup dependencySet in matchingPackage.DependencySets)
+                        foreach (PackageDependencyGroup packageDependencySet in matchingPackage.DependencySets)
                         {
                             // Grab the dependency set for the target framework. We only care about majors and minors in the version
-                            if (FrameworksMatch(dependencySet, packageDependency))
+                            if (FrameworksMatch(packageDependencySet, packageDependency))
                             {
-                                dependencies.AddRange(dependencySet.Packages);
+                                dependencySet.AddRange(packageDependencySet.Packages);
                                 break;
                             }
                         }
@@ -436,6 +431,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                     }
                 }
             }
+
+            List<PackageDependency> dependencies = new List<PackageDependency>();
+            dependencies.AddRange(dependencySet);
             return dependencies;
         }
 

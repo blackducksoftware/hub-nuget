@@ -11,6 +11,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 {
     public class Application
     {
+        public const string PARAM_KEY_APP_SETTINGS_FILE = "app_settings_file";
         public const string PARAM_KEY_SOLUTION = "solution_path";
         public const string PARAM_KEY_HUB_URL = "hub_url";
         public const string PARAM_KEY_HUB_USERNAME = "hub_username";
@@ -40,6 +41,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
         private bool ShowHelp = false;
         private bool Verbose = false;
+        private bool HasSettingsFileParam = false;
+        private bool HasAdditionalParams = false;
 
         public Application(string [] args)
         {
@@ -104,6 +107,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             PopulateParameterMap();
             OptionSet commandOptions = CreateOptionSet();
             ParseCommandLine(commandOptions);
+            string usageMessage = "Usage is BuildBom.exe [--solution_path=[path to solution] | --app_settings_file=[path to settings file] ]";
+
+            if (HasSettingsFileParam)
+            {
+                if (HasAdditionalParams)
+                {
+                    ShowHelpMessage(usageMessage, commandOptions);
+                }
+            }
+            
+            if (HasSettingsFileParam)
+            {
+                PopulatePropertyMapByExternalFile();
+            }
             
             if (Verbose)
             {
@@ -124,7 +141,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
             if(ShowHelp)
             {
-                ShowHelpMessage("Usage is BuildBom.exe --solution_path=[path to solution]", commandOptions);
+                ShowHelpMessage(usageMessage, commandOptions);
             }
 
             ConfigureGenerator();
@@ -143,7 +160,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         private OptionSet CreateOptionSet()
         {
             OptionSet optionSet = new OptionSet();
-
+            AddMenuOption(optionSet, PARAM_KEY_APP_SETTINGS_FILE, "The file path for the application settings that overrides all settings.", true);
             AddMenuOption(optionSet, PARAM_KEY_SOLUTION, "The path to the solution file to find dependencies");
             AddMenuOption(optionSet, PARAM_KEY_HUB_URL, "The URL of the Hub to connect to.");
             AddMenuOption(optionSet, PARAM_KEY_HUB_USERNAME, "The username to authenticate with the Hub.");
@@ -174,9 +191,20 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             return optionSet;
         }
 
-        private void AddMenuOption(OptionSet optionSet, string name, string description)
+        private void AddMenuOption(OptionSet optionSet, string name, string description, bool appSettingsParam = false)
         {
-            optionSet.Add($"{name}=", description, value => PropertyMap[name] = value );
+            optionSet.Add($"{name}=", description, (value) => 
+            {
+                PropertyMap[name] = value;
+                if(appSettingsParam)
+                {
+                    HasSettingsFileParam = true;
+                }
+                else
+                {
+                    HasAdditionalParams = true;
+                }
+            });
         }
         
         private void ParseCommandLine(OptionSet commandOptions)
@@ -188,6 +216,18 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             catch(OptionException)
             {
                 ShowHelpMessage("Error processing command line, usage is: ", commandOptions);
+            }
+        }
+
+        private void PopulatePropertyMapByExternalFile()
+        {
+            string path = PropertyMap[PARAM_KEY_APP_SETTINGS_FILE];
+            ExeConfigurationFileMap configFileMap = new ExeConfigurationFileMap();
+            configFileMap.ExeConfigFilename = path;
+            Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap,ConfigurationUserLevel.None);
+            foreach(KeyValueConfigurationElement element in config.AppSettings.Settings)
+            {
+                PropertyMap[element.Key] = element.Value;
             }
         }
 
