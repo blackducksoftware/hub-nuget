@@ -111,7 +111,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             string huburl = HubUrl.Trim();
             string packagesRepo = PackagesRepoUrl.Trim();
 
-            if(String.IsNullOrEmpty(packagesRepo))
+            if(string.IsNullOrEmpty(packagesRepo))
             {
                 messageBuilder.AppendLine("PackagesRepoUrl is required");
             }

@@ -41,8 +41,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
         private bool ShowHelp = false;
         private bool Verbose = false;
-        private bool HasSettingsFileParam = false;
-        private bool HasAdditionalParams = false;
 
         public Application(string [] args)
         {
@@ -62,24 +60,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 Console.Error.WriteLine(ex.Message);
             }
         }
-
-        private ProjectGenerator CreateGenerator()
-        {
-            string solutionPath = GetPropertyValue(PARAM_KEY_SOLUTION);
-            if (solutionPath.Contains(".sln"))
-            {                
-                SolutionGenerator solutionGenerator = new SolutionGenerator();
-                solutionGenerator.SolutionPath = solutionPath;
-                return solutionGenerator;
-            }
-            else
-            {
-                ProjectGenerator projectGenerator =  new ProjectGenerator();
-                projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", Path.GetDirectoryName(solutionPath), Path.DirectorySeparatorChar);
-                return projectGenerator;
-            }
-        }
-
+        
         public bool Execute()
         {
             try
@@ -107,21 +88,30 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             PopulateParameterMap();
             OptionSet commandOptions = CreateOptionSet();
             ParseCommandLine(commandOptions);
-            string usageMessage = "Usage is BuildBom.exe [--solution_path=[path to solution] | --app_settings_file=[path to settings file] ]";
+            string usageMessage = "Usage is BuildBom.exe [OPTIONS]";
 
-            if (HasSettingsFileParam)
+            string appSettingsFile = "";
+            if(PropertyMap.ContainsKey(PARAM_KEY_APP_SETTINGS_FILE))
             {
-                if (HasAdditionalParams)
-                {
-                    ShowHelpMessage(usageMessage, commandOptions);
-                }
+                appSettingsFile = PropertyMap[PARAM_KEY_APP_SETTINGS_FILE];
             }
-            
-            if (HasSettingsFileParam)
+
+            if (!string.IsNullOrWhiteSpace(appSettingsFile))
             {
                 PopulatePropertyMapByExternalFile();
             }
             
+            if(ShowHelp)
+            {
+                LogProperties();
+                ShowHelpMessage(usageMessage, commandOptions);
+            }
+
+            ConfigureGenerator();
+        }
+
+        private void LogProperties()
+        {
             if (Verbose)
             {
                 Console.WriteLine("Configuration Properties: ");
@@ -138,13 +128,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                     }
                 }
             }
-
-            if(ShowHelp)
-            {
-                ShowHelpMessage(usageMessage, commandOptions);
-            }
-
-            ConfigureGenerator();
         }
 
         private void PopulateParameterMap()
@@ -160,7 +143,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         private OptionSet CreateOptionSet()
         {
             OptionSet optionSet = new OptionSet();
-            AddMenuOption(optionSet, PARAM_KEY_APP_SETTINGS_FILE, "The file path for the application settings that overrides all settings.", true);
+            AddMenuOption(optionSet, PARAM_KEY_APP_SETTINGS_FILE, "The file path for the application settings that overrides all settings.");
             AddMenuOption(optionSet, PARAM_KEY_SOLUTION, "The path to the solution file to find dependencies");
             AddMenuOption(optionSet, PARAM_KEY_HUB_URL, "The URL of the Hub to connect to.");
             AddMenuOption(optionSet, PARAM_KEY_HUB_USERNAME, "The username to authenticate with the Hub.");
@@ -191,19 +174,11 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             return optionSet;
         }
 
-        private void AddMenuOption(OptionSet optionSet, string name, string description, bool appSettingsParam = false)
+        private void AddMenuOption(OptionSet optionSet, string name, string description)
         {
             optionSet.Add($"{name}=", description, (value) => 
             {
                 PropertyMap[name] = value;
-                if(appSettingsParam)
-                {
-                    HasSettingsFileParam = true;
-                }
-                else
-                {
-                    HasAdditionalParams = true;
-                }
             });
         }
         
@@ -215,7 +190,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
             catch(OptionException)
             {
-                ShowHelpMessage("Error processing command line, usage is: ", commandOptions);
+                ShowHelpMessage("Error processing command line, usage is: buildBom.exe [OPTIONS]", commandOptions);
             }
         }
 
@@ -233,12 +208,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
         private void ConfigureGenerator()
         {
-            if(!PropertyMap.ContainsKey(PARAM_KEY_SOLUTION))
-            {
-               throw new BlackDuckIntegrationException(String.Format("Missing required parameter {0}", PARAM_KEY_SOLUTION));
-            }
-
             ProjectGenerator = CreateGenerator();
+            LogProperties();
 
             ProjectGenerator.Verbose = Verbose;
             ProjectGenerator.HubUrl = GetPropertyValue(PARAM_KEY_HUB_URL);
@@ -265,6 +236,58 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             ProjectGenerator.CreateHubReport = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_REPORT,"false"));
             ProjectGenerator.CheckPolicies = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CHECK_POLICIES, "false"));
             ProjectGenerator.HubCodeLocationName = GetPropertyValue(PARAM_KEY_HUB_CODE_LOCATION_NAME);
+        }
+
+        private ProjectGenerator CreateGenerator()
+        {
+            string solutionPath = GetPropertyValue(PARAM_KEY_SOLUTION);
+            if (string.IsNullOrWhiteSpace(solutionPath))
+            {
+                // search for solution
+                string currentDirectory = Directory.GetCurrentDirectory();
+                string[] solutionPaths = Directory.GetFiles(currentDirectory, "*.sln");
+
+                if (solutionPaths != null && solutionPaths.Length >= 1)
+                {
+                    SolutionGenerator solutionGenerator = new SolutionGenerator();
+                    solutionGenerator.SolutionPath = solutionPaths[0];
+                    PropertyMap[PARAM_KEY_SOLUTION] = solutionPaths[0];
+                    return solutionGenerator;
+                }
+                else
+                {
+                    string[] projectPaths = Directory.GetFiles(currentDirectory, "*.csproj");
+                    if (projectPaths != null && projectPaths.Length > 0)
+                    {
+                        string projectPath = projectPaths[0];
+                        ProjectGenerator projectGenerator = new ProjectGenerator();
+                        projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", Path.GetDirectoryName(projectPath), Path.DirectorySeparatorChar);
+                        return projectGenerator;
+                    }
+                    else
+                    {
+                        ProjectGenerator projectGenerator = new ProjectGenerator();
+                        projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", currentDirectory, Path.DirectorySeparatorChar);
+                        return projectGenerator;
+                    }
+                }
+            }
+            else
+            {
+                if (solutionPath.Contains(".sln"))
+                {
+                    SolutionGenerator solutionGenerator = new SolutionGenerator();
+                    solutionGenerator.SolutionPath = solutionPath;
+
+                    return solutionGenerator;
+                }
+                else
+                {
+                    ProjectGenerator projectGenerator = new ProjectGenerator();
+                    projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", Path.GetDirectoryName(solutionPath), Path.DirectorySeparatorChar);
+                    return projectGenerator;
+                }
+            }
         }
 
         private string GetPropertyValue(string key, string defaultValue = "")
