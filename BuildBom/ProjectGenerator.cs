@@ -12,6 +12,7 @@ using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.PolicyStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.Project;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Model.ScanStatus;
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Rest;
+using Microsoft.Build.Evaluation;
 using NuGet.Configuration;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -22,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -30,6 +32,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 {
     public class ProjectGenerator
     {
+        public const string DEFAULT_OUTPUT_DIRECTORY = "blackduck";
+        public string ProjectPath { get; set; }
         public bool Verbose { get; set; } = false;
         public string HubUrl { get; set; }
         public string HubUsername { get; set; }
@@ -155,10 +159,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
         public void Setup()
         {
-            if(String.IsNullOrWhiteSpace(PackagesConfigPath))
+            string projectDirectory = Directory.GetParent(ProjectPath).FullName;
+            if (String.IsNullOrWhiteSpace(PackagesConfigPath))
             {
-                string currentDirectory = Directory.GetCurrentDirectory();
-                PackagesConfigPath = String.Format("{0}{1}packages.config",currentDirectory, Path.DirectorySeparatorChar);
+                PackagesConfigPath = CreateProjectPackageConfigPath(projectDirectory);
             }
 
             if (!String.IsNullOrWhiteSpace(HubUrl.Trim()))
@@ -169,6 +173,22 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 Setup(restConnection);
             }
 
+            if (String.IsNullOrWhiteSpace(OutputDirectory))
+            {
+                string currentDirectory = Directory.GetCurrentDirectory();
+                OutputDirectory = $"{currentDirectory}{Path.DirectorySeparatorChar}{DEFAULT_OUTPUT_DIRECTORY}";
+            }
+            
+            if (String.IsNullOrWhiteSpace(HubProjectName))
+            {
+                HubProjectName = Path.GetFileNameWithoutExtension(ProjectPath);
+            }
+
+            if (String.IsNullOrWhiteSpace(HubVersionName))
+            {
+                HubVersionName = GetProjectAssemblyVersion(projectDirectory);
+            }
+            
             // Set helper properties
             BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
             BdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
@@ -196,6 +216,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
             else
             {
+                Console.WriteLine("Processing Project: {0}", HubProjectName);
+                
+
                 // Creates output directory if it doesn't already exist
                 Directory.CreateDirectory(OutputDirectory);
 
@@ -242,6 +265,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                     PolicyStatus policyStatus = new PolicyStatus(GetPolicies());
                     LogPolicyViolations(policyStatus);
                 }
+
+                Console.WriteLine("Finished processing project {0}", HubProjectName);
             }
         }
 
@@ -272,6 +297,47 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             HubServerConfig hubServerConfig = new HubServerConfig(HubUrl, HubTimeout, credentials, proxyInfo);
             return hubServerConfig;
         }
+
+        public string CreatePath(List<string> pathSegments)
+        {
+            return String.Join(String.Format("{0}", Path.DirectorySeparatorChar), pathSegments);
+        }
+
+        private string GetProjectAssemblyVersion(string projectDirectory)
+        {
+            string version = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            List<string> pathSegments = new List<string>();
+            pathSegments.Add(projectDirectory);
+            pathSegments.Add("Properties");
+            pathSegments.Add("AssemblyInfo.cs");
+            string path = CreatePath(pathSegments);
+
+            if (File.Exists(path))
+            {
+                List<string> contents = new List<string>(File.ReadAllLines(path));
+                var versionText = contents.FindAll(text => text.Contains("[assembly: AssemblyVersion"));
+                foreach (string text in versionText)
+                {
+                    int firstParen = text.IndexOf("(");
+                    int lastParen = text.LastIndexOf(")");
+                    // exclude the '(' and the " characters
+                    int start = firstParen + 2;
+                    // exclude the ')' and the " characters
+                    int end = lastParen - 1;
+                    version = text.Substring(start, (end - start));
+                }
+            }
+            return version;
+        }
+
+        private string CreateProjectPackageConfigPath(string projectDirectory)
+        {
+            List<string> pathSegments = new List<string>();
+            pathSegments.Add(projectDirectory);
+            pathSegments.Add("packages.config");
+            return CreatePath(pathSegments);
+        }
+
 
         #region Make Flat Dependency List
 

@@ -19,67 +19,36 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             string originalHubVersionName = HubVersionName;
             try
             {
-                if (!File.Exists(SolutionPath))
-                {
-                    string currentDirectory = Directory.GetCurrentDirectory();
-                    SolutionPath = Path.GetDirectoryName(string.Format("{0}{1}{2}", currentDirectory, Path.DirectorySeparatorChar, SolutionPath));
-                }
-
+                // TODO: clean up this code to generate the BDIO first then perform the deploy and checks for each project
+                // Also aggregate the results of the check policies.
                 Dictionary<string, string> projectData = ParseSolutionFile(SolutionPath);
                 Console.WriteLine("Parsed Solution File");
                 if (projectData.Count > 0)
                 {
-
                     string solutionDirectory = Path.GetDirectoryName(SolutionPath);
-
                     Console.WriteLine("Solution directory: {0}", solutionDirectory);
-                    bool useProjectOutputDir = false;
-
-                    if (String.IsNullOrWhiteSpace(OutputDirectory))
-                    {
-                        useProjectOutputDir = true;
-                    }
-
                     foreach (string key in projectData.Keys)
                     {
-                        OutputDirectory = originalOutputDirectory;
-                        Console.WriteLine("Processing Project: {0}", key);
+                        OutputDirectory = originalOutputDirectory + Path.DirectorySeparatorChar + key;
                         string projectRelativePath = projectData[key];
-
                         List<string> projectPathSegments = new List<string>();
                         projectPathSegments.Add(solutionDirectory);
-                        projectPathSegments.Add(Path.GetDirectoryName(projectRelativePath));
+                        projectPathSegments.Add(projectRelativePath);
 
-                        if (String.IsNullOrWhiteSpace(originalHubProjectName))
+                        ProjectPath = CreatePath(projectPathSegments);
+
+                        if (string.IsNullOrWhiteSpace(originalHubProjectName))
                         {
                             HubProjectName = key;
                         }
 
-                        if(String.IsNullOrWhiteSpace(originalHubVersionName))
+                        if (String.IsNullOrWhiteSpace(originalHubVersionName))
                         {
-                            HubVersionName = GetProjectAssemblyVersion(projectPathSegments);
-                        }
-                        
-                        PackagesConfigPath = CreateProjectPackageConfigPath(projectPathSegments);
-
-                        if (useProjectOutputDir) // create 
-                        {
-                            OutputDirectory = CreateOutputDirectoryPath(solutionDirectory, projectRelativePath);
-                        }
-                        else
-                        {
-                            OutputDirectory = originalOutputDirectory + Path.DirectorySeparatorChar + key;
+                            HubVersionName = originalHubVersionName;
                         }
 
                         bool projectResult = base.Execute();
-                        if (projectResult)
-                        {
-                            Console.WriteLine("Generated Bdio file for project {0}", projectData[key]);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Could not generate Bdio file for project {0}", projectData[key]);
-                        }
+                        PackagesConfigPath = ""; // reset to use the project packages file.
                         result = result && projectResult;
                     }
                 }
@@ -107,32 +76,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
             return result;
         }
-
-        private string CreatePath(List<string> pathSegments)
-        {
-            return String.Join(String.Format("{0}", Path.DirectorySeparatorChar), pathSegments);
-        }
-
-        private Project CreateProjectObject(string solutionDirectory, string projectRelativePath)
-        {
-
-            List<string> pathSegments = new List<string>();
-            pathSegments.Add(solutionDirectory);
-            pathSegments.Add(projectRelativePath);
-            string projectFullPath = CreatePath(pathSegments);
-            var projectList = ProjectCollection.GlobalProjectCollection.LoadedProjects.Where(item => item.FullPath.Equals(projectFullPath));
-            Project project;
-            if (projectList.Count() > 0)
-            {
-                project = projectList.First();
-            }
-            else
-            {
-                project = new Project(projectFullPath);
-            }
-            return project;
-        }
-
+        
         private Dictionary<string, string> ParseSolutionFile(string solutionPath)
         {
             Dictionary<string, string> projectDataMap = new Dictionary<string, string>();
@@ -165,59 +109,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
 
             return projectDataMap;
-        }
-
-        private string GetProjectAssemblyVersion(List<string> projectPathSegments)
-        {
-            string version = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            List<string> pathSegments = new List<string>(projectPathSegments);
-            pathSegments.Add("Properties");
-            pathSegments.Add("AssemblyInfo.cs");
-            string path = CreatePath(pathSegments);
-
-            if (File.Exists(path))
-            {
-                List<string> contents = new List<string>(File.ReadAllLines(path));
-                var versionText = contents.FindAll(text => text.Contains("[assembly: AssemblyVersion"));
-                foreach (string text in versionText)
-                {
-                    int firstParen = text.IndexOf("(");
-                    int lastParen = text.LastIndexOf(")");
-                    // exclude the '(' and the " characters
-                    int start = firstParen + 2;
-                    // exclude the ')' and the " characters
-                    int end = lastParen - 1;
-                    version = text.Substring(start, (end - start));
-                }
-            }
-            return version;
-        }
-
-        private string CreateProjectPackageConfigPath(List<string> projectPathSegments)
-        {
-            List<string> pathSegments = new List<string>(projectPathSegments);
-            pathSegments.Add("packages.config");
-            return CreatePath(pathSegments);
-        }
-
-        private string CreateOutputDirectoryPath(string solutionDirectory, string projectRelativePath)
-        {
-            Project project = CreateProjectObject(solutionDirectory, projectRelativePath);
-            if (project != null)
-            {
-                ICollection<ProjectProperty> propertyGroup = project.AllEvaluatedProperties;
-                var outputPathProperties = propertyGroup.Where(property => property.Name.Equals("OutputPath"));
-                string builddirectory = outputPathProperties.First().EvaluatedValue;
-                List<string> pathSegments = new List<string>();
-                pathSegments.Add(solutionDirectory);
-                pathSegments.Add(Path.GetDirectoryName(projectRelativePath));
-                pathSegments.Add(builddirectory);
-                return CreatePath(pathSegments);
-            }
-            else
-            {
-                return null;
-            }
         }
     }
 }

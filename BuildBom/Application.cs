@@ -107,7 +107,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 ShowHelpMessage(usageMessage, commandOptions);
             }
 
-            ConfigureGenerator();
+            ConfigureGenerator(commandOptions);
         }
 
         private void LogProperties()
@@ -197,6 +197,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         private void PopulatePropertyMapByExternalFile()
         {
             string path = PropertyMap[PARAM_KEY_APP_SETTINGS_FILE];
+            
             ExeConfigurationFileMap configFileMap = new ExeConfigurationFileMap();
             configFileMap.ExeConfigFilename = path;
             Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap,ConfigurationUserLevel.None);
@@ -206,9 +207,25 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
         }
 
-        private void ConfigureGenerator()
+        private void ConfigureGenerator(OptionSet commandOptions)
         {
             ProjectGenerator = CreateGenerator();
+
+            if(ProjectGenerator == null)
+            {
+                ShowHelpMessage("Couldn't find a solution or project. Usage buildBom.exe [OPTIONS]", commandOptions);
+            }
+
+            if(PropertyMap.ContainsKey(PARAM_KEY_HUB_OUTPUT_DIRECTORY))
+            {
+                if (String.IsNullOrWhiteSpace(PropertyMap[PARAM_KEY_HUB_OUTPUT_DIRECTORY]))
+                {
+                    string currentDirectory = Directory.GetCurrentDirectory();
+                    string defaultOutputDirectory = $"{currentDirectory}{Path.DirectorySeparatorChar}{ProjectGenerator.DEFAULT_OUTPUT_DIRECTORY}";
+                    PropertyMap[PARAM_KEY_HUB_OUTPUT_DIRECTORY] = defaultOutputDirectory;
+                }
+            }
+
             LogProperties();
 
             ProjectGenerator.Verbose = Verbose;
@@ -243,6 +260,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             string solutionPath = GetPropertyValue(PARAM_KEY_SOLUTION);
             if (string.IsNullOrWhiteSpace(solutionPath))
             {
+                Console.WriteLine("Searching for a solution file to process...");
                 // search for solution
                 string currentDirectory = Directory.GetCurrentDirectory();
                 string[] solutionPaths = Directory.GetFiles(currentDirectory, "*.sln");
@@ -256,19 +274,19 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 }
                 else
                 {
+                    Console.WriteLine("No Solution file found.  Searching for a project file...");
                     string[] projectPaths = Directory.GetFiles(currentDirectory, "*.csproj");
                     if (projectPaths != null && projectPaths.Length > 0)
                     {
                         string projectPath = projectPaths[0];
+                        Console.WriteLine("Found project {0}", projectPath);
                         ProjectGenerator projectGenerator = new ProjectGenerator();
-                        projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", Path.GetDirectoryName(projectPath), Path.DirectorySeparatorChar);
+                        projectGenerator.ProjectPath = projectPath;
                         return projectGenerator;
                     }
                     else
                     {
-                        ProjectGenerator projectGenerator = new ProjectGenerator();
-                        projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", currentDirectory, Path.DirectorySeparatorChar);
-                        return projectGenerator;
+                        return null;
                     }
                 }
             }
@@ -284,7 +302,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 else
                 {
                     ProjectGenerator projectGenerator = new ProjectGenerator();
-                    projectGenerator.PackagesConfigPath = string.Format("{0}{1}packages.config", Path.GetDirectoryName(solutionPath), Path.DirectorySeparatorChar);
+                    projectGenerator.ProjectPath = solutionPath;
                     return projectGenerator;
                 }
             }
