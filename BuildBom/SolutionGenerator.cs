@@ -49,7 +49,14 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                     Console.WriteLine("Solution directory: {0}", solutionDirectory);
                     foreach (string key in projectData.Keys)
                     {
-                        OutputDirectory = originalOutputDirectory + Path.DirectorySeparatorChar + key;
+                        if (String.IsNullOrWhiteSpace(originalOutputDirectory))
+                        {
+                            OutputDirectory = $"{Directory.GetCurrentDirectory()}{Path.DirectorySeparatorChar}{key}";
+                        }
+                        else
+                        {
+                            OutputDirectory = $"{originalOutputDirectory}{Path.DirectorySeparatorChar}{key}";
+                        }
                         string projectRelativePath = projectData[key];
                         List<string> projectPathSegments = new List<string>();
                         projectPathSegments.Add(solutionDirectory);
@@ -57,7 +64,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
                         ProjectPath = CreatePath(projectPathSegments);
 
-                        if (string.IsNullOrWhiteSpace(originalHubProjectName))
+                        if (String.IsNullOrWhiteSpace(originalHubProjectName))
                         {
                             HubProjectName = key;
                         }
