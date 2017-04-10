@@ -57,6 +57,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         private ProjectGenerator ProjectGenerator;
         private string[] Args;
         private Dictionary<string, string> PropertyMap;
+        private Dictionary<string, string> CommandLinePropertyMap;
+        private Dictionary<string, string> AppSettingsMap;
 
         private bool ShowHelp = false;
         private bool Verbose = false;
@@ -65,6 +67,8 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         {
             this.Args = args;
             PropertyMap = new Dictionary<string, string>();
+            CommandLinePropertyMap = new Dictionary<string, string>();
+            AppSettingsMap = new Dictionary<string, string>();
         }
 
         public static void Main(string[] args)
@@ -108,17 +112,6 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             OptionSet commandOptions = CreateOptionSet();
             ParseCommandLine(commandOptions);
             string usageMessage = "Usage is BuildBom.exe [OPTIONS]";
-
-            string appSettingsFile = "";
-            if(PropertyMap.ContainsKey(PARAM_KEY_APP_SETTINGS_FILE))
-            {
-                appSettingsFile = PropertyMap[PARAM_KEY_APP_SETTINGS_FILE];
-            }
-
-            if (!string.IsNullOrWhiteSpace(appSettingsFile))
-            {
-                PopulatePropertyMapByExternalFile();
-            }
             
             if(ShowHelp)
             {
@@ -162,7 +155,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         private OptionSet CreateOptionSet()
         {
             OptionSet optionSet = new OptionSet();
-            AddMenuOption(optionSet, PARAM_KEY_APP_SETTINGS_FILE, "The file path for the application settings that overrides all settings.");
+            AddAppSettingsFileMenuOption(optionSet, PARAM_KEY_APP_SETTINGS_FILE, "The file path for the application settings that overrides all settings.");
             AddMenuOption(optionSet, PARAM_KEY_SOLUTION, "The path to the solution file to find dependencies");
             AddMenuOption(optionSet, PARAM_KEY_HUB_URL, "The URL of the Hub to connect to.");
             AddMenuOption(optionSet, PARAM_KEY_HUB_USERNAME, "The username to authenticate with the Hub.");
@@ -193,11 +186,23 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             return optionSet;
         }
 
+        private void AddAppSettingsFileMenuOption(OptionSet optionSet, string name, string description)
+        {
+            optionSet.Add($"{name}=", description, (value) =>
+            {
+                string appSettingsFile = value;
+                if (!string.IsNullOrWhiteSpace(appSettingsFile))
+                {
+                    PopulatePropertyMapByExternalFile(appSettingsFile);
+                }
+            });            
+        }
+
         private void AddMenuOption(OptionSet optionSet, string name, string description)
         {
             optionSet.Add($"{name}=", description, (value) => 
             {
-                PropertyMap[name] = value;
+                CommandLinePropertyMap[name] = value;
             });
         }
         
@@ -213,21 +218,33 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
         }
 
-        private void PopulatePropertyMapByExternalFile()
-        {
-            string path = PropertyMap[PARAM_KEY_APP_SETTINGS_FILE];
-            
+        private void PopulatePropertyMapByExternalFile(string path)
+        {            
             ExeConfigurationFileMap configFileMap = new ExeConfigurationFileMap();
             configFileMap.ExeConfigFilename = path;
             Configuration config = ConfigurationManager.OpenMappedExeConfiguration(configFileMap,ConfigurationUserLevel.None);
             foreach(KeyValueConfigurationElement element in config.AppSettings.Settings)
             {
-                PropertyMap[element.Key] = element.Value;
+                AppSettingsMap[element.Key] = element.Value;
+            }
+        }
+
+        private void ResolveProperties()
+        {
+            foreach (string key in AppSettingsMap.Keys)
+            {
+                PropertyMap[key] = AppSettingsMap[key];
+            }
+
+            foreach (string key in CommandLinePropertyMap.Keys)
+            {
+                PropertyMap[key] = CommandLinePropertyMap[key];
             }
         }
 
         private void ConfigureGenerator(OptionSet commandOptions)
         {
+            ResolveProperties();
             ProjectGenerator = CreateGenerator();
 
             if(ProjectGenerator == null)
