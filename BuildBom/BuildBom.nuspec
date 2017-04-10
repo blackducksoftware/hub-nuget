@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>BuildBom</id>
-    <version>0.0.7-alpha</version>
-    <title>BuildBom</title>
+    <id>Hub-NuGet</id>
+    <version>1.0.0-beta</version>
+    <title>Hub-NuGet</title>
     <authors>Black Duck Software</authors>
     <owners>Black Duck Software</owners>
     <licenseUrl>https://raw.githubusercontent.com/blackducksoftware/hub-nuget/master/LICENSE</licenseUrl>
