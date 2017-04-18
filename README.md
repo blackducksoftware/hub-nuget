@@ -13,4 +13,4 @@ For use with the .NET framework
 https://github.com/blackducksoftware/hub-nuget/releases
 
 ## Documentation ##
-All documentation for hub-nuget can be found on the base project:  https://github.com/blackducksoftware/hub-nuget/wiki
+All documentation for hub-nuget can be found on our public [Black Duck Confluence](https://blackducksoftware.atlassian.net/wiki/display/INTDOCS/)
