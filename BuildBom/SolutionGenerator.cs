@@ -185,7 +185,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             bdio.Project = bdioProject;
             bdio.Components = components;
 
-            string bdioFilePath = $"{OutputDirectory}{Path.DirectorySeparatorChar}{HubProjectName}.jsonld";
+            string bdioFilePath = Path.Combine(OutputDirectory, $"{HubProjectName}.jsonld");
             File.WriteAllText(bdioFilePath, bdio.ToString());
         }
     }
