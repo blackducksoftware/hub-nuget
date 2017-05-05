@@ -19,6 +19,8 @@
  * specific language governing permissions and limitations
  * under the License.
  *******************************************************************************/
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple;
+using Com.Blackducksoftware.Integration.Hub.Bdio.Simple.Model;
 using Com.Blackducksoftware.Integration.Hub.Common.Net;
 using System;
 using System.Collections.Generic;
@@ -30,6 +32,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
     public class SolutionGenerator : ProjectGenerator
     {
         public string SolutionPath { get; set; }
+        public bool GenerateMergedBdio { get; set; }
 
         public override bool Execute()
         {
@@ -37,6 +40,10 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             string originalOutputDirectory = OutputDirectory;
             string originalHubProjectName = HubProjectName;
             string originalHubVersionName = HubVersionName;
+
+            List<string> alreadyMergedComponents = new List<string>();
+            List<BdioNode> mergedComponentList = new List<BdioNode>();
+
             try
             {
                 // TODO: clean up this code to generate the BDIO first then perform the deploy and checks for each project
@@ -77,6 +84,22 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                         bool projectResult = base.Execute();
                         PackagesConfigPath = ""; // reset to use the project packages file.
                         result = result && projectResult;
+
+                        if (projectResult && GenerateMergedBdio)
+                        {
+                            string bdioFilePath = $"{OutputDirectory}{Path.DirectorySeparatorChar}{HubProjectName}.jsonld";
+                            string bdio = File.ReadAllText(bdioFilePath);
+                            BdioContent bdioContent = BdioContent.Parse(bdio);
+
+                            foreach (BdioComponent component in bdioContent.Components)
+                            {
+                                if (!alreadyMergedComponents.Contains(component.BdioExternalIdentifier.ExternalId))
+                                {
+                                    mergedComponentList.Add(component);
+                                    alreadyMergedComponents.Add(component.BdioExternalIdentifier.ExternalId);
+                                }
+                            }
+                        }
                     }
                 }
                 else
@@ -99,6 +122,12 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             finally
             {
                 OutputDirectory = originalOutputDirectory; // reset the output directory to original path
+            }
+
+            //Generate after so the "output directory" is the one for the solution, not just the last project processed
+            if (GenerateMergedBdio)
+            {
+                GenerateMergedFile(mergedComponentList);
             }
 
             return result;
@@ -136,6 +165,28 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
 
             return projectDataMap;
+        }
+
+        private void GenerateMergedFile(List<BdioNode> components)
+        {
+            BdioPropertyHelper bdioPropertyHelper = new BdioPropertyHelper();
+            BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
+            BdioContent bdio = new BdioContent();
+
+            // Create bdio bill of materials node
+            BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubCodeLocationName, HubProjectName, HubVersionName);
+
+            // Create bdio project node
+            string projectBdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
+            BdioExternalIdentifier projectExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(HubProjectName, HubVersionName); // Note: Could be different. Look at config file
+            BdioProject bdioProject = bdioNodeFactory.CreateProject(HubProjectName, HubVersionName, projectBdioId, projectExternalIdentifier);
+
+            bdio.BillOfMaterials = bdioBillOfMaterials;
+            bdio.Project = bdioProject;
+            bdio.Components = components;
+
+            string bdioFilePath = $"{OutputDirectory}{Path.DirectorySeparatorChar}{HubProjectName}.jsonld";
+            File.WriteAllText(bdioFilePath, bdio.ToString());
         }
     }
 }
