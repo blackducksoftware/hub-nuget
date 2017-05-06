@@ -121,7 +121,9 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             }
             finally
             {
-                OutputDirectory = originalOutputDirectory; // reset the output directory to original path
+                OutputDirectory = originalOutputDirectory; // reset the settings to original, for use by merge operations
+                HubProjectName = originalHubProjectName;
+                HubVersionName = originalHubVersionName;
             }
 
             //Generate after so the "output directory" is the one for the solution, not just the last project processed
