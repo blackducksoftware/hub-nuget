@@ -175,19 +175,33 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             BdioNodeFactory bdioNodeFactory = new BdioNodeFactory(bdioPropertyHelper);
             BdioContent bdio = new BdioContent();
 
+            // solutions do not have project names or versions by default
+            string projectName = HubProjectName;
+            string versionName = HubVersionName;
+
+            if (String.IsNullOrWhiteSpace(projectName))
+            {
+                projectName = Path.GetFileNameWithoutExtension(SolutionPath);
+            }
+
+            if(String.IsNullOrWhiteSpace(versionName))
+            {
+                versionName = DateTime.UtcNow.ToString(ProjectGenerator.DEFAULT_DATETIME_FORMAT);
+            }
+
             // Create bdio bill of materials node
-            BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubCodeLocationName, HubProjectName, HubVersionName);
+            BdioBillOfMaterials bdioBillOfMaterials = bdioNodeFactory.CreateBillOfMaterials(HubCodeLocationName, projectName, versionName);
 
             // Create bdio project node
-            string projectBdioId = bdioPropertyHelper.CreateBdioId(HubProjectName, HubVersionName);
-            BdioExternalIdentifier projectExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(HubProjectName, HubVersionName); // Note: Could be different. Look at config file
-            BdioProject bdioProject = bdioNodeFactory.CreateProject(HubProjectName, HubVersionName, projectBdioId, projectExternalIdentifier);
+            string projectBdioId = bdioPropertyHelper.CreateBdioId(projectName, versionName);
+            BdioExternalIdentifier projectExternalIdentifier = bdioPropertyHelper.CreateNugetExternalIdentifier(projectName, versionName); // Note: Could be different. Look at config file
+            BdioProject bdioProject = bdioNodeFactory.CreateProject(projectName, versionName, projectBdioId, projectExternalIdentifier);
 
             bdio.BillOfMaterials = bdioBillOfMaterials;
             bdio.Project = bdioProject;
             bdio.Components = components;
 
-            string bdioFilePath = Path.Combine(OutputDirectory, $"{HubProjectName}.jsonld");
+            string bdioFilePath = Path.Combine(OutputDirectory, $"{projectName}.jsonld");
             File.WriteAllText(bdioFilePath, bdio.ToString());
         }
     }
