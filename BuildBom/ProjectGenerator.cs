@@ -52,6 +52,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
     public class ProjectGenerator
     {
         public const string DEFAULT_OUTPUT_DIRECTORY = "blackduck";
+        public const string DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd_HH-mm-ss";
         public string ProjectPath { get; set; }
         public bool Verbose { get; set; } = false;
         public string HubUrl { get; set; }
@@ -324,7 +325,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
 
         private string GetProjectAssemblyVersion(string projectDirectory)
         {
-            string version = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            string version = DateTime.UtcNow.ToString(DEFAULT_DATETIME_FORMAT);
             List<string> pathSegments = new List<string>();
             pathSegments.Add(projectDirectory);
             pathSegments.Add("Properties");
