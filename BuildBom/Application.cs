@@ -53,6 +53,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
         public const string PARAM_KEY_HUB_CREATE_REPORT = "hub_create_report";
         public const string PARAM_KEY_HUB_CHECK_POLICIES = "hub_check_policies";
         public const string PARAM_KEY_HUB_CODE_LOCATION_NAME = "hub_code_location_name";
+        public const string PARAM_KEY_HUB_CREATE_MERGED_BDIO = "hub_create_merged_bdio";
 
         private ProjectGenerator ProjectGenerator;
         private string[] Args;
@@ -178,6 +179,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
             AddMenuOption(optionSet, PARAM_KEY_HUB_CREATE_REPORT, "True if the risk report should be generated in the output directory.");
             AddMenuOption(optionSet, PARAM_KEY_HUB_CHECK_POLICIES, "Check if the project contains policy violations in the Hub.");
             AddMenuOption(optionSet, PARAM_KEY_HUB_CODE_LOCATION_NAME, "Override for the code location to insert into the BDIO file.");
+            AddMenuOption(optionSet, PARAM_KEY_HUB_CREATE_MERGED_BDIO, "Generate an single merged BDIO file for the solution.");
 
             optionSet.Add("?|h|help", "Display the information on how to use this executable.", value => ShowHelp = value != null);
             optionSet.Add("v|verbose", "Display more messages when the executable runs.", value => Verbose = value != null);
@@ -305,6 +307,7 @@ namespace Com.Blackducksoftware.Integration.Hub.Nuget.BuildBom
                 {
                     SolutionGenerator solutionGenerator = new SolutionGenerator();
                     solutionGenerator.SolutionPath = solutionPaths[0];
+                    solutionGenerator.GenerateMergedBdio = Convert.ToBoolean(GetPropertyValue(PARAM_KEY_HUB_CREATE_MERGED_BDIO, "false"));
                     PropertyMap[PARAM_KEY_SOLUTION] = solutionPaths[0];
                     return solutionGenerator;
                 }
