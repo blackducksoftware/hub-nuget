@@ -21,14 +21,23 @@
  *******************************************************************************/
 using Com.Blackducksoftware.Integration.Hub.Common.Net.Global;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 
 namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
 {
     public class CredentialsResetConnection : RestConnection
     {
+        internal const string CsrfHeaderKey = "X-CSRF-TOKEN";
+
+
         public CredentialsResetConnection(HubServerConfig hubServerConfig) : base(hubServerConfig)
         {
+            /*  // Needed to test internal HTTPS resources with self signed cert.
+            System.Net.ServicePointManager.ServerCertificateValidationCallback +=
+  (sender, certificate, chain, sslPolicyErrors) => true;
+               */
+
             string hubUrl = hubServerConfig.Url;
 
             Dictionary<string, string> credentials = new Dictionary<string, string>
@@ -39,6 +48,13 @@ namespace Com.Blackducksoftware.Integration.Hub.Common.Net.Rest
 
             HttpContent content = new FormUrlEncodedContent(credentials);
             HttpResponseMessage response = PostAsync($"{hubUrl}/j_spring_security_check", content).Result;
+
+            var query = response.Headers.Where(param => param.Key == CsrfHeaderKey && param.Value.Any(value => !string.IsNullOrEmpty(value)));
+            if (query.Count() > 0)
+            {
+                var token = query.First();
+                this.DefaultRequestHeaders.Add(token.Key, token.Value);
+            }
         }
     }
 }
