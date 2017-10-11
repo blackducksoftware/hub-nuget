@@ -1,4 +1,7 @@
 ## Overview ##
+
+*Update:* This plugin is no longer supported.  This functionality has been replaced by [Detect](https://github.com/blackducksoftware/hub-detect).
+
 The Hub-NuGet library provides an executable to gather NuGet project dependencies.
 This project will produce [Black Duck I/O]() and has comparable functionality to the [hub-maven-plugin](https://github.com/blackducksoftware/hub-maven-plugin) and [hub-gradle-plugin](https://github.com/blackducksoftware/hub-gradle-plugin).
 
